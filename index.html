@@ -6,18 +6,18 @@
   <title>CyberAgro • Contador de Mangas</title>
   <style>
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
-    body { margin: 0; background: #0b1220; color: #e6eefc; }
+    body { margin: 0; background: #FFFFFF; color: #333333; } /* <-- Fundo branco, texto geral escuro */
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
-    .card { background: #111a2d; border: 1px solid #1e2b4a; border-radius: 16px; padding: 16px; box-shadow: 0 6px 20px #00000066; }
+    .card { background: #F8F8F8; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); } /* <-- Card mais claro */
     .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
     button { background: #2a7bf6; color: white; border: 0; border-radius: 12px; padding: 12px 16px; font-weight: 600; cursor: pointer; }
     button[disabled] { opacity: .6; cursor: not-allowed; }
-    .btn-upload { background: #1e2b4a; color: #a7c0ff; border: 1px dashed #2a7bf6; }
+    .btn-upload { background: #E6EEFA; color: #2a7bf6; border: 1px dashed #2a7bf6; } /* <-- Botão de upload ajustado */
     input[type="file"] { display: none; } 
     
-    .muted { color: #a7b8d8; font-size: .9rem; text-align: center; } /* Centralizei o subtítulo também */
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; word-break: break-word; }
-    .progress { height: 6px; background: #1e2b4a; border-radius: 999px; overflow: hidden; }
+    .muted { color: #555555; font-size: .9rem; text-align: center; } /* <-- Texto "Anexe..." mais escuro */
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; word-break: break-word; color: #333333; } /* <-- Texto do resultado escuro */
+    .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; } /* <-- Barra de progresso clara */
     .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
   </style>
 </head>
@@ -25,8 +25,7 @@
   <div class="wrap">
     
     <h1 style="text-align: center; margin-bottom: 16px;">
-      <img src="logo.png" alt="CyberAgro Logo" height="300">
-    </h1>
+      <img src="logo.png" alt="CyberAgro Logo" height="300"> </h1>
     <p class="muted">Anexe um vídeo do drone ou celular para a contagem da IA.</p>
 
     <div class="card" id="app">
@@ -37,90 +36,6 @@
         <button id="btnSend" disabled>2. Enviar para IA</button>
       </div>
 
-      <div style="margin:16px 0" class="muted" style="text-align: left;"> <div class="progress"><div id="pbar" class="bar"></div></div>
-        <div style="margin-top:8px">Status: <span id="status" class="mono">aguardando arquivo...</span></div>
-      </div>
-
-      <div>
-        <h3>Resultado</h3>
-        <pre id="out" class="mono">—</pre>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // === CONFIG ===
-    const API_URL = "https://contador-manga-476522137012.us-central1.run.app/contar";
-
-    // === ELEMENTOS ===
-    const btnSelect = document.getElementById("btnSelect");
-    const fileInput = document.getElementById("fileInput");
-    const btnSend   = document.getElementById("btnSend");
-    const out       = document.getElementById("out");
-    const statusEl  = document.getElementById("status");
-    const pbar      = document.getElementById("pbar");
-
-    let selectedFile = null;
-
-    function setStatus(msg) { statusEl.textContent = msg; }
-    function setProgress(p) { pbar.style.width = Math.min(100, Math.max(0, p)) + "%"; }
-    function resetProgress() { setProgress(0); }
-
-    // --- Lógica de Upload ---
-    
-    btnSelect.onclick = () => {
-      fileInput.click();
-    };
-
-    fileInput.onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        selectedFile = file;
-        btnSend.disabled = false;
-        setStatus(`Arquivo: ${(selectedFile.name)} (${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`);
-      }
-    };
-
-    btnSend.onclick = async () => {
-      if (!selectedFile) return;
-
-      if (selectedFile.size > 30 * 1024 * 1024) { 
-        alert("Erro: O arquivo é muito grande (>30MB). Tente um vídeo mais curto.");
-        return;
-      }
-      
-      btnSend.disabled = true;
-      btnSelect.disabled = true;
-      setStatus("enviando para IA…");
-      resetProgress();
-
-      const form = new FormData();
-      form.append("video", selectedFile, selectedFile.name); 
-
-      try {
-        const resp = await fetch(API_URL, { method: "POST", body: form });
-        setProgress(50); 
-        const text = await resp.text().catch(() => "");
-        setProgress(100);
-
-        if (resp.ok) {
-          setStatus("OK! Contagem recebida.");
-          try { out.textContent = JSON.stringify(JSON.parse(text), null, 2); } 
-          catch { out.textContent = text || "OK"; }
-        } else {
-          setStatus(`Erro no servidor: ${resp.status}`);
-          out.textContent = text || "Sem resposta do servidor.";
-        }
-      } catch (e) {
-        setStatus("Falha de rede. Verifique o console.");
-        out.textContent = String(e);
-      } finally {
-        btnSend.disabled = false;
-        btnSelect.disabled = false;
-      }
-    };
-  </script>
-</body>
-</html>
-
-
+      <div style="margin:16px 0" class="muted" style="text-align: left;">
+        <div class="progress"><div id="pbar" class="bar"></div></div>
+        <div style="margin-top:8px">Status: <span id="status"
