@@ -6,36 +6,142 @@
   <title>CyberAgro • Contador de Mangas</title>
   <style>
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
-    body { margin: 0; background: #FFFFFF; color: #333333; } /* <-- Fundo branco, texto geral escuro */
+    body { margin: 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
-    .card { background: #F8F8F8; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); } /* <-- Card mais claro */
+    .card { background: #F8F8F8; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
     .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
     button { background: #2a7bf6; color: white; border: 0; border-radius: 12px; padding: 12px 16px; font-weight: 600; cursor: pointer; }
     button[disabled] { opacity: .6; cursor: not-allowed; }
-    .btn-upload { background: #E6EEFA; color: #2a7bf6; border: 1px dashed #2a7bf6; } /* <-- Botão de upload ajustado */
-    input[type="file"] { display: none; } 
-    
-    .muted { color: #555555; font-size: .9rem; text-align: center; } /* <-- Texto "Anexe..." mais escuro */
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; word-break: break-word; color: #333333; } /* <-- Texto do resultado escuro */
-    .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; } /* <-- Barra de progresso clara */
+    .btn-upload { position: relative; display: inline-block; background: #E6EEFA; color: #2a7bf6; border: 1px dashed #2a7bf6; }
+    /* Input de arquivo “presente” (para mobile), mas invisível */
+    .file-proxy { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .muted { color: #555555; font-size: .9rem; text-align: center; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; word-break: break-word; color: #333333; }
+    .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; }
     .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
+    video { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    
-    <h1 style="text-align: center; margin-bottom: 16px;">
-      <img src="logo.png" alt="CyberAgro Logo" height="300"> </h1>
+    <h1 style="text-align:center;margin-bottom:16px;">
+      <img src="logo.png" alt="CyberAgro Logo" height="80">
+    </h1>
     <p class="muted">Anexe um vídeo do drone ou celular para a contagem da IA.</p>
 
     <div class="card" id="app">
       <div class="row">
-        <button id="btnSelect" class="btn-upload">1. Escolher Vídeo...</button>
-        <input type="file" id="fileInput" accept="video/*">
-        
+        <!-- Botão de upload com input sobreposto (compatível com iOS/Android/desktop) -->
+        <button id="btnSelect" class="btn-upload">1. Escolher vídeo…
+          <input id="fileInput" class="file-proxy" type="file" accept="video/*">
+        </button>
         <button id="btnSend" disabled>2. Enviar para IA</button>
+        <button id="btnClear" disabled style="background:#eee;color:#333;">Limpar</button>
       </div>
 
-      <div style="margin:16px 0" class="muted" style="text-align: left;">
+      <div style="margin:12px 0;text-align:left;">
         <div class="progress"><div id="pbar" class="bar"></div></div>
-        <div style="margin-top:8px">Status: <span id="status"
+        <div style="margin-top:8px">Status: <span id="status" class="mono">aguardando arquivo…</span></div>
+        <div id="fileInfo" class="muted" style="text-align:left;margin-top:8px;">Nenhum arquivo selecionado.</div>
+        <video id="preview" controls playsinline style="display:none;"></video>
+      </div>
+
+      <div>
+        <h3>Resultado</h3>
+        <pre id="out" class="mono">—</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const API_URL = "https://contador-manga-476522137012.us-central1.run.app/contar";
+      const MAX_MB = 30;
+
+      const fileInput = document.getElementById("fileInput");
+      const btnSend   = document.getElementById("btnSend");
+      const btnClear  = document.getElementById("btnClear");
+      const out       = document.getElementById("out");
+      const statusEl  = document.getElementById("status");
+      const pbar      = document.getElementById("pbar");
+      const fileInfo  = document.getElementById("fileInfo");
+      const preview   = document.getElementById("preview");
+
+      let selectedFile = null;
+
+      function setStatus(s){ statusEl.textContent = s; }
+      function setProgress(p){ pbar.style.width = Math.min(100, Math.max(0, p)) + "%"; }
+      function resetUI(){
+        selectedFile = null;
+        fileInput.value = "";
+        btnSend.disabled = true;
+        btnClear.disabled = true;
+        fileInfo.textContent = "Nenhum arquivo selecionado.";
+        preview.src = "";
+        preview.style.display = "none";
+        out.textContent = "—";
+        setProgress(0);
+        setStatus("aguardando arquivo…");
+      }
+
+      fileInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        selectedFile = file;
+        const mb = (file.size/1024/1024).toFixed(2);
+        fileInfo.textContent = `${file.name} • ${mb} MB`;
+        btnSend.disabled = file.size > MAX_MB*1024*1024;
+        btnClear.disabled = false;
+        setStatus(btnSend.disabled ? `arquivo muito grande (> ${MAX_MB} MB)` : "arquivo pronto para envio");
+
+        // preview
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+        preview.play().catch(()=>{});
+      });
+
+      btnClear.addEventListener("click", resetUI);
+
+      btnSend.addEventListener("click", async () => {
+        if (!selectedFile) return;
+        if (selectedFile.size > MAX_MB*1024*1024) {
+          alert(`Arquivo muito grande (> ${MAX_MB} MB). Corte/compacte o vídeo.`);
+          return;
+        }
+        btnSend.disabled = true;
+        setStatus("enviando para IA…");
+        setProgress(25);
+
+        const form = new FormData();
+        form.append("video", selectedFile, selectedFile.name || "clip.mp4");
+
+        try {
+          const resp = await fetch(API_URL, { method: "POST", body: form });
+          setProgress(75);
+          const text = await resp.text().catch(()=> "");
+          setProgress(100);
+
+          if (resp.ok) {
+            setStatus("OK! Contagem recebida.");
+            try { out.textContent = JSON.stringify(JSON.parse(text), null, 2); }
+            catch { out.textContent = text || "OK"; }
+          } else {
+            setStatus(`erro ${resp.status}`);
+            out.textContent = text || "Sem corpo de resposta.";
+          }
+        } catch (err) {
+          setStatus("falha de rede");
+          out.textContent = String(err);
+        } finally {
+          btnSend.disabled = false;
+        }
+      });
+
+      // iOS dicas:
+      // - Evite display:none no input (estamos usando opacity:0 + overlay).
+      // - O clique verdadeiro do usuário acontece no botão, mas o input está sobreposto
+      //   e recebe o evento, então o seletor abre em iOS/Android/desktop.
+    });
+  </script>
+</body>
+</html>
