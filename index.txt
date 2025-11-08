@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>xMango • Contador de Mangas (Demo)</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
+    body { margin: 0; background: #0b1220; color: #e6eefc; }
+    .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
+    .card { background: #111a2d; border: 1px solid #1e2b4a; border-radius: 16px; padding: 16px; box-shadow: 0 6px 20px #00000066; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    button { background: #2a7bf6; color: white; border: 0; border-radius: 12px; padding: 12px 16px; font-weight: 600; cursor: pointer; }
+    button[disabled] { opacity: .6; cursor: not-allowed; }
+    .ghost { background: transparent; border: 1px solid #2a7bf6; color: #2a7bf6; }
+    video { width: 100%; border-radius: 12px; background: #000; }
+    .muted { color: #a7b8d8; font-size: .9rem; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; word-break: break-word; }
+    .badge { display: inline-block; padding: 4px 8px; border-radius: 24px; background: #1e2b4a; color: #a7c0ff; font-size: .8rem; }
+    .progress { height: 6px; background: #1e2b4a; border-radius: 999px; overflow: hidden; }
+    .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🍋 xMango • Contador de Mangas</h1>
+    <p class="muted">Grave um vídeo curto do pomar (até ~10s) e envie para a IA.</p>
+
+    <div class="card" id="app">
+      <div class="row" style="justify-content: space-between;">
+        <span class="badge">v0.1 • Demo</span>
+        <span class="muted">API: <span id="apiUrlSpan" class="mono"></span></span>
+      </div>
+
+      <div style="margin:12px 0">
+        <video id="preview" playsinline muted></video>
+      </div>
+
+      <div class="row">
+        <button id="btnStart">🎥 Gravar (máx. 10s)</button>
+        <button id="btnStop" class="ghost" disabled>⏹️ Parar</button>
+        <button id="btnSend" disabled>📤 Enviar para IA</button>
+      </div>
+
+      <div style="margin:16px 0" class="muted">
+        <div class="progress"><div id="pbar" class="bar"></div></div>
+        <div style="margin-top:8px">Status: <span id="status" class="mono">pronto</span></div>
+      </div>
+
+      <div>
+        <h3>Resultado</h3>
+        <pre id="out" class="mono">—</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === CONFIG ===
+    const API_URL = "https://contador-manga-476522137012.us-central1.run.app/contar"; // sua rota
+    document.getElementById("apiUrlSpan").textContent = API_URL;
+
+    // === ELEMENTOS ===
+    const preview = document.getElementById("preview");
+    const btnStart = document.getElementById("btnStart");
+    const btnStop  = document.getElementById("btnStop");
+    const btnSend  = document.getElementById("btnSend");
+    const out      = document.getElementById("out");
+    const statusEl = document.getElementById("status");
+    const pbar     = document.getElementById("pbar");
+
+    let mediaStream = null;
+    let recorder = null;
+    let chunks = [];
+    let recordedBlob = null;
+
+    function setStatus(msg) { statusEl.textContent = msg; }
+    function setProgress(p) { pbar.style.width = Math.min(100, Math.max(0, p)) + "%"; }
+    function resetProgress() { setProgress(0); }
+
+    // Pede câmera traseira
+    async function getCamera() {
+      if (mediaStream) return mediaStream;
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
+      preview.srcObject = mediaStream;
+      await preview.play();
+      return mediaStream;
+    }
+
+    btnStart.onclick = async () => {
+      try {
+        await getCamera();
+        chunks = [];
+        const mimeOptions = [
+          "video/webm;codecs=vp9",
+          "video/webm;codecs=vp8",
+          "video/webm",
+          "video/mp4;codecs=avc1.42E01E,mp4a.40.2" // poucos browsers suportam
+        ];
+        let mimeType = "";
+        for (const m of mimeOptions) {
+          if (MediaRecorder.isTypeSupported(m)) { mimeType = m; break; }
+        }
+        recorder = new MediaRecorder(mediaStream, mimeType ? { mimeType } : undefined);
+        recorder.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+        recorder.onstop = () => {
+          recordedBlob = new Blob(chunks, { type: mimeType || "video/webm" });
+          const url = URL.createObjectURL(recordedBlob);
+          preview.srcObject = null; // mostra gravação pronta
+          preview.src = url;
+          preview.controls = true;
+          preview.play();
+          btnSend.disabled = false;
+          setStatus(`vídeo gravado: ${(recordedBlob.size/1024/1024).toFixed(2)} MB • ${mimeType || "webm"}`);
+        };
+        recorder.start();
+        btnStart.disabled = true;
+        btnStop.disabled = false;
+        btnSend.disabled = true;
+        setStatus("gravando… (parará em 10s)");
+        setTimeout(() => { if (recorder && recorder.state === "recording") recorder.stop(); }, 10000);
+      } catch (err) {
+        console.error(err);
+        setStatus("erro ao acessar câmera");
+      }
+    };
+
+    btnStop.onclick = () => { if (recorder && recorder.state === "recording") recorder.stop(); btnStop.disabled = true; btnStart.disabled = false; };
+
+    btnSend.onclick = async () => {
+      if (!recordedBlob) return;
+      // Limite prático do Cloud Run: ~32 MB
+      if (recordedBlob.size > 25 * 1024 * 1024) {
+        alert("O vídeo ficou grande (>25MB). Grave novamente mais curto.");
+        return;
+      }
+      btnSend.disabled = true;
+      setStatus("enviando para IA…");
+      resetProgress();
+
+      // envia multipart/form-data com campo 'video'
+      const form = new FormData();
+      const ext = (recordedBlob.type.includes("mp4") ? "mp4" : "webm");
+      form.append("video", recordedBlob, `clip.${ext}`);
+
+      try {
+        // progresso (best-effort)
+        const resp = await fetch(API_URL, { method: "POST", body: form });
+        setProgress(50); // upload feito (aprox)
+        const text = await resp.text().catch(() => "");
+        setProgress(100);
+        if (resp.ok) {
+          setStatus("OK");
+          try { out.textContent = JSON.stringify(JSON.parse(text), null, 2); }
+          catch { out.textContent = text || "OK"; }
+        } else {
+          setStatus(`erro ${resp.status}`);
+          out.textContent = text || "sem corpo";
+        }
+      } catch (e) {
+        setStatus("falha de rede");
+        out.textContent = String(e);
+      } finally {
+        btnSend.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>
