@@ -123,9 +123,21 @@
 
           if (resp.ok) {
             setStatus("OK! Contagem recebida.");
-            try { out.textContent = JSON.stringify(JSON.parse(text), null, 2); }
-            catch { out.textContent = text || "OK"; }
-          } else {
+            try {
+    // 1. Converte o texto da resposta em um objeto JSON
+    const data = JSON.parse(text);
+
+    // 2. Pega APENAS o valor da "contagem_final"
+    const contagem = data.contagem_final; 
+
+    // 3. Define o novo texto do resultado (Sua mensagem)
+    out.textContent = "RESULTADO DA CONTAGEM: " + contagem;
+
+  } catch (e) {
+    // Se o JSON estiver quebrado, mostre o erro
+    out.textContent = "Erro ao ler o JSON: " + text;
+  }
+} else {
             setStatus(`erro ${resp.status}`);
             out.textContent = text || "Sem corpo de resposta.";
           }
@@ -145,4 +157,5 @@
   </script>
 </body>
 </html>
+
 
