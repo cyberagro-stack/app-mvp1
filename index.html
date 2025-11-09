@@ -13,8 +13,21 @@
     button { background: #2a7bf6; color: white; border: 0; border-radius: 12px; padding: 12px 16px; font-weight: 600; cursor: pointer; }
     button[disabled] { opacity: .6; cursor: not-allowed; }
     .btn-upload { position: relative; display: inline-block; background: #E6EEFA; color: #2a7bf6; border: 1px dashed #2a7bf6; }
-    /* Input de arquivo “presente” (para mobile), mas invisível */
     .file-proxy { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    
+    /* --- NOVO ESTILO PARA O INPUT DE ÁREA --- */
+    .area-input {
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 10px 14px;
+      border: 1px solid #E0E0E0;
+      border-radius: 12px;
+      background: #FFFFFF;
+      flex-grow: 1; /* Faz ocupar o espaço */
+      min-width: 150px;
+    }
+    /* ------------------------------------- */
+
     .muted { color: #555555; font-size: .9rem; text-align: center; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; word-break: break-word; color: #333333; }
     .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; }
@@ -31,17 +44,21 @@
 
     <div class="card" id="app">
       <div class="row">
-        <!-- Botão de upload com input sobreposto (compatível com iOS/Android/desktop) -->
         <button id="btnSelect" class="btn-upload">1. Escolher vídeo…
           <input id="fileInput" class="file-proxy" type="file" accept="video/*">
         </button>
-        <button id="btnSend" disabled>2. Enviar para IA</button>
-        <button id="btnClear" disabled style="background:#eee;color:#333;">Limpar</button>
+        
+        <input type="number" id="areaInput" placeholder="Área do vídeo (m²)" class="area-input">
+        </div>
+      
+      <div class="row" style="margin-top: 12px;">
+         <button id="btnSend" disabled>2. Enviar para IA</button>
+         <button id="btnClear" disabled style="background:#eee;color:#333;">Limpar</button>
       </div>
 
       <div style="margin:12px 0;text-align:left;">
         <div class="progress"><div id="pbar" class="bar"></div></div>
-        <div style="margin-top:8px">Status: <span id="status" class="mono">aguardando arquivo…</span></div>
+        <div style="margin-top:8px">Status: <span id="status" class="mono">aguardando arquivo e área...</span></div>
         <div id="fileInfo" class="muted" style="text-align:left;margin-top:8px;">Nenhum arquivo selecionado.</div>
         <video id="preview" controls playsinline style="display:none;"></video>
       </div>
@@ -55,10 +72,15 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      // --- CONSTANTES DE CÁLCULO ---
       const API_URL = "https://contador-manga-476522137012.us-central1.run.app/contar";
+      const PESO_MEDIO_GRAMAS = 500; // <-- O peso médio de 500g que você definiu
+      const M2_POR_HECTARE = 10000;  // 1 Hectare = 10.000 m²
       const MAX_MB = 30;
 
+      // --- ELEMENTOS ---
       const fileInput = document.getElementById("fileInput");
+      const areaInput = document.getElementById("areaInput"); // <-- Novo elemento
       const btnSend   = document.getElementById("btnSend");
       const btnClear  = document.getElementById("btnClear");
       const out       = document.getElementById("out");
@@ -71,9 +93,11 @@
 
       function setStatus(s){ statusEl.textContent = s; }
       function setProgress(p){ pbar.style.width = Math.min(100, Math.max(0, p)) + "%"; }
+      
       function resetUI(){
         selectedFile = null;
         fileInput.value = "";
+        areaInput.value = ""; // <-- Limpa o campo de área
         btnSend.disabled = true;
         btnClear.disabled = true;
         fileInfo.textContent = "Nenhum arquivo selecionado.";
@@ -81,33 +105,54 @@
         preview.style.display = "none";
         out.textContent = "—";
         setProgress(0);
-        setStatus("aguardando arquivo…");
+        setStatus("aguardando arquivo e área...");
       }
 
+      // --- LÓGICA PARA HABILITAR O BOTÃO "ENVIAR" ---
+      // (Só habilita se AMBOS os campos estiverem preenchidos)
+      function checkInputs() {
+        const area = parseFloat(areaInput.value);
+        if (selectedFile && area > 0) {
+          btnSend.disabled = false;
+          setStatus("Pronto para enviar.");
+        } else {
+          btnSend.disabled = true;
+        }
+      }
+      
       fileInput.addEventListener("change", (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
         selectedFile = file;
         const mb = (file.size/1024/1024).toFixed(2);
         fileInfo.textContent = `${file.name} • ${mb} MB`;
-        btnSend.disabled = file.size > MAX_MB*1024*1024;
         btnClear.disabled = false;
-        setStatus(btnSend.disabled ? `arquivo muito grande (> ${MAX_MB} MB)` : "arquivo pronto para envio");
+        
+        if (file.size > MAX_MB*1024*1024) {
+          setStatus(`arquivo muito grande (> ${MAX_MB} MB)`);
+          btnSend.disabled = true;
+        } else {
+          checkInputs(); // Checa se a área também está preenchida
+        }
 
-        // preview
         preview.src = URL.createObjectURL(file);
         preview.style.display = "block";
         preview.play().catch(()=>{});
       });
-
+      
+      areaInput.addEventListener("input", checkInputs); // <-- Novo evento
       btnClear.addEventListener("click", resetUI);
 
+      // --- LÓGICA DE ENVIO E CÁLCULO ---
       btnSend.addEventListener("click", async () => {
         if (!selectedFile) return;
-        if (selectedFile.size > MAX_MB*1024*1024) {
-          alert(`Arquivo muito grande (> ${MAX_MB} MB). Corte/compacte o vídeo.`);
-          return;
+        
+        const area_video_m2 = parseFloat(areaInput.value);
+        if (!area_video_m2 || area_video_m2 <= 0) {
+            alert("Por favor, insira um valor válido para a área em metros quadrados (m²).");
+            return;
         }
+        
         btnSend.disabled = true;
         setStatus("enviando para IA…");
         setProgress(25);
@@ -124,20 +169,25 @@
           if (resp.ok) {
             setStatus("OK! Contagem recebida.");
             try {
-    // 1. Converte o texto da resposta em um objeto JSON
-    const data = JSON.parse(text);
+              // 1. Pega os dados da API
+              const data = JSON.parse(text);
+              const contagem_api = data.contagem_final; // ex: 151
+              
+              // 2. A LÓGICA DA REGRA DE 3
+              // (151 mangas * 0.5kg) / 50 m² = 1.51 kg/m²
+              const kg_por_m2 = (contagem_api * (PESO_MEDIO_GRAMAS / 1000)) / area_video_m2;
+              
+              // (1.51 kg/m² * 10.000 m²/ha) = 15100 kg/ha
+              const kg_por_hectare = kg_por_m2 * M2_POR_HECTARE;
 
-    // 2. Pega APENAS o valor da "contagem_final"
-    const contagem = data.contagem_final; 
+              // 3. Define o novo texto do resultado (formatado)
+              out.textContent = "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n"; // \n\n = linha em branco
+              out.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare.toFixed(2) + " KG/HA";
 
-    // 3. Define o novo texto do resultado (Sua mensagem)
-    out.textContent = "RESULTADO DA CONTAGEM: " + contagem;
-
-  } catch (e) {
-    // Se o JSON estiver quebrado, mostre o erro
-    out.textContent = "Erro ao ler o JSON: " + text;
-  }
-} else {
+            } catch (e) {
+              out.textContent = "Erro ao ler o JSON: " + text;
+            }
+          } else {
             setStatus(`erro ${resp.status}`);
             out.textContent = text || "Sem corpo de resposta.";
           }
@@ -148,14 +198,7 @@
           btnSend.disabled = false;
         }
       });
-
-      // iOS dicas:
-      // - Evite display:none no input (estamos usando opacity:0 + overlay).
-      // - O clique verdadeiro do usuário acontece no botão, mas o input está sobreposto
-      //   e recebe o evento, então o seletor abre em iOS/Android/desktop.
     });
   </script>
 </body>
 </html>
-
-
