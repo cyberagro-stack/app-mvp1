@@ -9,6 +9,7 @@
   <meta name="theme-color" content="#FFFFFF">
   <script>
     if ('serviceWorker' in navigator) {
+      // O caminho /app-mvp1/ é crucial para o GitHub Pages
       navigator.serviceWorker.register('/app-mvp1/sw.js')
         .then(() => console.log('Service Worker Registrado'))
         .catch(err => console.log('Service Worker falhou:', err));
@@ -17,7 +18,7 @@
   <style>
     /* --- ESTILOS GERAIS --- */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
-    body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; } /* Adiciona margem no final para o rodapé */
+    body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
     .card { background: #F8F8F8; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
     .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
@@ -87,7 +88,7 @@
 
   <div id="login-screen" class="wrap">
     <h1 style="text-align:center;margin-bottom:16px;">
-      <img src="logo.png" alt="CyberAgro Logo" height="250">
+      <img src="logo.png?v=2" alt="CyberAgro Logo" height="250">
     </h1>
     <div class="card">
       <h3 style="text-align: center;">Acesso Restrito</h3>
@@ -288,13 +289,11 @@
           if (resp.ok) {
             setStatus("OK! Contagem recebida.");
             try {
-              // --- FORMATAÇÃO DO RESULTADO (v2.5) ---
+              // --- FORMATAÇÃO DO RESULTADO ---
               const data = JSON.parse(text);
-      
               const contagem_api = data.contagem_final; 
               const kg_por_m2 = (contagem_api * (PESO_MEDIO_GRAMAS / 1000)) / area_video_m2;
               const kg_por_hectare = kg_por_m2 * M2_POR_HECTARE;
-
               out.textContent = "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
               out.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare.toFixed(2) + " KG/HA";
               // ------------------------------------
