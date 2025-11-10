@@ -4,6 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CyberAgro • Contador de Mangas</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FFFFFF">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/app-mvp1/sw.js')
+        .then(() => console.log('Service Worker Registrado'))
+        .catch(err => console.log('Service Worker falhou:', err));
+    }
+  </script>
   <style>
     /* --- ESTILOS GERAIS --- */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
@@ -24,7 +34,6 @@
     .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; }
     .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
     video { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
-    /* .link-voltar (Não mais usado, substituído por .btn-nova-contagem) */
 
     /* --- ESTILOS DO LOGIN --- */
     .login-error { color: #D32F2F; font-size: 0.9rem; text-align: center; margin-top: 10px; display: none; }
@@ -38,8 +47,6 @@
     .data-row { display: flex; justify-content: space-between; padding: 14px 8px; border-bottom: 1px solid #EEE; font-size: 0.9rem; }
     .data-row span:first-child { color: #333; }
     .data-row span:last-child { color: #555; font-weight: 500; }
-    
-    /* Estilo para Botão Verde (Nova Contagem) e Cinza (Voltar) */
     .btn-nova-contagem {
       background: #28a745; /* Verde */
       color: white;
@@ -120,6 +127,7 @@
     <button id="btnVoltarDashboard" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
       VOLTAR AO INICIO
     </button>
+    
     <p class="muted">Anexe um vídeo do drone ou celular para a contagem da IA.</p>
     
     <div class="card" id="app">
@@ -153,11 +161,10 @@
   </div>
 
   <script>
+    // Espera o HTML carregar antes de rodar o JS (resolveu o bug do botão)
     document.addEventListener("DOMContentLoaded", () => {
     
       // --- LÓGICA DE NAVEGAÇÃO ---
-      // (O JavaScript não precisa mudar, pois ele já encontra o botão
-      // pelo 'id="btnVoltarDashboard"', seja ele <a> ou <button>)
       const SENHA_SECRETA = "cyberagro2025"; 
       const loginScreen = document.getElementById("login-screen");
       const dashboardScreen = document.getElementById("dashboard-screen"); 
@@ -281,12 +288,16 @@
           if (resp.ok) {
             setStatus("OK! Contagem recebida.");
             try {
+              // --- FORMATAÇÃO DO RESULTADO (v2.5) ---
               const data = JSON.parse(text);
+      
               const contagem_api = data.contagem_final; 
               const kg_por_m2 = (contagem_api * (PESO_MEDIO_GRAMAS / 1000)) / area_video_m2;
               const kg_por_hectare = kg_por_m2 * M2_POR_HECTARE;
+
               out.textContent = "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
               out.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare.toFixed(2) + " KG/HA";
+              // ------------------------------------
             } catch (e) {
               out.textContent = "Erro ao ler o JSON: " + text;
             }
