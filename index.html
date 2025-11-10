@@ -7,7 +7,7 @@
   <style>
     /* --- ESTILOS GERAIS --- */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
-    body { margin: 0; background: #FFFFFF; color: #333333; }
+    body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; } /* Adiciona margem no final para o rodapé */
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
     .card { background: #F8F8F8; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
     .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
@@ -15,7 +15,6 @@
     button[disabled] { opacity: .6; cursor: not-allowed; }
     .muted { color: #555555; font-size: .9rem; text-align: center; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; word-break: break-word; color: #333333; }
-    h1 { text-align: center; margin-bottom: 16px; }
     h3 { margin-top: 20px; margin-bottom: 10px; }
     
     /* --- ESTILOS DA TELA DO APP (Contagem) --- */
@@ -30,169 +29,177 @@
     /* --- ESTILOS DO LOGIN --- */
     .login-error { color: #D32F2F; font-size: 0.9rem; text-align: center; margin-top: 10px; display: none; }
 
-    /* --- NOVOS ESTILOS DO DASHBOARD (Inspirado na Imagem) --- */
-    .summary-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr; /* Duas colunas */
-      gap: 12px;
-    }
+    /* --- NOVOS ESTILOS DO DASHBOARD (v2.7) --- */
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .summary-card {
-      background: #F8F8F8; 
+      background: #EEEEEE; /* <-- 1. Cor cinza (como pedido) */
       border: 1px solid #E0E0E0; 
       border-radius: 16px; 
       padding: 16px;
     }
-    .summary-card label {
-      display: block;
-      font-size: 0.8rem;
-      color: #555555;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-    }
-    .summary-card .value {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #333;
-    }
+    .summary-card label { display: block; font-size: 0.8rem; color: #555555; margin-bottom: 4px; text-transform: uppercase; }
+    .summary-card .value { font-size: 1.25rem; font-weight: 600; color: #333; }
     .data-list { list-style: none; padding: 0; margin: 0; }
-    .data-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 14px 8px;
-      border-bottom: 1px solid #EEE;
-      font-size: 0.9rem;
-    }
+    .data-row { display: flex; justify-content: space-between; padding: 14px 8px; border-bottom: 1px solid #EEE; font-size: 0.9rem; }
     .data-row span:first-child { color: #333; }
     .data-row span:last-child { color: #555; font-weight: 500; }
-    .fab-button { /* Floating Action Button */
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #2a7bf6;
+    
+    /* 2. Botão "Nova Contagem" (Verde, Grande) */
+    .btn-nova-contagem {
+      background: #28a745; /* Verde */
       color: white;
       border: 0;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 1.1rem;
+      border-radius: 12px;
+      padding: 16px;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      z-index: 1000;
-      padding: 0; /* Reset padding for circular button */
-      line-height: 60px; /* Center text vertically */
-      text-align: center; /* Center text horizontally */
+      width: 100%;
+      font-size: 1.1rem;
+      margin-top: 20px;
     }
-    /* ---------------------------------------------------- */
 
+    /* 3. Rodapé Fixo (Tab bar) */
+    .app-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #FFFFFF;
+      border-top: 1px solid #E0E0E0;
+      display: flex;
+      justify-content: space-around;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .footer-btn {
+      flex-grow: 1;
+      text-align: center;
+      padding: 14px 10px;
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #888888; /* Cinza (como pedido) */
+    }
+    .footer-btn.active {
+      color: #28a745; /* Verde (como pedido) */
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    
-    <h1>
+
+  <div id="login-screen" class="wrap">
+    <h1 style="text-align:center;margin-bottom:16px;">
       <img src="logo.png" alt="CyberAgro Logo" height="250">
     </h1>
+    <div class="card">
+      <h3 style="text-align: center;">Acesso Restrito</h3>
+      <p class="muted" style="text-align: left;">Insira a senha de acesso para continuar.</p>
+      <input type="password" id="passwordInput" placeholder="Senha" class="area-input" style="width:100%; box-sizing: border-box;">
+      <p id="loginError" class="login-error">Senha incorreta. Tente novamente.</p>
+      <button id="loginButton" style="width:100%; margin-top: 12px;">Entrar</button>
+    </div>
+  </div>
 
-    <div id="login-screen">
-      <div class="card">
-        <h3 style="text-align: center;">Acesso Restrito</h3>
-        <p class="muted" style="text-align: left;">Insira a senha de acesso para continuar.</p>
-        <input type="password" id="passwordInput" placeholder="Senha" class="area-input" style="width:100%; box-sizing: border-box;">
-        <p id="loginError" class="login-error">Senha incorreta. Tente novamente.</p>
-        <button id="loginButton" style="width:100%; margin-top: 12px;">Entrar</button>
+  <div id="dashboard-screen" class="wrap" style="display:none;">
+    
+    <h3>Visão Geral</h3>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <label>Contagens no Ano</label>
+        <div class="value">312</div> 
+      </div>
+      <div class="summary-card">
+        <label>Est. Faturamento Anual</label>
+        <div class="value">R$ 13.491.152</div> 
       </div>
     </div>
+    
+    <h3>Produtividade Mensal (Dados Fictícios)</h3>
+    <ul class="data-list card">
+      <li class="data-row"><span>Dezembro</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Novembro</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Outubro</span> <span>R$ 12.029.994,00</span></li>
+      <li class="data-row"><span>Setembro</span> <span>R$ 1.104.513,91</span></li>
+      <li class="data-row"><span>Agosto</span> <span>R$ 356.644,48</span></li>
+      <li class="data-row"><span>Julho</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Junho</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Maio</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Abril</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Março</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Fevereiro</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Janeiro</span> <span>R$ 0,00</span></li>
+    </ul>
 
-    <div id="dashboard-screen" style="display:none;">
-      
-      <h3>Visão Geral</h3>
-      <div class="summary-grid">
-        <div class="summary-card">
-          <label>Contagens no Ano</label>
-          <div class="value">312</div> </div>
-        <div class="summary-card">
-          <label>Est. Faturamento Anual</label>
-          <div class="value">R$ 13.491.152</div> </div>
+    <button id="btnNovaContagem" class="btn-nova-contagem">+ Nova Contagem</button>
+
+  </div>
+
+  <div id="app-screen" class="wrap" style="display:none;">
+    
+    <a href="#" id="btnVoltarDashboard" class="link-voltar">← Voltar ao Dashboard</a>
+    <p class="muted">Anexe um vídeo do drone ou celular para a contagem da IA.</p>
+    
+    <div class="card" id="app">
+      <div class="row">
+        <button id="btnSelect" class="btn-upload">1. Escolher vídeo…
+          <input id="fileInput" class="file-proxy" type="file" accept="video/*">
+        </button>
+        <input type="number" id="areaInput" placeholder="Área do vídeo (m²)" class="area-input">
       </div>
-      
-      <h3>Produtividade Mensal (Dados Fictícios)</h3>
-      <ul class="data-list card">
-        <li class="data-row"><span>Outubro</span> <span>R$ 12.029.994,00</span></li>
-        <li class="data-row"><span>Setembro</span> <span>R$ 1.104.513,91</span></li>
-        <li class="data-row"><span>Agosto</span> <span>R$ 356.644,48</span></li>
-        <li class="data-row"><span>Julho</span> <span>R$ 0,00</span></li>
-        <li class="data-row"><span>Junho</span> <span>R$ 0,00</span></li>
-        </ul>
-
-      <button id="btnNovaContagem" class="fab-button">+ Nova Contagem</button>
-
-    </div>
-
-    <div id="app-screen" style="display:none;">
-      
-      <a href="#" id="btnVoltarDashboard" class="link-voltar">← Voltar ao Dashboard</a>
-
-      <p class="muted">Anexe um vídeo do drone ou celular para a contagem da IA.</p>
-      
-      <div class="card" id="app">
-        <div class="row">
-          <button id="btnSelect" class="btn-upload">1. Escolher vídeo…
-            <input id="fileInput" class="file-proxy" type="file" accept="video/*">
-          </button>
-          <input type="number" id="areaInput" placeholder="Área do vídeo (m²)" class="area-input">
-        </div>
-        
-        <div class="row" style="margin-top: 12px;">
-           <button id="btnSend" disabled>2. Enviar para IA</button>
-           <button id="btnClear" disabled style="background:#eee;color:#333;">Limpar</button>
-        </div>
-
-        <div style="margin:12px 0;text-align:left;">
-          <div class="progress"><div id="pbar" class="bar"></div></div>
-          <div style="margin-top:8px">Status: <span id="status" class="mono">aguardando arquivo e área...</span></div>
-          <div id="fileInfo" class="muted" style="text-align:left;margin-top:8px;">Nenhum arquivo selecionado.</div>
-          <video id="preview" controls playsinline style="display:none;"></video>
-        </div>
-
-        <div>
-          <h3>Resultado</h3>
-          <pre id="out" class="mono">—</pre>
-        </div>
+      <div class="row" style="margin-top: 12px;">
+         <button id="btnSend" disabled>2. Enviar para IA</button>
+         <button id="btnClear" disabled style="background:#eee;color:#333;">Limpar</button>
+      </div>
+      <div style="margin:12px 0;text-align:left;">
+        <div class="progress"><div id="pbar" class="bar"></div></div>
+        <div style="margin-top:8px">Status: <span id="status" class="mono">aguardando arquivo e área...</span></div>
+        <div id="fileInfo" class="muted" style="text-align:left;margin-top:8px;">Nenhum arquivo selecionado.</div>
+        <video id="preview" controls playsinline style="display:none;"></video>
+      </div>
+      <div>
+        <h3>Resultado</h3>
+        <pre id="out" class="mono">—</pre>
       </div>
     </div>
   </div>
+
+  <div class="app-footer">
+    <a href="#" id="navInicio" class="footer-btn active">Início</a>
+    <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
+    <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
+  </div>
+
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
     
       // ===================================
-      // --- LÓGICA DE NAVEGAÇÃO (NOVA) ---
+      // --- LÓGICA DE NAVEGAÇÃO (v2.7) ---
       // ===================================
       const SENHA_SECRETA = "cyberagro2025"; 
 
       const loginScreen       = document.getElementById("login-screen");
-      const dashboardScreen   = document.getElementById("dashboard-screen"); // <-- TELA NOVA
+      const dashboardScreen   = document.getElementById("dashboard-screen"); 
       const appScreen         = document.getElementById("app-screen");
       const loginButton       = document.getElementById("loginButton");
       const passwordInput     = document.getElementById("passwordInput");
       const loginError        = document.getElementById("loginError");
-      const btnNovaContagem   = document.getElementById("btnNovaContagem"); // <-- BOTÃO NOVO
-      const btnVoltarDashboard = document.getElementById("btnVoltarDashboard"); // <-- BOTÃO NOVO
+      const btnNovaContagem   = document.getElementById("btnNovaContagem"); 
+      const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
+      
+      // Botões do Rodapé
+      const navInicio     = document.getElementById("navInicio");
+      const navRelatorios = document.getElementById("navRelatorios");
+      const navPerfil     = document.getElementById("navPerfil");
 
       loginButton.onclick = () => {
         if (passwordInput.value === SENHA_SECRETA) {
-          // --- MUDANÇA AQUI ---
-          // Em vez de mostrar o app, mostra o DASHBOARD
           loginScreen.style.display = "none";
           appScreen.style.display = "none";
-          dashboardScreen.style.display = "block"; // <-- MOSTRA O DASHBOARD
-          loginError.style.display = "none";
+          dashboardScreen.style.display = "block"; 
         } else {
           loginError.style.display = "block";
         }
       };
-      
       passwordInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") { e.preventDefault(); loginButton.click(); }
       });
@@ -205,11 +212,21 @@
 
       // Navega da tela de Contagem de volta para o Dashboard
       btnVoltarDashboard.onclick = (e) => {
-        e.preventDefault(); // Impede o link de pular a página
+        e.preventDefault(); 
         appScreen.style.display = "none";
         dashboardScreen.style.display = "block";
         resetUI(); // Limpa a tela de contagem
       };
+      
+      // Lógica do rodapé (simulada)
+      navInicio.onclick = (e) => {
+        e.preventDefault();
+        // (Já estamos aqui, mas garantimos)
+        appScreen.style.display = "none";
+        dashboardScreen.style.display = "block";
+      };
+      navRelatorios.onclick = (e) => { e.preventDefault(); alert("Tela 'Relatórios' em construção."); };
+      navPerfil.onclick = (e) => { e.preventDefault(); alert("Tela 'Perfil' em construção."); };
 
       // ===================================
       // --- LÓGICA DO APP (Contagem) ---
