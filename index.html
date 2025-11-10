@@ -9,14 +9,14 @@
   <meta name="theme-color" content="#FFFFFF">
   <script>
     if ('serviceWorker' in navigator) {
-      // O caminho /app-mvp1/ é crucial para o GitHub Pages
       navigator.serviceWorker.register('/app-mvp1/sw.js')
         .then(() => console.log('Service Worker Registrado'))
         .catch(err => console.log('Service Worker falhou:', err));
     }
   </script>
+
   <style>
-    /* --- ESTILOS GERAIS --- */
+    /* (Todos os estilos gerais, .card, .row, .summary-card, etc. continuam os mesmos) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -27,19 +27,13 @@
     .muted { color: #555555; font-size: .9rem; text-align: center; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; word-break: break-word; color: #333333; }
     h3 { margin-top: 20px; margin-bottom: 10px; }
-    
-    /* --- ESTILOS DA TELA DO APP (Contagem) --- */
     .btn-upload { position: relative; display: inline-block; background: #E6EEFA; color: #2a7bf6; border: 1px dashed #2a7bf6; }
     .file-proxy { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
     .area-input { font-family: inherit; font-size: 1rem; padding: 10px 14px; border: 1px solid #E0E0E0; border-radius: 12px; background: #FFFFFF; flex-grow: 1; min-width: 150px; }
     .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; }
     .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
     video { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
-
-    /* --- ESTILOS DO LOGIN --- */
     .login-error { color: #D32F2F; font-size: 0.9rem; text-align: center; margin-top: 10px; display: none; }
-
-    /* --- ESTILOS DO DASHBOARD --- */
     .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .summary-card { background: #EEEEEE; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; }
     .summary-card label { display: block; font-size: 0.8rem; color: #555555; margin-bottom: 4px; text-transform: uppercase; }
@@ -60,8 +54,6 @@
       font-size: 1.1rem;
       margin-top: 20px;
     }
-
-    /* --- ESTILOS DO RODAPÉ --- */
     .app-footer {
       position: fixed;
       bottom: 0;
@@ -82,6 +74,19 @@
       color: #888888; 
     }
     .footer-btn.active { color: #28a745; font-weight: 600; }
+    
+    /* --- NOVO ESTILO (Placeholder do Gráfico) --- */
+    #grafico-placeholder {
+      width: 100%;
+      height: 250px;
+      background: #EEEEEE;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-style: italic;
+      color: #888;
+    }
   </style>
 </head>
 <body>
@@ -124,13 +129,10 @@
   </div>
 
   <div id="app-screen" class="wrap" style="display:none;">
-    
     <button id="btnVoltarDashboard" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
       VOLTAR AO INICIO
     </button>
-    
     <p class="muted">Anexe um vídeo do drone ou celular para a contagem da IA.</p>
-    
     <div class="card" id="app">
       <div class="row">
         <button id="btnSelect" class="btn-upload">1. Escolher vídeo…
@@ -155,6 +157,22 @@
     </div>
   </div>
 
+  <div id="resultado-screen" class="wrap" style="display:none;">
+    <button id="btnVoltarDashboardResultado" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
+      VOLTAR AO INICIO
+    </button>
+    
+    <div class="card">
+      <h3>Resultado Detalhado</h3>
+      <div id="resultado-detalhado" class="mono">
+        </div>
+      
+      <h3 style="margin-top: 20px;">Gráfico Demonstrativo</h3>
+      <div id="grafico-placeholder">
+        (Gráfico de Produtividade em breve)
+      </div>
+    </div>
+  </div>
   <div class="app-footer">
     <a href="#" id="navInicio" class="footer-btn active">Início</a>
     <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
@@ -162,28 +180,40 @@
   </div>
 
   <script>
-    // Espera o HTML carregar antes de rodar o JS (resolveu o bug do botão)
     document.addEventListener("DOMContentLoaded", () => {
     
       // --- LÓGICA DE NAVEGAÇÃO ---
       const SENHA_SECRETA = "cyberagro2025"; 
-      const loginScreen = document.getElementById("login-screen");
-      const dashboardScreen = document.getElementById("dashboard-screen"); 
-      const appScreen = document.getElementById("app-screen");
-      const loginButton = document.getElementById("loginButton");
-      const passwordInput = document.getElementById("passwordInput");
-      const loginError = document.getElementById("loginError");
-      const btnNovaContagem = document.getElementById("btnNovaContagem"); 
+      
+      const loginScreen       = document.getElementById("login-screen");
+      const dashboardScreen   = document.getElementById("dashboard-screen"); 
+      const appScreen         = document.getElementById("app-screen");
+      const resultadoScreen   = document.getElementById("resultado-screen"); // <-- NOVA TELA
+      
+      const loginButton       = document.getElementById("loginButton");
+      const passwordInput     = document.getElementById("passwordInput");
+      const loginError        = document.getElementById("loginError");
+      const btnNovaContagem   = document.getElementById("btnNovaContagem"); 
       const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
-      const navInicio = document.getElementById("navInicio");
+      const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado"); // <-- NOVO BOTÃO VOLTAR
+      
+      const navInicio     = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
-      const navPerfil = document.getElementById("navPerfil");
+      const navPerfil     = document.getElementById("navPerfil");
+
+      // Função helper para mostrar UMA tela e esconder as outras
+      function showScreen(screenToShow) {
+        loginScreen.style.display = 'none';
+        dashboardScreen.style.display = 'none';
+        appScreen.style.display = 'none';
+        resultadoScreen.style.display = 'none';
+        
+        screenToShow.style.display = 'block';
+      }
 
       loginButton.onclick = () => {
         if (passwordInput.value === SENHA_SECRETA) {
-          loginScreen.style.display = "none";
-          appScreen.style.display = "none";
-          dashboardScreen.style.display = "block"; 
+          showScreen(dashboardScreen);
         } else {
           loginError.style.display = "block";
         }
@@ -191,21 +221,21 @@
       passwordInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") { e.preventDefault(); loginButton.click(); }
       });
-      btnNovaContagem.onclick = () => {
-        dashboardScreen.style.display = "none";
-        appScreen.style.display = "block";
-      };
+      btnNovaContagem.onclick = () => { showScreen(appScreen); };
+      
+      // Botões "Voltar" (agora 2 deles)
       btnVoltarDashboard.onclick = (e) => {
         e.preventDefault(); 
-        appScreen.style.display = "none";
-        dashboardScreen.style.display = "block";
+        showScreen(dashboardScreen);
         resetUI(); 
       };
-      navInicio.onclick = (e) => {
+      btnVoltarDashboardResultado.onclick = (e) => {
         e.preventDefault();
-        appScreen.style.display = "none";
-        dashboardScreen.style.display = "block";
+        showScreen(dashboardScreen);
+        resetUI(); // Também limpa o app
       };
+      
+      navInicio.onclick = (e) => { e.preventDefault(); showScreen(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); alert("Tela 'Relatórios' em construção."); };
       navPerfil.onclick = (e) => { e.preventDefault(); alert("Tela 'Perfil' em construção."); };
 
@@ -214,15 +244,19 @@
       const PESO_MEDIO_GRAMAS = 500; 
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
+      
       const fileInput = document.getElementById("fileInput");
       const areaInput = document.getElementById("areaInput"); 
-      const btnSend = document.getElementById("btnSend");
-      const btnClear = document.getElementById("btnClear");
-      const out = document.getElementById("out");
-      const statusEl = document.getElementById("status");
-      const pbar = document.getElementById("pbar");
-      const fileInfo = document.getElementById("fileInfo");
-      const preview = document.getElementById("preview");
+      const btnSend   = document.getElementById("btnSend");
+      const btnClear  = document.getElementById("btnClear");
+      const out       = document.getElementById("out"); // Onde o botão verde vai aparecer
+      const statusEl  = document.getElementById("status");
+      const pbar      = document.getElementById("pbar");
+      const fileInfo  = document.getElementById("fileInfo");
+      const preview   = document.getElementById("preview");
+      
+      const resultadoDetalhado = document.getElementById("resultado-detalhado"); // O conteúdo da nova página
+
       let selectedFile = null;
 
       function setStatus(s){ statusEl.textContent = s; }
@@ -237,7 +271,7 @@
         fileInfo.textContent = "Nenhum arquivo selecionado.";
         preview.src = "";
         preview.style.display = "none";
-        out.textContent = "—";
+        out.textContent = "—"; // Limpa o botão verde (se existir)
         setProgress(0);
         setStatus("aguardando arquivo e área...");
       }
@@ -269,6 +303,7 @@
       });
       areaInput.addEventListener("input", checkInputs); 
       btnClear.addEventListener("click", resetUI);
+      
       btnSend.addEventListener("click", async () => {
         if (!selectedFile) return;
         const area_video_m2 = parseFloat(areaInput.value);
@@ -279,24 +314,37 @@
         btnSend.disabled = true;
         setStatus("enviando para IA…");
         setProgress(25);
+
         const form = new FormData();
         form.append("video", selectedFile, selectedFile.name || "clip.mp4");
+        
         try {
           const resp = await fetch(API_URL, { method: "POST", body: form });
           setProgress(75);
           const text = await resp.text().catch(()=> "");
           setProgress(100);
+          
           if (resp.ok) {
             setStatus("OK! Contagem recebida.");
             try {
-              // --- FORMATAÇÃO DO RESULTADO ---
+              // --- FORMATAÇÃO DO RESULTADO (v2.10) ---
               const data = JSON.parse(text);
               const contagem_api = data.contagem_final; 
               const kg_por_m2 = (contagem_api * (PESO_MEDIO_GRAMAS / 1000)) / area_video_m2;
-              const kg_por_hectare = kg_por_m2 * M2_POR_HECTARE;
-              out.textContent = "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-              out.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare.toFixed(2) + " KG/HA";
-              // ------------------------------------
+              const kg_por_hectare = kg_por_hectare.toFixed(2);
+
+              // 1. Preenche a "página" de resultado (que está oculta)
+              resultadoDetalhado.textContent = "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
+              resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare + " KG/HA";
+              
+              // 2. Cria o botão verde clicável
+              out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
+              
+              // 3. Adiciona o evento ao botão recém-criado
+              document.getElementById("btnVerResultado").onclick = () => {
+                showScreen(resultadoScreen);
+              };
+              
             } catch (e) {
               out.textContent = "Erro ao ler o JSON: " + text;
             }
