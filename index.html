@@ -24,19 +24,14 @@
     .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; }
     .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
     video { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
-    .link-voltar { font-size: 0.9rem; color: #555; text-decoration: none; margin-bottom: 10px; display: inline-block; }
+    /* .link-voltar (Não mais usado, substituído por .btn-nova-contagem) */
 
     /* --- ESTILOS DO LOGIN --- */
     .login-error { color: #D32F2F; font-size: 0.9rem; text-align: center; margin-top: 10px; display: none; }
 
-    /* --- NOVOS ESTILOS DO DASHBOARD (v2.7) --- */
+    /* --- ESTILOS DO DASHBOARD --- */
     .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .summary-card {
-      background: #EEEEEE; /* <-- 1. Cor cinza (como pedido) */
-      border: 1px solid #E0E0E0; 
-      border-radius: 16px; 
-      padding: 16px;
-    }
+    .summary-card { background: #EEEEEE; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; }
     .summary-card label { display: block; font-size: 0.8rem; color: #555555; margin-bottom: 4px; text-transform: uppercase; }
     .summary-card .value { font-size: 1.25rem; font-weight: 600; color: #333; }
     .data-list { list-style: none; padding: 0; margin: 0; }
@@ -44,7 +39,7 @@
     .data-row span:first-child { color: #333; }
     .data-row span:last-child { color: #555; font-weight: 500; }
     
-    /* 2. Botão "Nova Contagem" (Verde, Grande) */
+    /* Estilo para Botão Verde (Nova Contagem) e Cinza (Voltar) */
     .btn-nova-contagem {
       background: #28a745; /* Verde */
       color: white;
@@ -58,7 +53,7 @@
       margin-top: 20px;
     }
 
-    /* 3. Rodapé Fixo (Tab bar) */
+    /* --- ESTILOS DO RODAPÉ --- */
     .app-footer {
       position: fixed;
       bottom: 0;
@@ -76,12 +71,9 @@
       padding: 14px 10px;
       font-size: 0.8rem;
       text-decoration: none;
-      color: #888888; /* Cinza (como pedido) */
+      color: #888888; 
     }
-    .footer-btn.active {
-      color: #28a745; /* Verde (como pedido) */
-      font-weight: 600;
-    }
+    .footer-btn.active { color: #28a745; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -100,19 +92,11 @@
   </div>
 
   <div id="dashboard-screen" class="wrap" style="display:none;">
-    
     <h3>Visão Geral</h3>
     <div class="summary-grid">
-      <div class="summary-card">
-        <label>Contagens no Ano</label>
-        <div class="value">312</div> 
-      </div>
-      <div class="summary-card">
-        <label>Est. Faturamento Anual</label>
-        <div class="value">R$ 13.491.152</div> 
-      </div>
+      <div class="summary-card"><label>Contagens no Ano</label><div class="value">312</div></div>
+      <div class="summary-card"><label>Est. Faturamento Anual</label><div class="value">R$ 13.491.152</div></div>
     </div>
-    
     <h3>Produtividade Mensal (Dados Fictícios)</h3>
     <ul class="data-list card">
       <li class="data-row"><span>Dezembro</span> <span>R$ 0,00</span></li>
@@ -128,14 +112,14 @@
       <li class="data-row"><span>Fevereiro</span> <span>R$ 0,00</span></li>
       <li class="data-row"><span>Janeiro</span> <span>R$ 0,00</span></li>
     </ul>
-
     <button id="btnNovaContagem" class="btn-nova-contagem">+ Nova Contagem</button>
-
   </div>
 
   <div id="app-screen" class="wrap" style="display:none;">
     
-    <a href="#" id="btnVoltarDashboard" class="link-voltar">← Voltar ao Dashboard</a>
+    <button id="btnVoltarDashboard" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
+      VOLTAR AO INICIO
+    </button>
     <p class="muted">Anexe um vídeo do drone ou celular para a contagem da IA.</p>
     
     <div class="card" id="app">
@@ -168,28 +152,24 @@
     <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
   </div>
 
-
   <script>
     document.addEventListener("DOMContentLoaded", () => {
     
-      // ===================================
-      // --- LÓGICA DE NAVEGAÇÃO (v2.7) ---
-      // ===================================
+      // --- LÓGICA DE NAVEGAÇÃO ---
+      // (O JavaScript não precisa mudar, pois ele já encontra o botão
+      // pelo 'id="btnVoltarDashboard"', seja ele <a> ou <button>)
       const SENHA_SECRETA = "cyberagro2025"; 
-
-      const loginScreen       = document.getElementById("login-screen");
-      const dashboardScreen   = document.getElementById("dashboard-screen"); 
-      const appScreen         = document.getElementById("app-screen");
-      const loginButton       = document.getElementById("loginButton");
-      const passwordInput     = document.getElementById("passwordInput");
-      const loginError        = document.getElementById("loginError");
-      const btnNovaContagem   = document.getElementById("btnNovaContagem"); 
+      const loginScreen = document.getElementById("login-screen");
+      const dashboardScreen = document.getElementById("dashboard-screen"); 
+      const appScreen = document.getElementById("app-screen");
+      const loginButton = document.getElementById("loginButton");
+      const passwordInput = document.getElementById("passwordInput");
+      const loginError = document.getElementById("loginError");
+      const btnNovaContagem = document.getElementById("btnNovaContagem"); 
       const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
-      
-      // Botões do Rodapé
-      const navInicio     = document.getElementById("navInicio");
+      const navInicio = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
-      const navPerfil     = document.getElementById("navPerfil");
+      const navPerfil = document.getElementById("navPerfil");
 
       loginButton.onclick = () => {
         if (passwordInput.value === SENHA_SECRETA) {
@@ -203,49 +183,38 @@
       passwordInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") { e.preventDefault(); loginButton.click(); }
       });
-      
-      // Navega do Dashboard para a tela de Contagem
       btnNovaContagem.onclick = () => {
         dashboardScreen.style.display = "none";
         appScreen.style.display = "block";
       };
-
-      // Navega da tela de Contagem de volta para o Dashboard
       btnVoltarDashboard.onclick = (e) => {
         e.preventDefault(); 
         appScreen.style.display = "none";
         dashboardScreen.style.display = "block";
-        resetUI(); // Limpa a tela de contagem
+        resetUI(); 
       };
-      
-      // Lógica do rodapé (simulada)
       navInicio.onclick = (e) => {
         e.preventDefault();
-        // (Já estamos aqui, mas garantimos)
         appScreen.style.display = "none";
         dashboardScreen.style.display = "block";
       };
       navRelatorios.onclick = (e) => { e.preventDefault(); alert("Tela 'Relatórios' em construção."); };
       navPerfil.onclick = (e) => { e.preventDefault(); alert("Tela 'Perfil' em construção."); };
 
-      // ===================================
       // --- LÓGICA DO APP (Contagem) ---
-      // ===================================
       const API_URL = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const PESO_MEDIO_GRAMAS = 500; 
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
-
       const fileInput = document.getElementById("fileInput");
       const areaInput = document.getElementById("areaInput"); 
-      const btnSend   = document.getElementById("btnSend");
-      const btnClear  = document.getElementById("btnClear");
-      const out       = document.getElementById("out");
-      const statusEl  = document.getElementById("status");
-      const pbar      = document.getElementById("pbar");
-      const fileInfo  = document.getElementById("fileInfo");
-      const preview   = document.getElementById("preview");
-
+      const btnSend = document.getElementById("btnSend");
+      const btnClear = document.getElementById("btnClear");
+      const out = document.getElementById("out");
+      const statusEl = document.getElementById("status");
+      const pbar = document.getElementById("pbar");
+      const fileInfo = document.getElementById("fileInfo");
+      const preview = document.getElementById("preview");
       let selectedFile = null;
 
       function setStatus(s){ statusEl.textContent = s; }
@@ -264,7 +233,6 @@
         setProgress(0);
         setStatus("aguardando arquivo e área...");
       }
-
       function checkInputs() {
         const area = parseFloat(areaInput.value);
         if (selectedFile && area > 0) {
@@ -274,7 +242,6 @@
           btnSend.disabled = true;
         }
       }
-      
       fileInput.addEventListener("change", (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
@@ -282,56 +249,44 @@
         const mb = (file.size/1024/1024).toFixed(2);
         fileInfo.textContent = `${file.name} • ${mb} MB`;
         btnClear.disabled = false;
-        
         if (file.size > MAX_MB*1024*1024) {
           setStatus(`arquivo muito grande (> ${MAX_MB} MB)`);
           btnSend.disabled = true;
         } else {
           checkInputs();
         }
-
         preview.src = URL.createObjectURL(file);
         preview.style.display = "block";
         preview.play().catch(()=>{});
       });
-      
       areaInput.addEventListener("input", checkInputs); 
       btnClear.addEventListener("click", resetUI);
-
       btnSend.addEventListener("click", async () => {
         if (!selectedFile) return;
-        
         const area_video_m2 = parseFloat(areaInput.value);
         if (!area_video_m2 || area_video_m2 <= 0) {
             alert("Por favor, insira um valor válido para a área em metros quadrados (m²).");
             return;
         }
-        
         btnSend.disabled = true;
         setStatus("enviando para IA…");
         setProgress(25);
-
         const form = new FormData();
         form.append("video", selectedFile, selectedFile.name || "clip.mp4");
-
         try {
           const resp = await fetch(API_URL, { method: "POST", body: form });
           setProgress(75);
           const text = await resp.text().catch(()=> "");
           setProgress(100);
-
           if (resp.ok) {
             setStatus("OK! Contagem recebida.");
             try {
               const data = JSON.parse(text);
               const contagem_api = data.contagem_final; 
-              
               const kg_por_m2 = (contagem_api * (PESO_MEDIO_GRAMAS / 1000)) / area_video_m2;
               const kg_por_hectare = kg_por_m2 * M2_POR_HECTARE;
-
               out.textContent = "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
               out.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare.toFixed(2) + " KG/HA";
-
             } catch (e) {
               out.textContent = "Erro ao ler o JSON: " + text;
             }
