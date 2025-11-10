@@ -1,5 +1,5 @@
 // Define um nome para o cache
-const CACHE_NAME = 'cyberagro-cache-v1';
+const CACHE_NAME = 'cyberagro-cache-v2';
 // Lista os arquivos que o app precisa para funcionar
 const urlsToCache = [
   '/',
@@ -34,4 +34,5 @@ self.addEventListener('fetch', event => {
       }
     )
   );
+
 });
