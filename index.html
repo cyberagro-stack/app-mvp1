@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CyberAgro • Contador de Mangas</title>
   <style>
+    /* --- ESTILOS GERAIS --- */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -12,38 +13,84 @@
     .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
     button { background: #2a7bf6; color: white; border: 0; border-radius: 12px; padding: 12px 16px; font-weight: 600; cursor: pointer; }
     button[disabled] { opacity: .6; cursor: not-allowed; }
-    .btn-upload { position: relative; display: inline-block; background: #E6EEFA; color: #2a7bf6; border: 1px dashed #2a7bf6; }
-    .file-proxy { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-    .area-input {
-      font-family: inherit;
-      font-size: 1rem;
-      padding: 10px 14px;
-      border: 1px solid #E0E0E0;
-      border-radius: 12px;
-      background: #FFFFFF;
-      flex-grow: 1; 
-      min-width: 150px;
-    }
     .muted { color: #555555; font-size: .9rem; text-align: center; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; word-break: break-word; color: #333333; }
+    h1 { text-align: center; margin-bottom: 16px; }
+    h3 { margin-top: 20px; margin-bottom: 10px; }
+    
+    /* --- ESTILOS DA TELA DO APP (Contagem) --- */
+    .btn-upload { position: relative; display: inline-block; background: #E6EEFA; color: #2a7bf6; border: 1px dashed #2a7bf6; }
+    .file-proxy { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .area-input { font-family: inherit; font-size: 1rem; padding: 10px 14px; border: 1px solid #E0E0E0; border-radius: 12px; background: #FFFFFF; flex-grow: 1; min-width: 150px; }
     .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; }
     .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
     video { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
-    
-    /* Estilo para a mensagem de erro do login */
-    .login-error {
-      color: #D32F2F; /* Vermelho */
-      font-size: 0.9rem;
-      text-align: center;
-      margin-top: 10px;
-      display: none; /* Começa escondido */
+    .link-voltar { font-size: 0.9rem; color: #555; text-decoration: none; margin-bottom: 10px; display: inline-block; }
+
+    /* --- ESTILOS DO LOGIN --- */
+    .login-error { color: #D32F2F; font-size: 0.9rem; text-align: center; margin-top: 10px; display: none; }
+
+    /* --- NOVOS ESTILOS DO DASHBOARD (Inspirado na Imagem) --- */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* Duas colunas */
+      gap: 12px;
     }
+    .summary-card {
+      background: #F8F8F8; 
+      border: 1px solid #E0E0E0; 
+      border-radius: 16px; 
+      padding: 16px;
+    }
+    .summary-card label {
+      display: block;
+      font-size: 0.8rem;
+      color: #555555;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .summary-card .value {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #333;
+    }
+    .data-list { list-style: none; padding: 0; margin: 0; }
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 8px;
+      border-bottom: 1px solid #EEE;
+      font-size: 0.9rem;
+    }
+    .data-row span:first-child { color: #333; }
+    .data-row span:last-child { color: #555; font-weight: 500; }
+    .fab-button { /* Floating Action Button */
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #2a7bf6;
+      color: white;
+      border: 0;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1000;
+      padding: 0; /* Reset padding for circular button */
+      line-height: 60px; /* Center text vertically */
+      text-align: center; /* Center text horizontally */
+    }
+    /* ---------------------------------------------------- */
+
   </style>
 </head>
 <body>
   <div class="wrap">
     
-    <h1 style="text-align:center;margin-bottom:16px;">
+    <h1>
       <img src="logo.png" alt="CyberAgro Logo" height="250">
     </h1>
 
@@ -51,16 +98,41 @@
       <div class="card">
         <h3 style="text-align: center;">Acesso Restrito</h3>
         <p class="muted" style="text-align: left;">Insira a senha de acesso para continuar.</p>
-        
         <input type="password" id="passwordInput" placeholder="Senha" class="area-input" style="width:100%; box-sizing: border-box;">
-        
         <p id="loginError" class="login-error">Senha incorreta. Tente novamente.</p>
-        
         <button id="loginButton" style="width:100%; margin-top: 12px;">Entrar</button>
       </div>
     </div>
 
+    <div id="dashboard-screen" style="display:none;">
+      
+      <h3>Visão Geral</h3>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <label>Contagens no Ano</label>
+          <div class="value">312</div> </div>
+        <div class="summary-card">
+          <label>Est. Faturamento Anual</label>
+          <div class="value">R$ 13.491.152</div> </div>
+      </div>
+      
+      <h3>Produtividade Mensal (Dados Fictícios)</h3>
+      <ul class="data-list card">
+        <li class="data-row"><span>Outubro</span> <span>R$ 12.029.994,00</span></li>
+        <li class="data-row"><span>Setembro</span> <span>R$ 1.104.513,91</span></li>
+        <li class="data-row"><span>Agosto</span> <span>R$ 356.644,48</span></li>
+        <li class="data-row"><span>Julho</span> <span>R$ 0,00</span></li>
+        <li class="data-row"><span>Junho</span> <span>R$ 0,00</span></li>
+        </ul>
+
+      <button id="btnNovaContagem" class="fab-button">+ Nova Contagem</button>
+
+    </div>
+
     <div id="app-screen" style="display:none;">
+      
+      <a href="#" id="btnVoltarDashboard" class="link-voltar">← Voltar ao Dashboard</a>
+
       <p class="muted">Anexe um vídeo do drone ou celular para a contagem da IA.</p>
       
       <div class="card" id="app">
@@ -95,41 +167,52 @@
     document.addEventListener("DOMContentLoaded", () => {
     
       // ===================================
-      // --- LÓGICA DE LOGIN (NOVA) ---
+      // --- LÓGICA DE NAVEGAÇÃO (NOVA) ---
       // ===================================
-      
-      // ATENÇÃO: Esta é a sua senha "secreta".
-      // Lembre-se, ela é visível no código-fonte.
       const SENHA_SECRETA = "cyberagro2025"; 
 
-      const loginScreen   = document.getElementById("login-screen");
-      const appScreen     = document.getElementById("app-screen");
-      const loginButton   = document.getElementById("loginButton");
-      const passwordInput = document.getElementById("passwordInput");
-      const loginError    = document.getElementById("loginError");
+      const loginScreen       = document.getElementById("login-screen");
+      const dashboardScreen   = document.getElementById("dashboard-screen"); // <-- TELA NOVA
+      const appScreen         = document.getElementById("app-screen");
+      const loginButton       = document.getElementById("loginButton");
+      const passwordInput     = document.getElementById("passwordInput");
+      const loginError        = document.getElementById("loginError");
+      const btnNovaContagem   = document.getElementById("btnNovaContagem"); // <-- BOTÃO NOVO
+      const btnVoltarDashboard = document.getElementById("btnVoltarDashboard"); // <-- BOTÃO NOVO
 
       loginButton.onclick = () => {
         if (passwordInput.value === SENHA_SECRETA) {
-          // Senha correta: esconde o login, mostra o app
+          // --- MUDANÇA AQUI ---
+          // Em vez de mostrar o app, mostra o DASHBOARD
           loginScreen.style.display = "none";
-          appScreen.style.display = "block";
+          appScreen.style.display = "none";
+          dashboardScreen.style.display = "block"; // <-- MOSTRA O DASHBOARD
           loginError.style.display = "none";
         } else {
-          // Senha errada: mostra o erro
           loginError.style.display = "block";
         }
       };
       
-      // Permite apertar "Enter" para logar
       passwordInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          loginButton.click();
-        }
+        if (e.key === "Enter") { e.preventDefault(); loginButton.click(); }
       });
+      
+      // Navega do Dashboard para a tela de Contagem
+      btnNovaContagem.onclick = () => {
+        dashboardScreen.style.display = "none";
+        appScreen.style.display = "block";
+      };
+
+      // Navega da tela de Contagem de volta para o Dashboard
+      btnVoltarDashboard.onclick = (e) => {
+        e.preventDefault(); // Impede o link de pular a página
+        appScreen.style.display = "none";
+        dashboardScreen.style.display = "block";
+        resetUI(); // Limpa a tela de contagem
+      };
 
       // ===================================
-      // --- LÓGICA DO APP (ANTIGA) ---
+      // --- LÓGICA DO APP (Contagem) ---
       // ===================================
       const API_URL = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const PESO_MEDIO_GRAMAS = 500; 
@@ -226,11 +309,9 @@
               const data = JSON.parse(text);
               const contagem_api = data.contagem_final; 
               
-              // Lógica da Regra de 3
               const kg_por_m2 = (contagem_api * (PESO_MEDIO_GRAMAS / 1000)) / area_video_m2;
               const kg_por_hectare = kg_por_m2 * M2_POR_HECTARE;
 
-              // Resultado Formatado
               out.textContent = "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
               out.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare.toFixed(2) + " KG/HA";
 
@@ -252,4 +333,3 @@
   </script>
 </body>
 </html>
-
