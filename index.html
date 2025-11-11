@@ -14,7 +14,7 @@
     }
   </script>
   <style>
-    /* (Estilos gerais...) */
+    /* (Todos os seus estilos .css continuam os mesmos) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -185,45 +185,102 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
     
-      // --- LÓGICA DE NAVEGAÇÃO ---
+      // --- LÓGICA DE NAVEGAÇÃO (v2.15) ---
       const SENHA_SECRETA = "cyberagro2025"; 
+      
+      // Telas
       const loginScreen = document.getElementById("login-screen");
       const dashboardScreen = document.getElementById("dashboard-screen"); 
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
+      
+      // Botões de Navegação
       const loginButton = document.getElementById("loginButton");
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
       const btnNovaContagem = document.getElementById("btnNovaContagem"); 
       const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
       const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
+      
+      // Botões do Rodapé
       const navInicio = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
       const navPerfil = document.getElementById("navPerfil");
-
-      function showScreen(screenToShow) {
+      
+      // --- ESTA É A NOVA FUNÇÃO DE NAVEGAÇÃO ---
+      function navigateTo(screenToShow) {
+        // 1. Esconde todas as telas
         loginScreen.style.display = 'none';
         dashboardScreen.style.display = 'none';
         appScreen.style.display = 'none';
         resultadoScreen.style.display = 'none';
+        
+        // 2. Mostra a tela desejada
         screenToShow.style.display = 'block';
+        
+        // 3. Reseta todos os botões do rodapé para cinza
+        navInicio.classList.remove('active');
+        navRelatorios.classList.remove('active');
+        navPerfil.classList.remove('active');
+        
+        // 4. Ativa (pinta de verde) o botão correto
+        if (screenToShow === dashboardScreen || screenToShow === appScreen) {
+          navInicio.classList.add('active'); // Início ou uma sub-página de Início
+        } else if (screenToShow === resultadoScreen) {
+          navRelatorios.classList.add('active'); // Página de Relatórios
+        } 
+        // (Podemos adicionar o navPerfil.classList.add('active') no futuro)
       }
+      // ------------------------------------------
 
-      loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) { showScreen(dashboardScreen); } else { loginError.style.display = "block"; } };
-      passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
-      btnNovaContagem.onclick = () => { showScreen(appScreen); };
-      btnVoltarDashboard.onclick = (e) => { e.preventDefault(); showScreen(dashboardScreen); resetUI(); };
-      btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); showScreen(dashboardScreen); resetUI(); };
-      navInicio.onclick = (e) => { e.preventDefault(); showScreen(dashboardScreen); };
-      navRelatorios.onclick = (e) => { e.preventDefault(); alert("Tela 'Relatórios' em construção."); };
-      navPerfil.onclick = (e) => { e.preventDefault(); alert("Tela 'Perfil' em construção."); };
-
+      loginButton.onclick = () => {
+        if (passwordInput.value === SENHA_SECRETA) {
+          navigateTo(dashboardScreen); // <-- MUDOU
+        } else {
+          loginError.style.display = "block";
+        }
+      };
+      passwordInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); loginButton.click(); }
+      });
+      
+      btnNovaContagem.onclick = () => { navigateTo(appScreen); }; // <-- MUDOU
+      
+      btnVoltarDashboard.onclick = (e) => {
+        e.preventDefault(); 
+        navigateTo(dashboardScreen); // <-- MUDOU
+        resetUI(); 
+      };
+      
+      btnVoltarDashboardResultado.onclick = (e) => {
+        e.preventDefault();
+        navigateTo(dashboardScreen); // <-- MUDOU
+        resetUI();
+      };
+      
+      // --- LÓGICA DO RODAPÉ ATUALIZADA ---
+      navInicio.onclick = (e) => { 
+        e.preventDefault(); 
+        navigateTo(dashboardScreen); // <-- MUDOU
+      };
+      navRelatorios.onclick = (e) => { 
+        e.preventDefault(); 
+        navigateTo(resultadoScreen); // <-- MUDOU (Cumpre o Requisito 2)
+      };
+      navPerfil.onclick = (e) => { 
+        e.preventDefault(); 
+        alert("Tela 'Perfil' em construção."); 
+        // (Quando construir, chame navigateTo(profileScreen) e ative o navPerfil)
+      };
+      
       // --- LÓGICA DO APP (Contagem) ---
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const PESO_MEDIO_GRAMAS = 500; 
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
+      
+      // (IDs dos elementos do app...)
       const fileInput = document.getElementById("fileInput");
       const areaInput = document.getElementById("areaInput"); 
       const btnSend = document.getElementById("btnSend");
@@ -237,22 +294,17 @@
       const resultadoDetalhado = document.getElementById("resultado-detalhado");
       let selectedFile = null;
 
+      // (Funções resetUI, checkInputs, fileInput.onchange... não mudam)
       function setStatus(s){ statusEl.textContent = s; }
       function setProgress(p){ pbar.style.width = Math.min(100, Math.max(0, p)) + "%"; }
-      
       function resetUI(){
-        selectedFile = null;
-        fileInput.value = "";
-        areaInput.value = ""; 
-        btnSend.disabled = true;
-        btnClear.disabled = true;
+        selectedFile = null; fileInput.value = ""; areaInput.value = ""; 
+        btnSend.disabled = true; btnClear.disabled = true;
         fileInfo.textContent = "Nenhum ficheiro selecionado.";
-        previewVideo.src = "";
-        previewVideo.style.display = "none";
-        previewImage.src = "";
-        previewImage.style.display = "none";
+        previewVideo.src = ""; previewVideo.style.display = "none";
+        previewImage.src = ""; previewImage.style.display = "none";
         areaInput.style.display = "none"; 
-        out.textContent = "—";
+        out.innerHTML = "—"; // Limpa o botão verde (se existir)
         setProgress(0);
         setStatus("aguardando ficheiro (vídeo ou imagem)...");
       }
@@ -260,89 +312,63 @@
         const area = parseFloat(areaInput.value);
         const isVideo = selectedFile && selectedFile.type.startsWith("video/");
         const isImage = selectedFile && selectedFile.type.startsWith("image/");
-        
         if ((isVideo && area > 0) || isImage) {
-          btnSend.disabled = false;
-          setStatus("Pronto para enviar.");
+          btnSend.disabled = false; setStatus("Pronto para enviar.");
         } else {
           btnSend.disabled = true;
         }
       }
-      
       fileInput.addEventListener("change", (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
-        
         const isVideo = file.type.startsWith("video/");
         const isImage = file.type.startsWith("image/");
-
         if (!isVideo && !isImage) {
             setStatus("Erro: Apenas arquivos de VÍDEO ou IMAGEM são permitidos.");
             fileInfo.textContent = "Erro: Apenas arquivos de VÍDEO ou IMAGEM.";
-            btnSend.disabled = true;
-            btnClear.disabled = true;
-            selectedFile = null;
-            previewVideo.style.display = "none";
-            previewImage.style.display = "none";
+            btnSend.disabled = true; btnClear.disabled = true; selectedFile = null;
+            previewVideo.style.display = "none"; previewImage.style.display = "none";
             return;
         }
-        
         selectedFile = file;
         const mb = (file.size/1024/1024).toFixed(2);
         fileInfo.textContent = `${file.name} • ${mb} MB`;
         btnClear.disabled = false;
-        
         if (file.size > MAX_MB*1024*1024) {
-          setStatus(`arquivo muito grande (> ${MAX_MB} MB)`);
-          btnSend.disabled = true;
+          setStatus(`arquivo muito grande (> ${MAX_MB} MB)`); btnSend.disabled = true;
         } else {
           checkInputs();
         }
-
         const previewURL = URL.createObjectURL(file);
         if (isVideo) {
-          previewVideo.src = previewURL;
-          previewVideo.style.display = "block";
-          previewImage.style.display = "none";
-          areaInput.style.display = "block"; 
+          previewVideo.src = previewURL; previewVideo.style.display = "block";
+          previewImage.style.display = "none"; areaInput.style.display = "block"; 
           previewVideo.play().catch(()=>{});
         } else {
-          previewImage.src = previewURL;
-          previewImage.style.display = "block";
-          previewVideo.style.display = "none";
-          areaInput.style.display = "none"; 
-          areaInput.value = ""; 
-          checkInputs(); 
+          previewImage.src = previewURL; previewImage.style.display = "block";
+          previewVideo.style.display = "none"; areaInput.style.display = "none"; 
+          areaInput.value = ""; checkInputs(); 
         }
       });
-      
       areaInput.addEventListener("input", checkInputs); 
       btnClear.addEventListener("click", resetUI);
       
       btnSend.addEventListener("click", async () => {
         if (!selectedFile) return;
-        
         const isVideoRequest = selectedFile.type.startsWith("video/");
         let target_url = ""; 
-        
         const area_video_m2 = parseFloat(areaInput.value);
         if (isVideoRequest && (!area_video_m2 || area_video_m2 <= 0)) {
             alert("Para vídeos, por favor, insira um valor válido para a área em metros quadrados (m²).");
             return;
         }
-        
         btnSend.disabled = true;
         setStatus("enviando para IA…");
         setProgress(25);
-
         const form = new FormData();
         form.append("video", selectedFile, selectedFile.name || "mediafile"); 
-
-        if (isVideoRequest) {
-            target_url = API_URL_VIDEO;
-        } else {
-            target_url = API_URL_IMAGEM;
-        }
+        if (isVideoRequest) { target_url = API_URL_VIDEO; } 
+        else { target_url = API_URL_IMAGEM; }
         
         try {
           const resp = await fetch(target_url, { method: "POST", body: form });
@@ -352,15 +378,7 @@
           
           if (resp.ok) {
             setStatus("OK! Contagem recebida.");
-            
-            // --- MODIFICAÇÃO DE SCROLL (v2.14) ---
-            // Rola a página para baixo para mostrar o botão
-            window.scrollTo({
-              top: document.body.scrollHeight,
-              behavior: 'smooth'
-            });
-            // ------------------------------------
-            
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             try {
               const data = JSON.parse(text);
               const contagem_api = data.contagem_final; 
@@ -368,7 +386,6 @@
               if (isVideoRequest) {
                 const kg_por_m2 = (contagem_api * (PESO_MEDIO_GRAMAS / 1000)) / area_video_m2;
                 const kg_por_hectare = (kg_por_m2 * M2_POR_HECTARE).toFixed(2);
-                
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
                 resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare + " KG/HA";
@@ -380,8 +397,9 @@
               
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
               
+              // --- MUDANÇA AQUI (Cumpre o Requisito 1) ---
               document.getElementById("btnVerResultado").onclick = () => {
-                showScreen(resultadoScreen);
+                navigateTo(resultadoScreen); // <-- MUDOU
               };
               
             } catch (e) {
