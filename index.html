@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CyberAgro • Contador de Mangas</title>
+
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FFFFFF">
   <script>
@@ -13,8 +14,9 @@
         .catch(err => console.log('Service Worker falhou:', err));
     }
   </script>
+
   <style>
-    /* (Estilos gerais, .card, .row, etc. - sem alterações) */
+    /* (Todos os seus estilos .css continuam os mesmos) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -30,7 +32,7 @@
     .area-input { font-family: inherit; font-size: 1rem; padding: 10px 14px; border: 1px solid #E0E0E0; border-radius: 12px; background: #FFFFFF; flex-grow: 1; min-width: 150px; }
     .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; }
     .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
-    video, img#preview-img { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; } /* Adicionado #preview-img */
+    video { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
     .login-error { color: #D32F2F; font-size: 0.9rem; text-align: center; margin-top: 10px; display: none; }
     .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .summary-card { background: #EEEEEE; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; }
@@ -40,36 +42,57 @@
     .data-row { display: flex; justify-content: space-between; padding: 14px 8px; border-bottom: 1px solid #EEE; font-size: 0.9rem; }
     .data-row span:first-child { color: #333; }
     .data-row span:last-child { color: #555; font-weight: 500; }
-    .btn-nova-contagem { background: #28a745; color: white; border: 0; border-radius: 12px; padding: 16px; font-weight: 600; cursor: pointer; width: 100%; font-size: 1.1rem; margin-top: 20px; }
-    .app-footer { position: fixed; bottom: 0; left: 0; right: 0; background: #FFFFFF; border-top: 1px solid #E0E0E0; display: flex; justify-content: space-around; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-    .footer-btn { flex-grow: 1; text-align: center; padding: 14px 10px; font-size: 0.8rem; text-decoration: none; color: #888888; }
-    .footer-btn.active { color: #28a745; font-weight: 600; }
-    
-    /* --- NOVOS ESTILOS (Seleção Foto/Vídeo) --- */
-    .modo-selecao { display: flex; gap: 10px; margin-bottom: 15px; }
-    .modo-selecao label {
-      flex: 1;
-      padding: 10px;
-      border: 2px solid #E0E0E0;
+    .btn-nova-contagem {
+      background: #28a745; /* Verde */
+      color: white;
+      border: 0;
       border-radius: 12px;
-      text-align: center;
+      padding: 16px;
+      font-weight: 600;
       cursor: pointer;
-      font-weight: 500;
+      width: 100%;
+      font-size: 1.1rem;
+      margin-top: 20px;
     }
-    .modo-selecao input { display: none; } /* Esconde o radio button real */
-    /* Estilo quando selecionado */
-    .modo-selecao input:checked + label {
-      background: #E6EEFA;
-      border-color: #2a7bf6;
-      color: #2a7bf6;
+    .app-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #FFFFFF;
+      border-top: 1px solid #E0E0E0;
+      display: flex;
+      justify-content: space-around;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
     }
-    /* ------------------------------------- */
+    .footer-btn {
+      flex-grow: 1;
+      text-align: center;
+      padding: 14px 10px;
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #888888; 
+    }
+    .footer-btn.active { color: #28a745; font-weight: 600; }
+    #grafico-placeholder {
+      width: 100%;
+      height: 250px;
+      background: #EEEEEE;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-style: italic;
+      color: #888;
+    }
   </style>
 </head>
 <body>
-  
+
   <div id="login-screen" class="wrap">
-    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=2" alt="CyberAgro Logo" height="250"></h1>
+    <h1 style="text-align:center;margin-bottom:16px;">
+      <img src="logo.png?v=2" alt="CyberAgro Logo" height="250">
+    </h1>
     <div class="card">
       <h3 style="text-align: center;">Acesso Restrito</h3>
       <p class="muted" style="text-align: left;">Insira a senha de acesso para continuar.</p>
@@ -87,42 +110,44 @@
     </div>
     <h3>Produtividade Mensal (Dados Fictícios)</h3>
     <ul class="data-list card">
-      (Lista de meses...)
+      <li class="data-row"><span>Dezembro</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Novembro</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Outubro</span> <span>R$ 12.029.994,00</span></li>
+      <li class="data-row"><span>Setembro</span> <span>R$ 1.104.513,91</span></li>
+      <li class="data-row"><span>Agosto</span> <span>R$ 356.644,48</span></li>
+      <li class="data-row"><span>Julho</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Junho</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Maio</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Abril</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Março</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Fevereiro</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Janeiro</span> <span>R$ 0,00</span></li>
     </ul>
     <button id="btnNovaContagem" class="btn-nova-contagem">+ Nova Contagem</button>
   </div>
 
   <div id="app-screen" class="wrap" style="display:none;">
-    <button id="btnVoltarDashboard" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">VOLTAR AO INICIO</button>
-    
+    <button id="btnVoltarDashboard" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
+      VOLTAR AO INICIO
+    </button>
+    <p class="muted">Anexe um vídeo do drone ou celular para a contagem da IA.</p>
     <div class="card" id="app">
-      
-      <div class="modo-selecao">
-        <input type="radio" name="modo" id="modoFoto" value="foto">
-        <label for="modoFoto">📷 Testar com Foto</label>
-        
-        <input type="radio" name="modo" id="modoVideo" value="video" checked> <label for="modoVideo">🎥 Calcular com Vídeo</label>
-      </div>
       <div class="row">
-        <button id="btnSelect" class="btn-upload">1. Escolher arquivo…
-          <input id="fileInput" class="file-proxy" type="file" accept="video/*"> 
+        <button id="btnSelect" class="btn-upload">1. Escolher vídeo…
+          <input id="fileInput" class="file-proxy" type="file" accept="video/*">
         </button>
         <input type="number" id="areaInput" placeholder="Área do vídeo (m²)" class="area-input">
       </div>
-      
       <div class="row" style="margin-top: 12px;">
          <button id="btnSend" disabled>2. Enviar para IA</button>
          <button id="btnClear" disabled style="background:#eee;color:#333;">Limpar</button>
       </div>
-
       <div style="margin:12px 0;text-align:left;">
         <div class="progress"><div id="pbar" class="bar"></div></div>
         <div style="margin-top:8px">Status: <span id="status" class="mono">aguardando arquivo e área...</span></div>
         <div id="fileInfo" class="muted" style="text-align:left;margin-top:8px;">Nenhum arquivo selecionado.</div>
-        <video id="preview-vid" controls playsinline style="display:none;"></video>
-        <img id="preview-img" src="" alt="Preview da imagem" style="display:none;">
+        <video id="preview" controls playsinline style="display:none;"></video>
       </div>
-
       <div>
         <h3>Resultado</h3>
         <pre id="out" class="mono">—</pre>
@@ -131,15 +156,19 @@
   </div>
 
   <div id="resultado-screen" class="wrap" style="display:none;">
-    <button id="btnVoltarDashboardResultado" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">VOLTAR AO INICIO</button>
+    <button id="btnVoltarDashboardResultado" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
+      VOLTAR AO INICIO
+    </button>
     <div class="card">
       <h3>Resultado Detalhado</h3>
-      <div id="resultado-detalhado" class="mono"></div>
+      <div id="resultado-detalhado" class="mono">
+        </div>
       <h3 style="margin-top: 20px;">Gráfico Demonstrativo</h3>
-      <div id="grafico-placeholder">(Gráfico de Produtividade em breve)</div>
+      <div id="grafico-placeholder">
+        (Gráfico de Produtividade em breve)
+      </div>
     </div>
   </div>
-
 
   <div class="app-footer">
     <a href="#" id="navInicio" class="footer-btn active">Início</a>
@@ -150,12 +179,12 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
     
-      // --- LÓGICA DE NAVEGAÇÃO (Sem alterações) ---
+      // --- LÓGICA DE NAVEGAÇÃO ---
       const SENHA_SECRETA = "cyberagro2025"; 
       const loginScreen = document.getElementById("login-screen");
       const dashboardScreen = document.getElementById("dashboard-screen"); 
       const appScreen = document.getElementById("app-screen");
-      const resultadoScreen = document.getElementById("resultado-screen"); 
+      const resultadoScreen = document.getElementById("resultado-screen");
       const loginButton = document.getElementById("loginButton");
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
@@ -165,6 +194,7 @@
       const navInicio = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
       const navPerfil = document.getElementById("navPerfil");
+
       function showScreen(screenToShow) {
         loginScreen.style.display = 'none';
         dashboardScreen.style.display = 'none';
@@ -172,16 +202,28 @@
         resultadoScreen.style.display = 'none';
         screenToShow.style.display = 'block';
       }
+
       loginButton.onclick = () => {
-        if (passwordInput.value === SENHA_SECRETA) { showScreen(dashboardScreen); } 
-        else { loginError.style.display = "block"; }
+        if (passwordInput.value === SENHA_SECRETA) {
+          showScreen(dashboardScreen);
+        } else {
+          loginError.style.display = "block";
+        }
       };
       passwordInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") { e.preventDefault(); loginButton.click(); }
       });
       btnNovaContagem.onclick = () => { showScreen(appScreen); };
-      btnVoltarDashboard.onclick = (e) => { e.preventDefault(); showScreen(dashboardScreen); resetUI(); };
-      btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); showScreen(dashboardScreen); resetUI(); };
+      btnVoltarDashboard.onclick = (e) => {
+        e.preventDefault(); 
+        showScreen(dashboardScreen);
+        resetUI(); 
+      };
+      btnVoltarDashboardResultado.onclick = (e) => {
+        e.preventDefault();
+        showScreen(dashboardScreen);
+        resetUI();
+      };
       navInicio.onclick = (e) => { e.preventDefault(); showScreen(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); alert("Tela 'Relatórios' em construção."); };
       navPerfil.onclick = (e) => { e.preventDefault(); alert("Tela 'Perfil' em construção."); };
@@ -191,26 +233,17 @@
       const PESO_MEDIO_GRAMAS = 500; 
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
-      
       const fileInput = document.getElementById("fileInput");
       const areaInput = document.getElementById("areaInput"); 
-      const btnSend   = document.getElementById("btnSend");
-      const btnClear  = document.getElementById("btnClear");
-      const out       = document.getElementById("out"); 
-      const statusEl  = document.getElementById("status");
-      const pbar      = document.getElementById("pbar");
-      const fileInfo  = document.getElementById("fileInfo");
-      const previewVid = document.getElementById("preview-vid"); // Player de Vídeo
-      const previewImg = document.getElementById("preview-img"); // Player de Imagem
-      
-      const resultadoDetalhado = document.getElementById("resultado-detalhado"); 
-      
-      // *** NOVOS ELEMENTOS (Seleção de Modo) ***
-      const modoFoto = document.getElementById("modoFoto");
-      const modoVideo = document.getElementById("modoVideo");
-      
+      const btnSend = document.getElementById("btnSend");
+      const btnClear = document.getElementById("btnClear");
+      const out = document.getElementById("out");
+      const statusEl = document.getElementById("status");
+      const pbar = document.getElementById("pbar");
+      const fileInfo = document.getElementById("fileInfo");
+      const preview = document.getElementById("preview");
+      const resultadoDetalhado = document.getElementById("resultado-detalhado");
       let selectedFile = null;
-      let modoAtual = 'video'; // Começa como vídeo por padrão
 
       function setStatus(s){ statusEl.textContent = s; }
       function setProgress(p){ pbar.style.width = Math.min(100, Math.max(0, p)) + "%"; }
@@ -222,53 +255,38 @@
         btnSend.disabled = true;
         btnClear.disabled = true;
         fileInfo.textContent = "Nenhum arquivo selecionado.";
-        previewVid.src = "";
-        previewVid.style.display = "none";
-        previewImg.src = "";
-        previewImg.style.display = "none";
-        out.textContent = "—"; 
+        preview.src = "";
+        preview.style.display = "none";
+        out.textContent = "—";
         setProgress(0);
-        checkModo(); // Reconfigura o status inicial
+        setStatus("aguardando arquivo e área...");
       }
-      
-      // *** LÓGICA ATUALIZADA (Habilita o botão Enviar) ***
       function checkInputs() {
         const area = parseFloat(areaInput.value);
-        let areaValida = (modoAtual === 'foto') ? true : (area > 0); // Se for foto, área não importa
-        
-        if (selectedFile && areaValida) {
+        if (selectedFile && area > 0) {
           btnSend.disabled = false;
           setStatus("Pronto para enviar.");
         } else {
           btnSend.disabled = true;
-          if (modoAtual === 'video') setStatus("aguardando arquivo e área...");
-          else setStatus("aguardando arquivo...");
         }
       }
       
-      // *** NOVA FUNÇÃO (Controla a UI) ***
-      function checkModo() {
-        if (modoFoto.checked) {
-          modoAtual = 'foto';
-          fileInput.accept = "image/*"; // Aceita apenas imagens
-          areaInput.style.display = 'none'; // Esconde o campo de área
-          resetUI();
-          setStatus("aguardando arquivo...");
-        } else {
-          modoAtual = 'video';
-          fileInput.accept = "video/*"; // Aceita apenas vídeos
-          areaInput.style.display = 'block'; // Mostra o campo de área
-          resetUI();
-        }
-      }
-      
-      modoFoto.addEventListener("change", checkModo);
-      modoVideo.addEventListener("change", checkModo);
-      
-      // --- LÓGICA DE UPLOAD ATUALIZADA ---
       fileInput.addEventListener("change", (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
+        
+        // **** NOVA VALIDAÇÃO DE TIPO DE ARQUIVO ****
+        if (!file.type.startsWith("video/")) {
+            setStatus("Erro: Apenas arquivos de VÍDEO são permitidos.");
+            fileInfo.textContent = "Erro: Apenas arquivos de VÍDEO são permitidos.";
+            btnSend.disabled = true;
+            btnClear.disabled = true;
+            selectedFile = null;
+            preview.style.display = "none";
+            return; // Interrompe a execução
+        }
+        // *******************************************
+
         selectedFile = file;
         const mb = (file.size/1024/1024).toFixed(2);
         fileInfo.textContent = `${file.name} • ${mb} MB`;
@@ -278,50 +296,30 @@
           setStatus(`arquivo muito grande (> ${MAX_MB} MB)`);
           btnSend.disabled = true;
         } else {
-          checkInputs(); // Checa se a área (se visível) está preenchida
+          checkInputs();
         }
-
-        // Mostra o preview correto (vídeo ou imagem)
-        const url = URL.createObjectURL(file);
-        if (modoAtual === 'video') {
-          previewVid.src = url;
-          previewVid.style.display = "block";
-          previewImg.style.display = "none";
-          previewVid.play().catch(()=>{});
-        } else {
-          previewImg.src = url;
-          previewImg.style.display = "block";
-          previewVid.style.display = "none";
-        }
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+        preview.play().catch(()=>{});
       });
       
       areaInput.addEventListener("input", checkInputs); 
       btnClear.addEventListener("click", resetUI);
       
-      // --- LÓGICA DE ENVIO E CÁLCULO ATUALIZADA ---
       btnSend.addEventListener("click", async () => {
         if (!selectedFile) return;
-        
         const area_video_m2 = parseFloat(areaInput.value);
-        if (modoAtual === 'video' && (!area_video_m2 || area_video_m2 <= 0)) {
+        if (!area_video_m2 || area_video_m2 <= 0) {
             alert("Por favor, insira um valor válido para a área em metros quadrados (m²).");
             return;
         }
-        
         btnSend.disabled = true;
         setStatus("enviando para IA…");
         setProgress(25);
 
         const form = new FormData();
-        // O backend vai ler o mimetype, então enviamos 'video' ou 'image' no nome do campo
-        const fieldName = (modoAtual === 'video') ? 'video' : 'image'; 
-        form.append(fieldName, selectedFile, selectedFile.name || "media-file");
+        form.append("video", selectedFile, selectedFile.name || "clip.mp4");
         
-        // Se for vídeo, enviamos a área
-        if (modoAtual === 'video') {
-          form.append("area_m2", area_video_m2);
-        }
-
         try {
           const resp = await fetch(API_URL, { method: "POST", body: form });
           setProgress(75);
@@ -332,22 +330,13 @@
             setStatus("OK! Contagem recebida.");
             try {
               const data = JSON.parse(text);
-              const contagem_api = data.contagem_final;
-              
-              let resultadoTexto = "";
-              
-              // Se a API retornar a estimativa (é um vídeo), mostramos
-              if (data.estimativa_kg_ha) {
-                const kg_por_hectare = data.estimativa_kg_ha;
-                resultadoTexto = "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-                resultadoTexto += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare + " KG/HA";
-              } else {
-                // Se for só foto, mostramos só a contagem
-                resultadoTexto = "RESULTADO DA CONTAGEM: " + contagem_api;
-              }
+              const contagem_api = data.contagem_final; 
+              const kg_por_m2 = (contagem_api * (PESO_MEDIO_GRAMAS / 1000)) / area_video_m2;
+              const kg_por_hectare = (kg_por_m2 * M2_POR_HECTARE).toFixed(2);
 
               // 1. Preenche a "página" de resultado (oculta)
-              resultadoDetalhado.textContent = resultadoTexto;
+              resultadoDetalhado.textContent = "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
+              resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare + " KG/HA";
               
               // 2. Cria o botão verde clicável
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
