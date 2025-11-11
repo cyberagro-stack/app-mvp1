@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CyberAgro • Contador de Mangas</title>
-
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FFFFFF">
   <script>
@@ -14,7 +13,6 @@
         .catch(err => console.log('Service Worker falhou:', err));
     }
   </script>
-
   <style>
     /* (Todos os seus estilos .css continuam os mesmos) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
@@ -32,7 +30,7 @@
     .area-input { font-family: inherit; font-size: 1rem; padding: 10px 14px; border: 1px solid #E0E0E0; border-radius: 12px; background: #FFFFFF; flex-grow: 1; min-width: 150px; }
     .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; }
     .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
-    video { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
+    video, img { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; } /* Agora inclui IMG */
     .login-error { color: #D32F2F; font-size: 0.9rem; text-align: center; margin-top: 10px; display: none; }
     .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .summary-card { background: #EEEEEE; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; }
@@ -130,13 +128,13 @@
     <button id="btnVoltarDashboard" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
       VOLTAR AO INICIO
     </button>
-    <p class="muted">Anexe um vídeo do drone ou celular para a contagem da IA.</p>
+    <p class="muted">Anexe um vídeo ou imagem para a contagem da IA.</p>
     <div class="card" id="app">
       <div class="row">
-        <button id="btnSelect" class="btn-upload">1. Escolher vídeo…
-          <input id="fileInput" class="file-proxy" type="file" accept="video/*">
+        <button id="btnSelect" class="btn-upload">1. Escolher Ficheiro…
+          <input id="fileInput" class="file-proxy" type="file" accept="video/*,image/*">
         </button>
-        <input type="number" id="areaInput" placeholder="Área do vídeo (m²)" class="area-input">
+        <input type="number" id="areaInput" placeholder="Área do vídeo (m²)" class="area-input" style="display:none;">
       </div>
       <div class="row" style="margin-top: 12px;">
          <button id="btnSend" disabled>2. Enviar para IA</button>
@@ -144,9 +142,11 @@
       </div>
       <div style="margin:12px 0;text-align:left;">
         <div class="progress"><div id="pbar" class="bar"></div></div>
-        <div style="margin-top:8px">Status: <span id="status" class="mono">aguardando arquivo e área...</span></div>
-        <div id="fileInfo" class="muted" style="text-align:left;margin-top:8px;">Nenhum arquivo selecionado.</div>
-        <video id="preview" controls playsinline style="display:none;"></video>
+        <div style="margin-top:8px">Status: <span id="status" class="mono">aguardando ficheiro...</span></div>
+        <div id="fileInfo" class="muted" style="text-align:left;margin-top:8px;">Nenhum ficheiro selecionado.</div>
+        
+        <video id="previewVideo" controls playsinline style="display:none;"></video>
+        <img id="previewImage" src="" alt="Preview da Imagem" style="display:none; width: 100%; border-radius: 12px; margin-top: 10px;">
       </div>
       <div>
         <h3>Resultado</h3>
@@ -181,10 +181,12 @@
     
       // --- LÓGICA DE NAVEGAÇÃO ---
       const SENHA_SECRETA = "cyberagro2025"; 
+      // ... (IDs das telas)
       const loginScreen = document.getElementById("login-screen");
       const dashboardScreen = document.getElementById("dashboard-screen"); 
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
+      // ... (IDs dos botões)
       const loginButton = document.getElementById("loginButton");
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
@@ -203,36 +205,26 @@
         screenToShow.style.display = 'block';
       }
 
-      loginButton.onclick = () => {
-        if (passwordInput.value === SENHA_SECRETA) {
-          showScreen(dashboardScreen);
-        } else {
-          loginError.style.display = "block";
-        }
-      };
-      passwordInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") { e.preventDefault(); loginButton.click(); }
-      });
+      // ... (Lógica de clique dos botões de navegação não muda)
+      loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) { showScreen(dashboardScreen); } else { loginError.style.display = "block"; } };
+      passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
       btnNovaContagem.onclick = () => { showScreen(appScreen); };
-      btnVoltarDashboard.onclick = (e) => {
-        e.preventDefault(); 
-        showScreen(dashboardScreen);
-        resetUI(); 
-      };
-      btnVoltarDashboardResultado.onclick = (e) => {
-        e.preventDefault();
-        showScreen(dashboardScreen);
-        resetUI();
-      };
+      btnVoltarDashboard.onclick = (e) => { e.preventDefault(); showScreen(dashboardScreen); resetUI(); };
+      btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); showScreen(dashboardScreen); resetUI(); };
       navInicio.onclick = (e) => { e.preventDefault(); showScreen(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); alert("Tela 'Relatórios' em construção."); };
       navPerfil.onclick = (e) => { e.preventDefault(); alert("Tela 'Perfil' em construção."); };
 
       // --- LÓGICA DO APP (Contagem) ---
-      const API_URL = "https://contador-manga-476522137012.us-central1.run.app/contar";
+      
+      // **** MUDANÇA AQUI: Duas URLs de API ****
+      const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
+      const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
+      
       const PESO_MEDIO_GRAMAS = 500; 
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
+      
       const fileInput = document.getElementById("fileInput");
       const areaInput = document.getElementById("areaInput"); 
       const btnSend = document.getElementById("btnSend");
@@ -241,7 +233,11 @@
       const statusEl = document.getElementById("status");
       const pbar = document.getElementById("pbar");
       const fileInfo = document.getElementById("fileInfo");
-      const preview = document.getElementById("preview");
+      
+      // **** MUDANÇA AQUI: Dois previews ****
+      const previewVideo = document.getElementById("previewVideo");
+      const previewImage = document.getElementById("previewImage");
+      
       const resultadoDetalhado = document.getElementById("resultado-detalhado");
       let selectedFile = null;
 
@@ -254,16 +250,23 @@
         areaInput.value = ""; 
         btnSend.disabled = true;
         btnClear.disabled = true;
-        fileInfo.textContent = "Nenhum arquivo selecionado.";
-        preview.src = "";
-        preview.style.display = "none";
+        fileInfo.textContent = "Nenhum ficheiro selecionado.";
+        previewVideo.src = "";
+        previewVideo.style.display = "none";
+        previewImage.src = "";
+        previewImage.style.display = "none";
         out.textContent = "—";
         setProgress(0);
-        setStatus("aguardando arquivo e área...");
+        setStatus("aguardando ficheiro...");
       }
+      
       function checkInputs() {
         const area = parseFloat(areaInput.value);
-        if (selectedFile && area > 0) {
+        const isVideo = selectedFile && selectedFile.type.startsWith("video/");
+        const isImage = selectedFile && selectedFile.type.startsWith("image/");
+        
+        // Se for vídeo, precisa de área. Se for imagem, não precisa.
+        if ((isVideo && area > 0) || isImage) {
           btnSend.disabled = false;
           setStatus("Pronto para enviar.");
         } else {
@@ -275,18 +278,21 @@
         const file = e.target.files && e.target.files[0];
         if (!file) return;
         
-        // **** NOVA VALIDAÇÃO DE TIPO DE ARQUIVO ****
-        if (!file.type.startsWith("video/")) {
-            setStatus("Erro: Apenas arquivos de VÍDEO são permitidos.");
-            fileInfo.textContent = "Erro: Apenas arquivos de VÍDEO são permitidos.";
+        // **** MUDANÇA AQUI: Aceita vídeo ou imagem ****
+        const isVideo = file.type.startsWith("video/");
+        const isImage = file.type.startsWith("image/");
+
+        if (!isVideo && !isImage) {
+            setStatus("Erro: Apenas arquivos de VÍDEO ou IMAGEM são permitidos.");
+            fileInfo.textContent = "Erro: Apenas arquivos de VÍDEO ou IMAGEM.";
             btnSend.disabled = true;
             btnClear.disabled = true;
             selectedFile = null;
-            preview.style.display = "none";
-            return; // Interrompe a execução
+            previewVideo.style.display = "none";
+            previewImage.style.display = "none";
+            return;
         }
-        // *******************************************
-
+        
         selectedFile = file;
         const mb = (file.size/1024/1024).toFixed(2);
         fileInfo.textContent = `${file.name} • ${mb} MB`;
@@ -296,32 +302,60 @@
           setStatus(`arquivo muito grande (> ${MAX_MB} MB)`);
           btnSend.disabled = true;
         } else {
-          checkInputs();
+          checkInputs(); // Checa se a área (se necessária) está preenchida
         }
-        preview.src = URL.createObjectURL(file);
-        preview.style.display = "block";
-        preview.play().catch(()=>{});
+
+        // Mostra o preview correto
+        const previewURL = URL.createObjectURL(file);
+        if (isVideo) {
+          previewVideo.src = previewURL;
+          previewVideo.style.display = "block";
+          previewImage.style.display = "none";
+          areaInput.style.display = "block"; // <-- Mostra o campo de área
+          previewVideo.play().catch(()=>{});
+        } else {
+          previewImage.src = previewURL;
+          previewImage.style.display = "block";
+          previewVideo.style.display = "none";
+          areaInput.style.display = "none"; // <-- Esconde o campo de área
+          areaInput.value = ""; // Limpa a área
+        }
       });
       
       areaInput.addEventListener("input", checkInputs); 
       btnClear.addEventListener("click", resetUI);
       
+      // **** MUDANÇA AQUI: Lógica de envio atualizada ****
       btnSend.addEventListener("click", async () => {
         if (!selectedFile) return;
+        
+        const isVideoRequest = selectedFile.type.startsWith("video/");
+        let target_url = ""; // URL da API a ser chamada
+        
+        // Validação de área (só para vídeo)
         const area_video_m2 = parseFloat(areaInput.value);
-        if (!area_video_m2 || area_video_m2 <= 0) {
-            alert("Por favor, insira um valor válido para a área em metros quadrados (m²).");
+        if (isVideoRequest && (!area_video_m2 || area_video_m2 <= 0)) {
+            alert("Para vídeos, por favor, insira um valor válido para a área em metros quadrados (m²).");
             return;
         }
+        
         btnSend.disabled = true;
         setStatus("enviando para IA…");
         setProgress(25);
 
         const form = new FormData();
-        form.append("video", selectedFile, selectedFile.name || "clip.mp4");
+        // O backend espera o campo 'video' para ambos os tipos
+        form.append("video", selectedFile, selectedFile.name || "mediafile"); 
+
+        // Define qual API chamar
+        if (isVideoRequest) {
+            target_url = API_URL_VIDEO;
+        } else {
+            target_url = API_URL_IMAGEM;
+        }
         
         try {
-          const resp = await fetch(API_URL, { method: "POST", body: form });
+          const resp = await fetch(target_url, { method: "POST", body: form });
           setProgress(75);
           const text = await resp.text().catch(()=> "");
           setProgress(100);
@@ -331,17 +365,27 @@
             try {
               const data = JSON.parse(text);
               const contagem_api = data.contagem_final; 
-              const kg_por_m2 = (contagem_api * (PESO_MEDIO_GRAMAS / 1000)) / area_video_m2;
-              const kg_por_hectare = (kg_por_m2 * M2_POR_HECTARE).toFixed(2);
-
-              // 1. Preenche a "página" de resultado (oculta)
-              resultadoDetalhado.textContent = "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-              resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare + " KG/HA";
               
-              // 2. Cria o botão verde clicável
+              // Preenche a página de resultado (que está oculta)
+              if (isVideoRequest) {
+                // Lógica de Produtividade (só para vídeo)
+                const kg_por_m2 = (contagem_api * (PESO_MEDIO_GRAMAS / 1000)) / area_video_m2;
+                const kg_por_hectare = (kg_por_m2 * M2_POR_HECTARE).toFixed(2);
+                
+                resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
+                resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
+                resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare + " KG/HA";
+              } else {
+                // Lógica de Imagem (só contagem)
+                resultadoDetalhado.textContent = "TIPO: IMAGEM\n";
+                resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
+                resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A (requer vídeo)";
+              }
+              
+              // Cria o botão verde clicável
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
               
-              // 3. Adiciona o evento ao botão recém-criado
+              // Adiciona o evento ao botão recém-criado
               document.getElementById("btnVerResultado").onclick = () => {
                 showScreen(resultadoScreen);
               };
