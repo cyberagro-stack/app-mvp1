@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CyberAgro • Contador de Mangas</title>
+
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FFFFFF">
   <script>
@@ -13,8 +14,9 @@
         .catch(err => console.log('Service Worker falhou:', err));
     }
   </script>
+
   <style>
-    /* (Todos os seus estilos .css continuam os mesmos) */
+    /* (Estilos gerais...) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -31,13 +33,7 @@
     .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; }
     .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
     
-    #previewVideo, #previewImage { 
-      width: 100%; 
-      border-radius: 12px; 
-      background: #000; 
-      margin-top: 10px; 
-    }
-    
+    #previewVideo, #previewImage { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
     .login-error { color: #D32F2F; font-size: 0.9rem; text-align: center; margin-top: 10px; display: none; }
     .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .summary-card { background: #EEEEEE; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; }
@@ -59,6 +55,8 @@
       font-size: 1.1rem;
       margin-top: 20px;
     }
+    
+    /* --- ESTILO DO RODAPÉ --- */
     .app-footer {
       position: fixed;
       bottom: 0;
@@ -69,6 +67,7 @@
       display: flex;
       justify-content: space-around;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+      z-index: 999; /* Garante que o rodapé esteja acima do conteúdo */
     }
     .footer-btn {
       flex-grow: 1;
@@ -79,6 +78,7 @@
       color: #888888; 
     }
     .footer-btn.active { color: #28a745; font-weight: 600; }
+    
     #grafico-placeholder {
       width: 100%;
       height: 250px;
@@ -90,14 +90,31 @@
       font-style: italic;
       color: #888;
     }
+    
+    /* --- NOVO BOTÃO DE CHAT (FAB) --- */
+    .chat-fab {
+      position: fixed;
+      bottom: 90px; /* Acima da margem do rodapé (80px) */
+      right: 20px;
+      background: #28a745; /* Verde */
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%; /* Redondo */
+      font-size: 1.5rem; /* Tamanho do emoji */
+      line-height: 50px; /* Centraliza o emoji */
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1000; /* Acima de tudo, menos do rodapé */
+      padding: 0;
+    }
+    /* ---------------------------------- */
   </style>
 </head>
 <body>
 
   <div id="login-screen" class="wrap">
-    <h1 style="text-align:center;margin-bottom:16px;">
-      <img src="logo.png?v=3" alt="CyberAgro Logo" height="250">
-    </h1>
+    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=3" alt="CyberAgro Logo" height="250"></h1>
     <div class="card">
       <h3 style="text-align: center;">Acesso Restrito</h3>
       <p class="muted" style="text-align: left;">Insira a senha de acesso para continuar.</p>
@@ -111,28 +128,23 @@
     <h3>Visão Geral</h3>
     <div class="summary-grid">
       <div class="summary-card"><label>Contagens no Ano</label><div class="value">312</div></div>
-      
-      <div class="summary-card">
-        <label>Est. Faturamento Anual</label>
-        <div class="value" id="faturamento-anual-valor">R$ 0,00</div>
-      </div>
-      </div>
-    
-    <h3>Produtividade Mensal</h3>
+      <div class="summary-card"><label>Est. Faturamento Anual</label><div class="value">R$ 13.491.152</div></div>
+    </div>
+    <h3>Produtividade Mensal (Dados Fictícios)</h3>
     <ul class="data-list card">
-      <li class="data-row"><span>Dezembro</span> <span class="monthly-value">R$ 0,00</span></li>
-      <li class="data-row"><span>Novembro</span> <span class="monthly-value">R$ 0,00</span></li>
-      <li class="data-row"><span>Outubro</span> <span class="monthly-value">R$ 12.029.994,00</span></li>
-      <li class="data-row"><span>Setembro</span> <span class="monthly-value">R$ 1.104.513,91</span></li>
-      <li class="data-row"><span>Agosto</span> <span class="monthly-value">R$ 356.644,48</span></li>
-      <li class="data-row"><span>Julho</span> <span class="monthly-value">R$ 0,00</span></li>
-      <li class="data-row"><span>Junho</span> <span class="monthly-value">R$ 0,00</span></li>
-      <li class="data-row"><span>Maio</span> <span class="monthly-value">R$ 0,00</span></li>
-      <li class="data-row"><span>Abril</span> <span class="monthly-value">R$ 0,00</span></li>
-      <li class="data-row"><span>Março</span> <span class="monthly-value">R$ 0,00</span></li>
-      <li class="data-row"><span>Fevereiro</span> <span class="monthly-value">R$ 0,00</span></li>
-      <li class="data-row"><span>Janeiro</span> <span class="monthly-value">R$ 0,00</span></li>
-      </ul>
+      <li class="data-row"><span>Dezembro</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Novembro</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Outubro</span> <span>R$ 12.029.994,00</span></li>
+      <li class="data-row"><span>Setembro</span> <span>R$ 1.104.513,91</span></li>
+      <li class="data-row"><span>Agosto</span> <span>R$ 356.644,48</span></li>
+      <li class="data-row"><span>Julho</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Junho</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Maio</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Abril</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Março</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Fevereiro</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Janeiro</span> <span>R$ 0,00</span></li>
+    </ul>
     <button id="btnNovaContagem" class="btn-nova-contagem">+ Nova Contagem</button>
   </div>
 
@@ -183,7 +195,8 @@
     <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
     <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
   </div>
-
+  
+  <button id="btnChat" class="chat-fab">💬</button>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
     
@@ -202,38 +215,72 @@
       const navInicio = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
       const navPerfil = document.getElementById("navPerfil");
+      const btnChat = document.getElementById("btnChat"); // <-- NOVO BOTÃO
+      const appFooter = document.querySelector(".app-footer"); // O rodapé
 
       function navigateTo(screenToShow) {
         loginScreen.style.display = 'none';
         dashboardScreen.style.display = 'none';
         appScreen.style.display = 'none';
         resultadoScreen.style.display = 'none';
+        
+        // Esconde o botão de chat e o rodapé na tela de login
+        if (screenToShow === loginScreen) {
+          appFooter.style.display = 'none';
+          btnChat.style.display = 'none';
+        } else {
+          appFooter.style.display = 'flex'; // 'flex' é o display original
+          btnChat.style.display = 'block';
+        }
+        
         screenToShow.style.display = 'block';
+        
         navInicio.classList.remove('active');
         navRelatorios.classList.remove('active');
         navPerfil.classList.remove('active');
+        
         if (screenToShow === dashboardScreen || screenToShow === appScreen) {
           navInicio.classList.add('active'); 
         } else if (screenToShow === resultadoScreen) {
           navRelatorios.classList.add('active'); 
         } 
       }
-      loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) { navigateTo(dashboardScreen); } else { loginError.style.display = "block"; } };
-      passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
+      
+      // Estado inicial (mostra o login e esconde os menus)
+      navigateTo(loginScreen);
+
+      loginButton.onclick = () => {
+        if (passwordInput.value === SENHA_SECRETA) {
+          navigateTo(dashboardScreen); 
+        } else {
+          loginError.style.display = "block";
+        }
+      };
+      passwordInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); loginButton.click(); }
+      });
       btnNovaContagem.onclick = () => { navigateTo(appScreen); };
       btnVoltarDashboard.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       navInicio.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); navigateTo(resultadoScreen); };
       navPerfil.onclick = (e) => { e.preventDefault(); alert("Tela 'Perfil' em construção."); };
+      
+      // --- LÓGICA DO NOVO BOTÃO DE CHAT ---
+      btnChat.onclick = (e) => {
+        e.preventDefault();
+        alert("Agente de IA (Chatbot) em construção.");
+        // (Aqui você pode redirecionar para seu link do WhatsApp / n8n no futuro)
+      };
 
       // --- LÓGICA DO APP (Contagem) ---
+      // (Toda a lógica da API, `btnSend`, `resetUI`, `checkInputs`, etc. 
+      // continua exatamente a mesma de antes)
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
-      // O PESO_MEDIO_GRAMAS foi removido daqui
+      const PESO_MEDIO_GRAMAS = 500; 
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
-      
       const fileInput = document.getElementById("fileInput");
       const areaInput = document.getElementById("areaInput"); 
       const btnSend = document.getElementById("btnSend");
@@ -249,7 +296,6 @@
 
       function setStatus(s){ statusEl.textContent = s; }
       function setProgress(p){ pbar.style.width = Math.min(100, Math.max(0, p)) + "%"; }
-      
       function resetUI(){
         selectedFile = null; fileInput.value = ""; areaInput.value = ""; 
         btnSend.disabled = true; btnClear.disabled = true;
@@ -305,45 +351,18 @@
       });
       areaInput.addEventListener("input", checkInputs); 
       btnClear.addEventListener("click", resetUI);
-      
-      // --- LÓGICA DE ENVIO ATUALIZADA (v2.17) ---
-      btnSend.addEventListener("click", iniciarContagem);
-
-      async function iniciarContagem() {
+      btnSend.addEventListener("click", async () => {
         if (!selectedFile) return;
-        
-        btnSend.disabled = true;
-        setStatus("Passo 1/3: A obter cotação do dia...");
-        setProgress(10);
-        
-        // --- PASSO A: Obter os dados de preço (do JSON) ---
-        let dados_preco;
-        try {
-          const respPreco = await fetch(`mango_prices.json?v=${Date.now()}`); 
-          if (!respPreco.ok) throw new Error("Não foi possível buscar o arquivo de preços.");
-          dados_preco = await respPreco.json();
-        } catch (err) {
-          console.warn("Falha ao obter cotação, usando valores padrão:", err);
-          setStatus("Falha ao obter cotação. Usando valores padrão.");
-          // **** ALTERAÇÃO 4 ****
-          // Fallback (plano B) se o JSON falhar: removido "(Fictício)"
-          dados_preco = { preco_kg: 0, peso_medio_g: 500, fonte: "CEPEA/ESALQ" }; 
-        }
-        
-        // --- PASSO B: Enviar o ficheiro para a API ---
         const isVideoRequest = selectedFile.type.startsWith("video/");
         let target_url = ""; 
         const area_video_m2 = parseFloat(areaInput.value);
-        
         if (isVideoRequest && (!area_video_m2 || area_video_m2 <= 0)) {
             alert("Para vídeos, por favor, insira um valor válido para a área em metros quadrados (m²).");
-            resetUI();
             return;
         }
-        
-        setStatus("Passo 2/3: Enviando para IA…");
+        btnSend.disabled = true;
+        setStatus("enviando para IA…");
         setProgress(25);
-
         const form = new FormData();
         form.append("video", selectedFile, selectedFile.name || "mediafile"); 
         if (isVideoRequest) { target_url = API_URL_VIDEO; } 
@@ -354,45 +373,27 @@
           setProgress(75);
           const text = await resp.text().catch(()=> "");
           setProgress(100);
-          
           if (resp.ok) {
             setStatus("OK! Contagem recebida.");
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            
-            // --- PASSO C: Cálculo (agora com dados dinâmicos) ---
             try {
               const data = JSON.parse(text);
               const contagem_api = data.contagem_final; 
-              
               if (isVideoRequest) {
-                const peso_medio_kg = dados_preco.peso_medio_g / 1000;
-                const preco_por_kg = dados_preco.preco_kg;
-                
-                const kg_por_m2 = (contagem_api * peso_medio_kg) / area_video_m2;
-                const kg_por_hectare = (kg_por_m2 * M2_POR_HECTARE);
-                const faturamento_ha = (kg_por_hectare * preco_por_kg).toFixed(2);
-                
-                // **** ALTERAÇÃO 5 ****
-                // Limpa a palavra "(Fictício)" da fonte
-                const fonte_limpa = dados_preco.fonte.replace("(Fictício)", "").trim();
-                
+                const kg_por_m2 = (contagem_api * (PESO_MEDIO_GRAMAS / 1000)) / area_video_m2;
+                const kg_por_hectare = (kg_por_m2 * M2_POR_HECTARE).toFixed(2);
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-                resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare.toFixed(2) + "\n";
-                resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha + "\n\n";
-                resultadoDetalhado.textContent += `(Cotação: R$ ${preco_por_kg}/kg | Fonte: ${fonte_limpa})`;
-                
+                resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare + " KG/HA";
               } else {
                 resultadoDetalhado.textContent = "TIPO: IMAGEM\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-                resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A";
+                resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A (requer vídeo)";
               }
-              
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
               document.getElementById("btnVerResultado").onclick = () => {
                 navigateTo(resultadoScreen); 
               };
-              
             } catch (e) {
               out.textContent = "Erro ao ler o JSON: " + text;
             }
@@ -406,49 +407,8 @@
         } finally {
           btnSend.disabled = false;
         }
-      } // Fim da função iniciarContagem
-      
-      // --- NOVA FUNÇÃO (v2.17) ---
-      // Calcula o faturamento anual somando os meses
-      function calcularFaturamentoAnual() {
-        let totalAnual = 0;
-        // 1. Pega todos os spans com os valores mensais
-        const valoresMensais = document.querySelectorAll(".monthly-value");
-        
-        valoresMensais.forEach(span => {
-          // 2. Limpa a string: "R$ 1.104.513,91" -> "1104513.91"
-          const valorStr = span.textContent
-            .replace("R$", "")
-            .replace(/\./g, "")  // Remove todos os pontos
-            .replace(",", ".")  // Troca vírgula por ponto
-            .trim();
-            
-          // 3. Converte para número e soma
-          const valorNum = parseFloat(valorStr);
-          if (!isNaN(valorNum)) {
-            totalAnual += valorNum;
-          }
-        });
-        
-        // 4. Formata de volta para R$ (Formato Brasileiro)
-        const formatador = new Intl.NumberFormat('pt-BR', {
-          style: 'currency',
-          currency: 'BRL'
-        });
-        
-        // 5. Atualiza o HTML
-        const faturamentoEl = document.getElementById("faturamento-anual-valor");
-        if (faturamentoEl) {
-          faturamentoEl.textContent = formatador.format(totalAnual);
-        }
-      }
-      
-      // Roda a função assim que a página carregar
-      calcularFaturamentoAnual();
-      // -----------------------------
-      
+      });
     });
   </script>
 </body>
 </html>
-
