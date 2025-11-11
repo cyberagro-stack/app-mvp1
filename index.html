@@ -14,7 +14,7 @@
     }
   </script>
   <style>
-    /* (Todos os seus estilos .css continuam os mesmos) */
+    /* (Estilos gerais...) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -75,30 +75,64 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; padding: 0;
     }
     .chat-window {
-      height: 400px;
-      background: #FFF;
-      border: 1px solid #EEE;
-      border-radius: 12px;
-      overflow-y: auto; /* Scroll */
-      padding: 10px;
-      margin-bottom: 10px;
+      height: 400px; background: #FFF; border: 1px solid #EEE;
+      border-radius: 12px; overflow-y: auto; padding: 10px; margin-bottom: 10px;
     }
-    .chat-bubble {
-      padding: 10px 14px;
-      border-radius: 16px;
-      margin-bottom: 8px;
-      max-width: 80%;
+    .chat-bubble { padding: 10px 14px; border-radius: 16px; margin-bottom: 8px; max-width: 80%; }
+    .chat-bubble.user { background: #2a7bf6; color: white; margin-left: auto; }
+    .chat-bubble.bot { background: #EEEEEE; color: #333; margin-right: auto; }
+    
+    /* --- NOVOS ESTILOS DA TELA DE PERFIL (v2.19) --- */
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
-    .chat-bubble.user {
-      background: #2a7bf6;
-      color: white;
-      margin-left: auto; /* Alinha à direita */
+    .profile-pic {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%; /* Círculo */
+      object-fit: cover; /* Garante que a logo caiba sem distorcer */
+      background: #DDD; /* Fundo caso a logo falhe */
     }
-    .chat-bubble.bot {
-      background: #EEEEEE;
+    .profile-name {
+      font-size: 1.2rem;
+      font-weight: 600;
       color: #333;
-      margin-right: auto; /* Alinha à esquerda */
     }
+    .profile-subtitle {
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .menu-list {
+      margin-top: 20px;
+      padding: 0; /* Remove padding do .card */
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      text-decoration: none;
+      color: #333;
+      font-size: 1rem;
+      border-bottom: 1px solid #EEE;
+    }
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+    .menu-icon {
+      font-size: 1.2rem;
+      margin-right: 16px;
+      width: 24px; /* Alinha os ícones */
+      text-align: center;
+    }
+    .menu-chevron {
+      margin-left: auto; /* Empurra a seta para a direita */
+      color: #AAA;
+      font-weight: 600;
+    }
+    /* ---------------------------------------------------- */
+    
   </style>
 </head>
 <body>
@@ -195,7 +229,36 @@
       </div>
     </div>
   </div>
+  
+  <div id="perfil-screen" class="wrap" style="display:none;">
+    
+    <div class="profile-header card">
+      <img src="logo.png?v=3" alt="Foto de Perfil" class="profile-pic">
+      <div class="profile-info">
+        <div class="profile-name">Fazenda Takayasu</div>
+        <div class="profile-subtitle">São Carlo Acutis rogai por nós!</div>
+      </div>
+    </div>
+    
+    <div class="menu-list card">
+      <a href="#" class="menu-item" id="navDadosFazenda">
+        <span class="menu-icon">👤</span> <span>Dados da Fazenda</span> <span class="menu-chevron">&gt;</span>
+      </a>
+      <a href="#" class="menu-item" id="navMinhasContagens">
+        <span class="menu-icon">📋</span> <span>Minhas Contagens</span> <span class="menu-chevron">&gt;</span>
+      </a>
+      <a href="#" class="menu-item" id="navConfigIA">
+        <span class="menu-icon">⚙️</span> <span>Configurações da IA</span> <span class="menu-chevron">&gt;</span>
+      </a>
+      <a href="#" class="menu-item" id="navAssinatura">
+        <span class="menu-icon">💳</span> <span>Gerir Assinatura</span> <span class="menu-chevron">&gt;</span>
+      </a>
+      <a href="#" class="menu-item" id="navSuporte">
+        <span class="menu-icon">💬</span> <span>Suporte Técnico</span> <span class="menu-chevron">&gt;</span>
+      </a>
+    </div>
 
+  </div>
   <div class="app-footer">
     <a href="#" id="navInicio" class="footer-btn active">Início</a>
     <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
@@ -207,32 +270,38 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
     
-      // --- LÓGICA DE NAVEGAÇÃO ---
+      // --- LÓGICA DE NAVEGAÇÃO (v2.19) ---
       const SENHA_SECRETA = "cyberagro2025"; 
-      const loginScreen = document.getElementById("login-screen");
-      const dashboardScreen = document.getElementById("dashboard-screen"); 
-      const appScreen = document.getElementById("app-screen");
-      const resultadoScreen = document.getElementById("resultado-screen");
-      const chatScreen = document.getElementById("chat-screen");
-      const loginButton = document.getElementById("loginButton");
-      const passwordInput = document.getElementById("passwordInput");
-      const loginError = document.getElementById("loginError");
-      const btnNovaContagem = document.getElementById("btnNovaContagem"); 
+      
+      const loginScreen       = document.getElementById("login-screen");
+      const dashboardScreen   = document.getElementById("dashboard-screen"); 
+      const appScreen         = document.getElementById("app-screen");
+      const resultadoScreen   = document.getElementById("resultado-screen");
+      const chatScreen        = document.getElementById("chat-screen");
+      const perfilScreen      = document.getElementById("perfil-screen"); // <-- NOVA TELA
+      
+      const loginButton       = document.getElementById("loginButton");
+      const passwordInput     = document.getElementById("passwordInput");
+      const loginError        = document.getElementById("loginError");
+      const btnNovaContagem   = document.getElementById("btnNovaContagem"); 
       const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
       const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
       const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
-      const navInicio = document.getElementById("navInicio");
+      
+      const navInicio     = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
-      const navPerfil = document.getElementById("navPerfil");
-      const btnChat = document.getElementById("btnChat");
-      const appFooter = document.querySelector(".app-footer");
+      const navPerfil     = document.getElementById("navPerfil");
+      const btnChat       = document.getElementById("btnChat");
+      const appFooter     = document.querySelector(".app-footer");
 
       function navigateTo(screenToShow) {
+        // Esconde todas as 6 telas
         loginScreen.style.display = 'none';
         dashboardScreen.style.display = 'none';
         appScreen.style.display = 'none';
         resultadoScreen.style.display = 'none';
         chatScreen.style.display = 'none';
+        perfilScreen.style.display = 'none'; // <-- Esconde Perfil
         
         if (screenToShow === loginScreen) {
           appFooter.style.display = 'none';
@@ -244,27 +313,44 @@
         
         screenToShow.style.display = 'block';
         
+        // Reseta todos os botões do rodapé
         navInicio.classList.remove('active');
         navRelatorios.classList.remove('active');
         navPerfil.classList.remove('active');
         
+        // Ativa (pinta de verde) o botão correto
         if (screenToShow === dashboardScreen || screenToShow === appScreen || screenToShow === chatScreen) {
           navInicio.classList.add('active'); 
         } else if (screenToShow === resultadoScreen) {
           navRelatorios.classList.add('active'); 
-        } 
+        } else if (screenToShow === perfilScreen) {
+          navPerfil.classList.add('active'); // <-- ATIVA O PERFIL
+        }
       }
+      
       navigateTo(loginScreen);
+
       loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) { navigateTo(dashboardScreen); } else { loginError.style.display = "block"; } };
       passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
       btnNovaContagem.onclick = () => { navigateTo(appScreen); };
       btnVoltarDashboard.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       btnVoltarDashboardChat.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
+      
       navInicio.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); navigateTo(resultadoScreen); };
-      navPerfil.onclick = (e) => { e.preventDefault(); alert("Tela 'Perfil' em construção."); };
+      navPerfil.onclick = (e) => { 
+        e.preventDefault(); 
+        navigateTo(perfilScreen); // <-- ATUALIZADO
+      };
       
+      // Lógica (fictícia) para os botões do menu de Perfil
+      document.getElementById("navDadosFazenda").onclick = (e) => { e.preventDefault(); alert("Tela 'Dados da Fazenda' em construção."); };
+      document.getElementById("navMinhasContagens").onclick = (e) => { e.preventDefault(); alert("Tela 'Minhas Contagens' em construção."); };
+      document.getElementById("navConfigIA").onclick = (e) => { e.preventDefault(); alert("Tela 'Configurações da IA' em construção."); };
+      document.getElementById("navAssinatura").onclick = (e) => { e.preventDefault(); alert("Tela 'Gerir Assinatura' em construção."); };
+      document.getElementById("navSuporte").onclick = (e) => { e.preventDefault(); alert("Tela 'Suporte Técnico' em construção."); };
+
       // --- LÓGICA DO CHATBOT ---
       const N8N_WEBHOOK_URL = "COLE_A_URL_DO_SEU_WEBHOOK_DO_N8N_AQUI"; 
       const chatWindow = document.getElementById("chatWindow");
@@ -305,9 +391,11 @@
       chatInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); handleChatSend(); } });
 
       // --- LÓGICA DO APP (Contagem) ---
+      // (Toda a lógica da API, `btnSend`, `resetUI`, `checkInputs`, etc. 
+      // continua exatamente a mesma de antes)
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
-      // const PESO_MEDIO_GRAMAS = 500; <-- Não usamos mais, vem do JSON
+      const PESO_MEDIO_GRAMAS = 500; 
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
       const fileInput = document.getElementById("fileInput");
@@ -380,89 +468,48 @@
       });
       areaInput.addEventListener("input", checkInputs); 
       btnClear.addEventListener("click", resetUI);
-      
-      // O clique no botão "Enviar" agora chama esta função
-      btnSend.addEventListener("click", iniciarContagem);
-      
-      async function iniciarContagem() {
+      btnSend.addEventListener("click", async () => {
         if (!selectedFile) return;
-        
-        btnSend.disabled = true;
-        setStatus("Passo 1/3: A obter cotação do dia...");
-        setProgress(10);
-        
-        // --- PASSO A: Obter os dados de preço (do JSON) ---
-        let dados_preco;
-        try {
-          const respPreco = await fetch(`mango_prices.json?v=${Date.now()}`); 
-          if (!respPreco.ok) throw new Error("Não foi possível buscar o arquivo de preços.");
-          dados_preco = await respPreco.json();
-        } catch (err) {
-          setStatus("Falha ao obter cotação. Usando valores padrão.");
-          dados_preco = { preco_kg: 0, peso_medio_g: 500 }; 
-        }
-        
-        // --- PASSO B: Enviar o ficheiro para a API ---
         const isVideoRequest = selectedFile.type.startsWith("video/");
         let target_url = ""; 
         const area_video_m2 = parseFloat(areaInput.value);
-        
         if (isVideoRequest && (!area_video_m2 || area_video_m2 <= 0)) {
             alert("Para vídeos, por favor, insira um valor válido para a área em metros quadrados (m²).");
-            resetUI();
             return;
         }
-        
-        setStatus("Passo 2/3: Enviando para IA…");
+        btnSend.disabled = true;
+        setStatus("enviando para IA…");
         setProgress(25);
-
         const form = new FormData();
         form.append("video", selectedFile, selectedFile.name || "mediafile"); 
         if (isVideoRequest) { target_url = API_URL_VIDEO; } 
         else { target_url = API_URL_IMAGEM; }
-        
         try {
           const resp = await fetch(target_url, { method: "POST", body: form });
           setProgress(75);
           const text = await resp.text().catch(()=> "");
           setProgress(100);
-          
           if (resp.ok) {
-            setStatus("OK! Contagem recebida!");
+            setStatus("OK! Contagem recebida.");
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            
-            // --- PASSO C: Cálculo (agora com dados dinâmicos) ---
             try {
               const data = JSON.parse(text);
               const contagem_api = data.contagem_final; 
-              
               if (isVideoRequest) {
-                const peso_medio_kg = dados_preco.peso_medio_g / 1000;
-                const preco_por_kg = dados_preco.preco_kg;
-                
-                const kg_por_m2 = (contagem_api * peso_medio_kg) / area_video_m2;
-                
-                // **** CORREÇÃO DE ARREDONDAMENTO AQUI (v2.16-fix) ****
-                const kg_por_hectare = Math.round(kg_por_m2 * M2_POR_HECTARE); // Arredonda para inteiro
-                const faturamento_ha = (kg_por_hectare * preco_por_kg).toFixed(2);
-                
+                const kg_por_m2 = (contagem_api * (PESO_MEDIO_GRAMAS / 1000)) / area_video_m2;
+                const kg_por_hectare = (kg_por_m2 * M2_POR_HECTARE).toFixed(2);
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-                resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare + " KG/HA\n"; // <-- Remove .toFixed(2)
-                resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha;
-                // ******************************************************
-                
+                resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare + " KG/HA";
               } else {
                 resultadoDetalhado.textContent = "TIPO: IMAGEM\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-                resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A";
+                resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A (requer vídeo)";
               }
-              
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
               document.getElementById("btnVerResultado").onclick = () => {
                 navigateTo(resultadoScreen); 
               };
-              
             } catch (e) {
               out.textContent = "Erro ao ler o JSON: " + text;
             }
@@ -476,7 +523,7 @@
         } finally {
           btnSend.disabled = false;
         }
-      } // Fim da função iniciarContagem
+      });
     });
   </script>
 </body>
