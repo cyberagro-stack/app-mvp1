@@ -1,0 +1,42 @@
+name: Atualizar Preços da Manga
+
+on:
+  # 1. "Cron" (Agenda): Roda todo dia ao meio-dia (horário UTC)
+  schedule:
+    - cron: '0 12 * * *'
+  # 2. "Botão Manual": Permite que você rode manualmente pela aba "Actions"
+  workflow_dispatch:
+
+jobs:
+  update-prices:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Baixa o código do seu repositório (para ter acesso ao script e ao JSON)
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # 2. Configura o Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip' # Faz o cache das bibliotecas
+
+      # 3. Instala as ferramentas de scraping
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4
+          
+      # 4. Roda o seu script de scraping (que vamos criar no Passo 4)
+      - name: Run price fetcher
+        run: python scripts/fetch_price.py
+
+      # 5. Faz o "Commit" automático do novo JSON
+      - name: Commit and push if data changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add mango_prices.json
+          # Só faz o commit se o ficheiro realmente mudou
+          git diff --staged --quiet || git commit -m "Atualização automática de preços da manga"
+          git push
