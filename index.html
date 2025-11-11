@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CyberAgro • Contador de Mangas</title>
-
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FFFFFF">
   <script>
@@ -14,9 +13,8 @@
         .catch(err => console.log('Service Worker falhou:', err));
     }
   </script>
-
   <style>
-    /* (Estilos gerais...) */
+    /* (Todos os seus estilos .css continuam os mesmos) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -32,7 +30,6 @@
     .area-input { font-family: inherit; font-size: 1rem; padding: 10px 14px; border: 1px solid #E0E0E0; border-radius: 12px; background: #FFFFFF; flex-grow: 1; min-width: 150px; }
     .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; }
     .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
-    
     #previewVideo, #previewImage { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
     .login-error { color: #D32F2F; font-size: 0.9rem; text-align: center; margin-top: 10px; display: none; }
     .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -55,60 +52,53 @@
       font-size: 1.1rem;
       margin-top: 20px;
     }
-    
-    /* --- ESTILO DO RODAPÉ --- */
     .app-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #FFFFFF;
-      border-top: 1px solid #E0E0E0;
-      display: flex;
-      justify-content: space-around;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-      z-index: 999; /* Garante que o rodapé esteja acima do conteúdo */
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #FFFFFF; border-top: 1px solid #E0E0E0;
+      display: flex; justify-content: space-around;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 999;
     }
     .footer-btn {
-      flex-grow: 1;
-      text-align: center;
-      padding: 14px 10px;
-      font-size: 0.8rem;
-      text-decoration: none;
-      color: #888888; 
+      flex-grow: 1; text-align: center; padding: 14px 10px;
+      font-size: 0.8rem; text-decoration: none; color: #888888; 
     }
     .footer-btn.active { color: #28a745; font-weight: 600; }
-    
     #grafico-placeholder {
-      width: 100%;
-      height: 250px;
-      background: #EEEEEE;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-style: italic;
-      color: #888;
+      width: 100%; height: 250px; background: #EEEEEE;
+      border-radius: 12px; display: flex; align-items: center;
+      justify-content: center; font-style: italic; color: #888;
     }
-    
-    /* --- NOVO BOTÃO DE CHAT (FAB) --- */
     .chat-fab {
-      position: fixed;
-      bottom: 90px; /* Acima da margem do rodapé (80px) */
-      right: 20px;
-      background: #28a745; /* Verde */
-      color: white;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%; /* Redondo */
-      font-size: 1.5rem; /* Tamanho do emoji */
-      line-height: 50px; /* Centraliza o emoji */
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      z-index: 1000; /* Acima de tudo, menos do rodapé */
-      padding: 0;
+      position: fixed; bottom: 90px; right: 20px; background: #28a745;
+      color: white; width: 50px; height: 50px; border-radius: 50%;
+      font-size: 1.5rem; line-height: 50px; text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; padding: 0;
     }
-    /* ---------------------------------- */
+    .chat-window {
+      height: 400px;
+      background: #FFF;
+      border: 1px solid #EEE;
+      border-radius: 12px;
+      overflow-y: auto; /* Scroll */
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .chat-bubble {
+      padding: 10px 14px;
+      border-radius: 16px;
+      margin-bottom: 8px;
+      max-width: 80%;
+    }
+    .chat-bubble.user {
+      background: #2a7bf6;
+      color: white;
+      margin-left: auto; /* Alinha à direita */
+    }
+    .chat-bubble.bot {
+      background: #EEEEEE;
+      color: #333;
+      margin-right: auto; /* Alinha à esquerda */
+    }
   </style>
 </head>
 <body>
@@ -189,6 +179,22 @@
       <div id="grafico-placeholder">(Gráfico de Produtividade em breve)</div>
     </div>
   </div>
+  
+  <div id="chat-screen" class="wrap" style="display:none;">
+    <button id="btnVoltarDashboardChat" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
+      VOLTAR AO INICIO
+    </button>
+    <div class="card">
+      <h3>Agente IA (Cotação de Preços)</h3>
+      <div id="chatWindow" class="chat-window">
+        <div class="chat-bubble bot">Olá! Pergunte-me o preço de um produto agrícola. (Ex: "preço da manga tommy")</div>
+      </div>
+      <div class="row" style="margin-top: 10px;">
+        <input type="text" id="chatInput" placeholder="Digite sua mensagem..." class="area-input" style="flex-grow: 1;">
+        <button id="chatSendButton" style="min-width: 60px;">Enviar</button>
+      </div>
+    </div>
+  </div>
 
   <div class="app-footer">
     <a href="#" id="navInicio" class="footer-btn active">Início</a>
@@ -197,6 +203,7 @@
   </div>
   
   <button id="btnChat" class="chat-fab">💬</button>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
     
@@ -206,30 +213,32 @@
       const dashboardScreen = document.getElementById("dashboard-screen"); 
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
+      const chatScreen = document.getElementById("chat-screen");
       const loginButton = document.getElementById("loginButton");
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
       const btnNovaContagem = document.getElementById("btnNovaContagem"); 
       const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
       const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
+      const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
       const navInicio = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
       const navPerfil = document.getElementById("navPerfil");
-      const btnChat = document.getElementById("btnChat"); // <-- NOVO BOTÃO
-      const appFooter = document.querySelector(".app-footer"); // O rodapé
+      const btnChat = document.getElementById("btnChat");
+      const appFooter = document.querySelector(".app-footer");
 
       function navigateTo(screenToShow) {
         loginScreen.style.display = 'none';
         dashboardScreen.style.display = 'none';
         appScreen.style.display = 'none';
         resultadoScreen.style.display = 'none';
+        chatScreen.style.display = 'none';
         
-        // Esconde o botão de chat e o rodapé na tela de login
         if (screenToShow === loginScreen) {
           appFooter.style.display = 'none';
           btnChat.style.display = 'none';
         } else {
-          appFooter.style.display = 'flex'; // 'flex' é o display original
+          appFooter.style.display = 'flex';
           btnChat.style.display = 'block';
         }
         
@@ -239,46 +248,66 @@
         navRelatorios.classList.remove('active');
         navPerfil.classList.remove('active');
         
-        if (screenToShow === dashboardScreen || screenToShow === appScreen) {
+        if (screenToShow === dashboardScreen || screenToShow === appScreen || screenToShow === chatScreen) {
           navInicio.classList.add('active'); 
         } else if (screenToShow === resultadoScreen) {
           navRelatorios.classList.add('active'); 
         } 
       }
-      
-      // Estado inicial (mostra o login e esconde os menus)
       navigateTo(loginScreen);
-
-      loginButton.onclick = () => {
-        if (passwordInput.value === SENHA_SECRETA) {
-          navigateTo(dashboardScreen); 
-        } else {
-          loginError.style.display = "block";
-        }
-      };
-      passwordInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") { e.preventDefault(); loginButton.click(); }
-      });
+      loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) { navigateTo(dashboardScreen); } else { loginError.style.display = "block"; } };
+      passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
       btnNovaContagem.onclick = () => { navigateTo(appScreen); };
       btnVoltarDashboard.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
+      btnVoltarDashboardChat.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       navInicio.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); navigateTo(resultadoScreen); };
       navPerfil.onclick = (e) => { e.preventDefault(); alert("Tela 'Perfil' em construção."); };
       
-      // --- LÓGICA DO NOVO BOTÃO DE CHAT ---
-      btnChat.onclick = (e) => {
-        e.preventDefault();
-        alert("Agente de IA (Chatbot) em construção.");
-        // (Aqui você pode redirecionar para seu link do WhatsApp / n8n no futuro)
-      };
+      // --- LÓGICA DO CHATBOT ---
+      const N8N_WEBHOOK_URL = "COLE_A_URL_DO_SEU_WEBHOOK_DO_N8N_AQUI"; 
+      const chatWindow = document.getElementById("chatWindow");
+      const chatInput = document.getElementById("chatInput");
+      const chatSendButton = document.getElementById("chatSendButton");
+      btnChat.onclick = (e) => { e.preventDefault(); navigateTo(chatScreen); };
+      function addChatBubble(message, isUser = false) {
+          const bubble = document.createElement('div');
+          bubble.classList.add('chat-bubble');
+          bubble.classList.add(isUser ? 'user' : 'bot');
+          bubble.textContent = message;
+          chatWindow.appendChild(bubble);
+          chatWindow.scrollTop = chatWindow.scrollHeight;
+      }
+      async function handleChatSend() {
+          const message = chatInput.value.trim();
+          if (!message) return;
+          addChatBubble(message, true); 
+          chatInput.value = ""; 
+          chatSendButton.disabled = true; 
+          try {
+              const resp = await fetch(N8N_WEBHOOK_URL, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ text: message })
+              });
+              if (!resp.ok) { throw new Error(`O servidor n8n respondeu com ${resp.status}`); }
+              const data = await resp.json();
+              addChatBubble(data.response || "Não entendi."); 
+          } catch (err) {
+              console.error(err);
+              addChatBubble("Desculpe, estou com problemas de conexão com o agente.");
+          } finally {
+              chatSendButton.disabled = false; 
+          }
+      }
+      chatSendButton.onclick = handleChatSend;
+      chatInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); handleChatSend(); } });
 
       // --- LÓGICA DO APP (Contagem) ---
-      // (Toda a lógica da API, `btnSend`, `resetUI`, `checkInputs`, etc. 
-      // continua exatamente a mesma de antes)
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
-      const PESO_MEDIO_GRAMAS = 500; 
+      // const PESO_MEDIO_GRAMAS = 500; <-- Não usamos mais, vem do JSON
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
       const fileInput = document.getElementById("fileInput");
@@ -351,18 +380,42 @@
       });
       areaInput.addEventListener("input", checkInputs); 
       btnClear.addEventListener("click", resetUI);
-      btnSend.addEventListener("click", async () => {
+      
+      // O clique no botão "Enviar" agora chama esta função
+      btnSend.addEventListener("click", iniciarContagem);
+      
+      async function iniciarContagem() {
         if (!selectedFile) return;
+        
+        btnSend.disabled = true;
+        setStatus("Passo 1/3: A obter cotação do dia...");
+        setProgress(10);
+        
+        // --- PASSO A: Obter os dados de preço (do JSON) ---
+        let dados_preco;
+        try {
+          const respPreco = await fetch(`mango_prices.json?v=${Date.now()}`); 
+          if (!respPreco.ok) throw new Error("Não foi possível buscar o arquivo de preços.");
+          dados_preco = await respPreco.json();
+        } catch (err) {
+          setStatus("Falha ao obter cotação. Usando valores padrão.");
+          dados_preco = { preco_kg: 0, peso_medio_g: 500 }; 
+        }
+        
+        // --- PASSO B: Enviar o ficheiro para a API ---
         const isVideoRequest = selectedFile.type.startsWith("video/");
         let target_url = ""; 
         const area_video_m2 = parseFloat(areaInput.value);
+        
         if (isVideoRequest && (!area_video_m2 || area_video_m2 <= 0)) {
             alert("Para vídeos, por favor, insira um valor válido para a área em metros quadrados (m²).");
+            resetUI();
             return;
         }
-        btnSend.disabled = true;
-        setStatus("enviando para IA…");
+        
+        setStatus("Passo 2/3: Enviando para IA…");
         setProgress(25);
+
         const form = new FormData();
         form.append("video", selectedFile, selectedFile.name || "mediafile"); 
         if (isVideoRequest) { target_url = API_URL_VIDEO; } 
@@ -373,27 +426,43 @@
           setProgress(75);
           const text = await resp.text().catch(()=> "");
           setProgress(100);
+          
           if (resp.ok) {
-            setStatus("OK! Contagem recebida.");
+            setStatus("OK! Contagem recebida!");
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            
+            // --- PASSO C: Cálculo (agora com dados dinâmicos) ---
             try {
               const data = JSON.parse(text);
               const contagem_api = data.contagem_final; 
+              
               if (isVideoRequest) {
-                const kg_por_m2 = (contagem_api * (PESO_MEDIO_GRAMAS / 1000)) / area_video_m2;
-                const kg_por_hectare = (kg_por_m2 * M2_POR_HECTARE).toFixed(2);
+                const peso_medio_kg = dados_preco.peso_medio_g / 1000;
+                const preco_por_kg = dados_preco.preco_kg;
+                
+                const kg_por_m2 = (contagem_api * peso_medio_kg) / area_video_m2;
+                
+                // **** CORREÇÃO DE ARREDONDAMENTO AQUI (v2.16-fix) ****
+                const kg_por_hectare = Math.round(kg_por_m2 * M2_POR_HECTARE); // Arredonda para inteiro
+                const faturamento_ha = (kg_por_hectare * preco_por_kg).toFixed(2);
+                
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-                resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: " + kg_por_hectare + " KG/HA";
+                resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare + " KG/HA\n"; // <-- Remove .toFixed(2)
+                resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha;
+                // ******************************************************
+                
               } else {
                 resultadoDetalhado.textContent = "TIPO: IMAGEM\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-                resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A (requer vídeo)";
+                resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A";
               }
+              
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
               document.getElementById("btnVerResultado").onclick = () => {
                 navigateTo(resultadoScreen); 
               };
+              
             } catch (e) {
               out.textContent = "Erro ao ler o JSON: " + text;
             }
@@ -407,7 +476,7 @@
         } finally {
           btnSend.disabled = false;
         }
-      });
+      } // Fim da função iniciarContagem
     });
   </script>
 </body>
