@@ -31,8 +31,6 @@
     .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; }
     .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
     
-    /* --- CORREÇÃO DE CSS (v2.13) --- */
-    /* Agora o estilo SÓ se aplica aos IDs de preview, não à logo */
     #previewVideo, #previewImage { 
       width: 100%; 
       border-radius: 12px; 
@@ -40,7 +38,6 @@
       margin-top: 10px; 
     }
     
-    /* (Resto dos estilos...) */
     .login-error { color: #D32F2F; font-size: 0.9rem; text-align: center; margin-top: 10px; display: none; }
     .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .summary-card { background: #EEEEEE; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; }
@@ -154,9 +151,9 @@
         <div class="progress"><div id="pbar" class="bar"></div></div>
         <div style="margin-top:8px">Status: <span id="status" class="mono">aguardando ficheiro...</span></div>
         <div id="fileInfo" class="muted" style="text-align:left;margin-top:8px;">Nenhum ficheiro selecionado.</div>
-        
         <video id="previewVideo" controls playsinline style="display:none;"></video>
-        <img id="previewImage" src="" alt="Preview da Imagem" style="display:none;"> </div>
+        <img id="previewImage" src="" alt="Preview da Imagem" style="display:none;">
+      </div>
       <div>
         <h3>Resultado</h3>
         <pre id="out" class="mono">—</pre>
@@ -254,10 +251,10 @@
         previewVideo.style.display = "none";
         previewImage.src = "";
         previewImage.style.display = "none";
-        areaInput.style.display = "none"; // Garante que a área está oculta
+        areaInput.style.display = "none"; 
         out.textContent = "—";
         setProgress(0);
-        setStatus("aguardando ficheiro (vídeo ou imagem)..."); // <-- CORREÇÃO DE UI
+        setStatus("aguardando ficheiro (vídeo ou imagem)...");
       }
       function checkInputs() {
         const area = parseFloat(areaInput.value);
@@ -307,15 +304,15 @@
           previewVideo.src = previewURL;
           previewVideo.style.display = "block";
           previewImage.style.display = "none";
-          areaInput.style.display = "block"; // <-- Mostra o campo de área
+          areaInput.style.display = "block"; 
           previewVideo.play().catch(()=>{});
         } else {
           previewImage.src = previewURL;
           previewImage.style.display = "block";
           previewVideo.style.display = "none";
-          areaInput.style.display = "none"; // <-- Esconde o campo de área
-          areaInput.value = ""; // Limpa a área
-          checkInputs(); // Re-valida (para imagem, não precisa de área)
+          areaInput.style.display = "none"; 
+          areaInput.value = ""; 
+          checkInputs(); 
         }
       });
       
@@ -355,6 +352,15 @@
           
           if (resp.ok) {
             setStatus("OK! Contagem recebida.");
+            
+            // --- MODIFICAÇÃO DE SCROLL (v2.14) ---
+            // Rola a página para baixo para mostrar o botão
+            window.scrollTo({
+              top: document.body.scrollHeight,
+              behavior: 'smooth'
+            });
+            // ------------------------------------
+            
             try {
               const data = JSON.parse(text);
               const contagem_api = data.contagem_final; 
