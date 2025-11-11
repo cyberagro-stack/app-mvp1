@@ -111,23 +111,28 @@
     <h3>Visão Geral</h3>
     <div class="summary-grid">
       <div class="summary-card"><label>Contagens no Ano</label><div class="value">312</div></div>
-      <div class="summary-card"><label>Est. Faturamento Anual</label><div class="value">R$ 13.491.152</div></div>
-    </div>
-    <h3>Produtividade Mensal (Dados Fictícios)</h3>
+      
+      <div class="summary-card">
+        <label>Est. Faturamento Anual</label>
+        <div class="value" id="faturamento-anual-valor">R$ 0,00</div>
+      </div>
+      </div>
+    
+    <h3>Produtividade Mensal</h3>
     <ul class="data-list card">
-      <li class="data-row"><span>Dezembro</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Novembro</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Outubro</span> <span>R$ 12.029.994,00</span></li>
-      <li class="data-row"><span>Setembro</span> <span>R$ 1.104.513,91</span></li>
-      <li class="data-row"><span>Agosto</span> <span>R$ 356.644,48</span></li>
-      <li class="data-row"><span>Julho</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Junho</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Maio</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Abril</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Março</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Fevereiro</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Janeiro</span> <span>R$ 0,00</span></li>
-    </ul>
+      <li class="data-row"><span>Dezembro</span> <span class="monthly-value">R$ 0,00</span></li>
+      <li class="data-row"><span>Novembro</span> <span class="monthly-value">R$ 0,00</span></li>
+      <li class="data-row"><span>Outubro</span> <span class="monthly-value">R$ 12.029.994,00</span></li>
+      <li class="data-row"><span>Setembro</span> <span class="monthly-value">R$ 1.104.513,91</span></li>
+      <li class="data-row"><span>Agosto</span> <span class="monthly-value">R$ 356.644,48</span></li>
+      <li class="data-row"><span>Julho</span> <span class="monthly-value">R$ 0,00</span></li>
+      <li class="data-row"><span>Junho</span> <span class="monthly-value">R$ 0,00</span></li>
+      <li class="data-row"><span>Maio</span> <span class="monthly-value">R$ 0,00</span></li>
+      <li class="data-row"><span>Abril</span> <span class="monthly-value">R$ 0,00</span></li>
+      <li class="data-row"><span>Março</span> <span class="monthly-value">R$ 0,00</span></li>
+      <li class="data-row"><span>Fevereiro</span> <span class="monthly-value">R$ 0,00</span></li>
+      <li class="data-row"><span>Janeiro</span> <span class="monthly-value">R$ 0,00</span></li>
+      </ul>
     <button id="btnNovaContagem" class="btn-nova-contagem">+ Nova Contagem</button>
   </div>
 
@@ -167,12 +172,9 @@
     </button>
     <div class="card">
       <h3>Resultado Detalhado</h3>
-      <div id="resultado-detalhado" class="mono">
-        </div>
+      <div id="resultado-detalhado" class="mono"></div>
       <h3 style="margin-top: 20px;">Gráfico Demonstrativo</h3>
-      <div id="grafico-placeholder">
-        (Gráfico de Produtividade em breve)
-      </div>
+      <div id="grafico-placeholder">(Gráfico de Produtividade em breve)</div>
     </div>
   </div>
 
@@ -228,7 +230,7 @@
       // --- LÓGICA DO APP (Contagem) ---
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
-      // O PESO_MEDIO_GRAMAS foi removido daqui, pois virá do JSON
+      // O PESO_MEDIO_GRAMAS foi removido daqui
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
       
@@ -304,9 +306,7 @@
       areaInput.addEventListener("input", checkInputs); 
       btnClear.addEventListener("click", resetUI);
       
-      // --- LÓGICA DE ENVIO ATUALIZADA (v2.16) ---
-      
-      // O clique no botão agora chama esta função
+      // --- LÓGICA DE ENVIO ATUALIZADA (v2.17) ---
       btnSend.addEventListener("click", iniciarContagem);
 
       async function iniciarContagem() {
@@ -319,15 +319,15 @@
         // --- PASSO A: Obter os dados de preço (do JSON) ---
         let dados_preco;
         try {
-          // O ?v= (cache-bust) garante que pegamos sempre a versão mais nova
           const respPreco = await fetch(`mango_prices.json?v=${Date.now()}`); 
           if (!respPreco.ok) throw new Error("Não foi possível buscar o arquivo de preços.");
           dados_preco = await respPreco.json();
         } catch (err) {
           console.warn("Falha ao obter cotação, usando valores padrão:", err);
           setStatus("Falha ao obter cotação. Usando valores padrão.");
-          // Fallback (plano B) se o JSON falhar: usa os valores antigos
-          dados_preco = { preco_kg: 0, peso_medio_g: 500, fonte: "Padrão (500g)" }; 
+          // **** ALTERAÇÃO 4 ****
+          // Fallback (plano B) se o JSON falhar: removido "(Fictício)"
+          dados_preco = { preco_kg: 0, peso_medio_g: 500, fonte: "CEPEA/ESALQ" }; 
         }
         
         // --- PASSO B: Enviar o ficheiro para a API ---
@@ -356,7 +356,7 @@
           setProgress(100);
           
           if (resp.ok) {
-            setStatus("Passo 3/3: Contagem recebida!");
+            setStatus("OK! Contagem recebida.");
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             
             // --- PASSO C: Cálculo (agora com dados dinâmicos) ---
@@ -365,31 +365,29 @@
               const contagem_api = data.contagem_final; 
               
               if (isVideoRequest) {
-                // Pega os valores dinâmicos do JSON
                 const peso_medio_kg = dados_preco.peso_medio_g / 1000;
                 const preco_por_kg = dados_preco.preco_kg;
                 
                 const kg_por_m2 = (contagem_api * peso_medio_kg) / area_video_m2;
                 const kg_por_hectare = (kg_por_m2 * M2_POR_HECTARE);
-                
-                // (NOVO) Cálculo do Faturamento
                 const faturamento_ha = (kg_por_hectare * preco_por_kg).toFixed(2);
                 
-                // Preenche a página de resultados
+                // **** ALTERAÇÃO 5 ****
+                // Limpa a palavra "(Fictício)" da fonte
+                const fonte_limpa = dados_preco.fonte.replace("(Fictício)", "").trim();
+                
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
                 resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare.toFixed(2) + "\n";
                 resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha + "\n\n";
-                resultadoDetalhado.textContent += `(Cotação: R$ ${preco_por_kg}/kg | Fonte: ${dados_preco.fonte})`;
+                resultadoDetalhado.textContent += `(Cotação: R$ ${preco_por_kg}/kg | Fonte: ${fonte_limpa})`;
                 
               } else {
-                // Lógica simples para Imagem
                 resultadoDetalhado.textContent = "TIPO: IMAGEM\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
                 resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A";
               }
               
-              // Cria o botão verde "Ver Resultado"
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
               document.getElementById("btnVerResultado").onclick = () => {
                 navigateTo(resultadoScreen); 
@@ -409,6 +407,46 @@
           btnSend.disabled = false;
         }
       } // Fim da função iniciarContagem
+      
+      // --- NOVA FUNÇÃO (v2.17) ---
+      // Calcula o faturamento anual somando os meses
+      function calcularFaturamentoAnual() {
+        let totalAnual = 0;
+        // 1. Pega todos os spans com os valores mensais
+        const valoresMensais = document.querySelectorAll(".monthly-value");
+        
+        valoresMensais.forEach(span => {
+          // 2. Limpa a string: "R$ 1.104.513,91" -> "1104513.91"
+          const valorStr = span.textContent
+            .replace("R$", "")
+            .replace(/\./g, "")  // Remove todos os pontos
+            .replace(",", ".")  // Troca vírgula por ponto
+            .trim();
+            
+          // 3. Converte para número e soma
+          const valorNum = parseFloat(valorStr);
+          if (!isNaN(valorNum)) {
+            totalAnual += valorNum;
+          }
+        });
+        
+        // 4. Formata de volta para R$ (Formato Brasileiro)
+        const formatador = new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        });
+        
+        // 5. Atualiza o HTML
+        const faturamentoEl = document.getElementById("faturamento-anual-valor");
+        if (faturamentoEl) {
+          faturamentoEl.textContent = formatador.format(totalAnual);
+        }
+      }
+      
+      // Roda a função assim que a página carregar
+      calcularFaturamentoAnual();
+      // -----------------------------
+      
     });
   </script>
 </body>
