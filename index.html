@@ -211,7 +211,7 @@
     <div class="card">
       <h3>Agente IA (Cotação de Preços)</h3>
       <div id="chatWindow" class="chat-window">
-        <div class="chat-bubble bot">Olá! Pergunte-me o preço de um produto agrícola. (Ex: "preço da manga tommy")</div>
+        <div class="chat-bubble bot">Olá! Pergunte-me o preço de um produto agrícola. (Ex: "preço do Spander da Gran7")</div>
       </div>
       <div class="row" style="margin-top: 10px;">
         <input type="text" id="chatInput" placeholder="Digite sua mensagem..." class="area-input" style="flex-grow: 1;">
@@ -231,7 +231,7 @@
     <div class="menu-list card">
       <a href="#" class="menu-item" id="navDadosFazenda"><span class="menu-icon">👤</span> <span>Dados da Fazenda</span> <span class="menu-chevron">&gt;</span></a>
       <a href="#" class="menu-item" id="navMinhasContagens"><span class="menu-icon">📋</span> <span>Minhas Contagens</span> <span class="menu-chevron">&gt;</span></a>
-      <a href="#" class="menu-item" id="navConfigIA"><span class="menu-icon">⚙️</span> <span>Configurações da IA</span> <span class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item" id="navConfigIA"><span class="menu-icon">⚙️</span> <span>Configurações</span> <span class="menu-chevron">&gt;</span></a>
       <a href="#" class="menu-item" id="navAssinatura"><span class="menu-icon">💳</span> <span>Gerir Assinatura</span> <span class="menu-chevron">&gt;</span></a>
       <a href="#" class="menu-item" id="navSuporte"><span class="menu-icon">💬</span> <span>Suporte Técnico</span> <span class="menu-chevron">&gt;</span></a>
     </div>
@@ -319,7 +319,7 @@
       document.getElementById("navSuporte").onclick = (e) => { e.preventDefault(); alert("Tela 'Suporte Técnico' em construção."); };
 
       // --- LÓGICA DO CHATBOT ---
-      const N8N_WEBHOOK_URL = "SUA_URL_DE_PRODUCAO_DO_N8N_AQUI"; // <-- COLE A URL DO N8N AQUI
+      const N8N_WEBHOOK_URL = "https://nascoli.app.n8n.cloud/webhook/edcbe418-5081-45ed-a356-3c1fd6fa345e"; // <-- COLE A URL DO N8N AQUI
       const chatWindow = document.getElementById("chatWindow");
       const chatInput = document.getElementById("chatInput");
       const chatSendButton = document.getElementById("chatSendButton");
@@ -535,3 +535,4 @@
   </script>
 </body>
 </html>
+
