@@ -2,17 +2,18 @@ import gspread
 import json
 import os
 import time
-import re # <-- 1. IMPORTA A BIBLIOTECA DE LIMPEZA
+import re # <-- Importa a biblioteca de "limpeza" (Regex)
 
 # --- CONFIGURAÇÃO ---
 NOME_DA_TABELA = "CyberAgro_Precos"
-NOME_DA_ABA = "Sheet1" # (Nome padrão)
-PRODUTO_ALVO = "Tommy - produtor" # (O seu produto correto, Linha 3)
+NOME_DA_ABA = "Sheet1" # (Nome padrão que corrigimos)
+PRODUTO_ALVO = "Tommy - produtor" # (O seu produto correto)
 PESO_MEDIO_FALLBACK = 500
 JSON_PATH = "mango_prices.json"
 # --------------------
 
 try:
+    # Este passo agora deve funcionar (graças ao Passo 1)
     key_content = os.environ.get('GCP_SA_KEY')
     if not key_content:
         raise ValueError("Secret GCP_SA_KEY não encontrado.")
@@ -44,7 +45,7 @@ try:
     if 'Preço' not in dados_manga:
         raise ValueError("Coluna 'Preço' em falta na tabela.")
 
-    # --- 2. CORREÇÃO DE LIMPEZA DE STRING ---
+    # --- CORREÇÃO DE LIMPEZA DE STRING (v2.18) ---
     # Pega a string do preço (ex: "R$ 1,86")
     preco_str = str(dados_manga.get('Preço', 0))
     
@@ -79,7 +80,7 @@ except Exception as e:
     fallback_data = { "preco_kg": 0, "peso_medio_g": 500, "fonte": f"Erro ao ler GSheet: {e}", "ultima_atualizacao": "N/A" }
     with open(JSON_PATH, 'w', encoding='utf-8') as f:
         json.dump(fallback_data, f, indent=2, ensure_ascii=False)
-    raise e # Faz o build falhar (vermelho)
+    raise e
 finally:
     if os.path.exists("gcp_key.json"):
         os.remove("gcp_key.json")
