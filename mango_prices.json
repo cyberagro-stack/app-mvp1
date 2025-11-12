@@ -41,7 +41,7 @@ try:
     if len(lista_de_listas) < 2:
         raise ValueError("A tabela não tem uma segunda linha (primeira linha de dados).")
         
-    data_row = lista_de_listas[1] # Pega a SEGUNDA linha
+    data_row = lista_de_listas[2] # Pega a SEGUNDA linha
     # -----------------------------
     
     # Mapeia os cabeçalhos para os dados da linha 2
