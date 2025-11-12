@@ -2,11 +2,12 @@ import gspread
 import json
 import os
 import time
+import re # <-- 1. IMPORTA A BIBLIOTECA DE LIMPEZA
 
-# --- CONFIGURAÇÃO CORRIGIDA ---
+# --- CONFIGURAÇÃO ---
 NOME_DA_TABELA = "CyberAgro_Precos"
-NOME_DA_ABA = "Sheet1" # (Nome padrão após a importação)
-PRODUTO_ALVO = "Tommy - produtor" # <-- CORREÇÃO (Linha 3 da sua tabela)
+NOME_DA_ABA = "Sheet1" # (Nome padrão)
+PRODUTO_ALVO = "Tommy - produtor" # (O seu produto correto, Linha 3)
 PESO_MEDIO_FALLBACK = 500
 JSON_PATH = "mango_prices.json"
 # --------------------
@@ -32,21 +33,28 @@ try:
         raise ValueError("Nenhum dado encontrado na tabela.")
         
     dados_manga = None
-    # Procura pela última (mais recente) entrada do produto
     for registo in reversed(lista_de_registos): 
-        # Procura o nome exato do produto (Coluna 'Produto')
         if registo.get('Produto') and registo['Produto'].strip() == PRODUTO_ALVO:
             dados_manga = registo
-            break # Encontra o mais recente e para
+            break 
             
     if not dados_manga:
         raise ValueError(f"Produto '{PRODUTO_ALVO}' não encontrado na tabela.")
 
-    # Pega o valor da Coluna 'Preço' (Coluna H)
     if 'Preço' not in dados_manga:
         raise ValueError("Coluna 'Preço' em falta na tabela.")
 
-    preco_limpo = float(str(dados_manga.get('Preço', 0)).replace(",", "."))
+    # --- 2. CORREÇÃO DE LIMPEZA DE STRING ---
+    # Pega a string do preço (ex: "R$ 1,86")
+    preco_str = str(dados_manga.get('Preço', 0))
+    
+    # Apaga TUDO o que não for um dígito (0-9) ou uma vírgula (,)
+    preco_limpo_str = re.sub(r'[^\d,]', '', preco_str)
+    
+    # Troca a vírgula por ponto (ex: "1,86" -> "1.86") e converte para float
+    preco_limpo = float(preco_limpo_str.replace(",", "."))
+    # ------------------------------------------------
+
     peso_limpo = int(dados_manga.get('Peso_Medio_G', PESO_MEDIO_FALLBACK))
     data_str = f"{dados_manga.get('Dia')}/{dados_manga.get('Mês')}/{dados_manga.get('Ano')}"
 
@@ -57,6 +65,9 @@ try:
         "ultima_atualizacao": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     }
 
+    if preco_limpo == 0:
+        print("Aviso: O preço limpo extraído da tabela foi 0.")
+        
     print(f"Dados encontrados: {PRODUTO_ALVO} - Preço R${novos_dados['preco_kg']}, Peso {novos_dados['peso_medio_g']}g")
     with open(JSON_PATH, 'w', encoding='utf-8') as f:
         json.dump(novos_dados, f, indent=2, ensure_ascii=False)
@@ -64,4 +75,11 @@ try:
 
 except Exception as e:
     print(f"Erro fatal: {e}")
-    if not os.path
+    # Se falhar, grava um JSON com preço 0
+    fallback_data = { "preco_kg": 0, "peso_medio_g": 500, "fonte": f"Erro ao ler GSheet: {e}", "ultima_atualizacao": "N/A" }
+    with open(JSON_PATH, 'w', encoding='utf-8') as f:
+        json.dump(fallback_data, f, indent=2, ensure_ascii=False)
+    raise e # Faz o build falhar (vermelho)
+finally:
+    if os.path.exists("gcp_key.json"):
+        os.remove("gcp_key.json")
