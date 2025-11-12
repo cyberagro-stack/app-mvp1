@@ -4,19 +4,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CyberAgro • Contador de Mangas</title>
-
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FFFFFF">
   <script>
     if ('serviceWorker' in navigator) {
-      // O caminho /app-mvp1/ é crucial para o GitHub Pages
       navigator.serviceWorker.register('/app-mvp1/sw.js')
         .then(() => console.log('Service Worker Registrado v4'))
         .catch(err => console.log('Service Worker falhou:', err));
     }
   </script>
   <style>
-    /* --- ESTILOS GERAIS --- */
+    /* (Todos os seus estilos .css continuam os mesmos) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -27,26 +25,13 @@
     .muted { color: #555555; font-size: .9rem; text-align: center; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; word-break: break-word; color: #333333; }
     h3 { margin-top: 20px; margin-bottom: 10px; }
-    
-    /* --- ESTILOS DO APP (Contagem) --- */
     .btn-upload { position: relative; display: inline-block; background: #E6EEFA; color: #2a7bf6; border: 1px dashed #2a7bf6; }
     .file-proxy { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
     .area-input { font-family: inherit; font-size: 1rem; padding: 10px 14px; border: 1px solid #E0E0E0; border-radius: 12px; background: #FFFFFF; flex-grow: 1; min-width: 150px; }
     .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; }
     .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
-    
-    /* CORREÇÃO (v2.13): Estilo de largura 100% SÓ para os previews, não para a logo */
-    #previewVideo, #previewImage { 
-      width: 100%; 
-      border-radius: 12px; 
-      background: #000; 
-      margin-top: 10px; 
-    }
-    
-    /* --- ESTILOS DO LOGIN --- */
+    #previewVideo, #previewImage { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
     .login-error { color: #D32F2F; font-size: 0.9rem; text-align: center; margin-top: 10px; display: none; }
-
-    /* --- ESTILOS DO DASHBOARD (Início) --- */
     .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .summary-card { background: #EEEEEE; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; }
     .summary-card label { display: block; font-size: 0.8rem; color: #555555; margin-bottom: 4px; text-transform: uppercase; }
@@ -67,8 +52,6 @@
       font-size: 1.1rem;
       margin-top: 20px;
     }
-
-    /* --- ESTILOS DO RODAPÉ (Navegação) --- */
     .app-footer {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: #FFFFFF; border-top: 1px solid #E0E0E0;
@@ -80,15 +63,11 @@
       font-size: 0.8rem; text-decoration: none; color: #888888; 
     }
     .footer-btn.active { color: #28a745; font-weight: 600; }
-    
-    /* --- ESTILOS DO GRÁFICO (Placeholder) --- */
     #grafico-placeholder {
       width: 100%; height: 250px; background: #EEEEEE;
       border-radius: 12px; display: flex; align-items: center;
       justify-content: center; font-style: italic; color: #888;
     }
-    
-    /* --- ESTILOS DO CHATBOT --- */
     .chat-fab {
       position: fixed; bottom: 90px; right: 20px; background: #28a745;
       color: white; width: 50px; height: 50px; border-radius: 50%;
@@ -96,39 +75,36 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; padding: 0;
     }
     .chat-window {
-      height: 400px; background: #FFF; border: 1px solid #EEE;
-      border-radius: 12px; overflow-y: auto; padding: 10px; margin-bottom: 10px;
+      height: 400px;
+      background: #FFF;
+      border: 1px solid #EEE;
+      border-radius: 12px;
+      overflow-y: auto; /* Scroll */
+      padding: 10px;
+      margin-bottom: 10px;
     }
-    .chat-bubble { padding: 10px 14px; border-radius: 16px; margin-bottom: 8px; max-width: 80%; }
-    .chat-bubble.user { background: #2a7bf6; color: white; margin-left: auto; }
-    .chat-bubble.bot { background: #EEEEEE; color: #333; margin-right: auto; }
-    
-    /* --- ESTILOS DO PERFIL --- */
-    .profile-header { display: flex; align-items: center; gap: 16px; }
-    .profile-pic {
-      width: 60px; height: 60px; border-radius: 50%;
-      object-fit: cover; background: #DDD;
+    .chat-bubble {
+      padding: 10px 14px;
+      border-radius: 16px;
+      margin-bottom: 8px;
+      max-width: 80%;
     }
-    .profile-name { font-size: 1.2rem; font-weight: 600; color: #333; }
-    .profile-subtitle { font-size: 0.9rem; color: #555; }
-    .menu-list { margin-top: 20px; padding: 0; }
-    .menu-item {
-      display: flex; align-items: center; padding: 16px;
-      text-decoration: none; color: #333; font-size: 1rem;
-      border-bottom: 1px solid #EEE;
+    .chat-bubble.user {
+      background: #2a7bf6;
+      color: white;
+      margin-left: auto; /* Alinha à direita */
     }
-    .menu-item:last-child { border-bottom: none; }
-    .menu-icon { font-size: 1.2rem; margin-right: 16px; width: 24px; text-align: center; }
-    .menu-chevron { margin-left: auto; color: #AAA; font-weight: 600; }
-    
+    .chat-bubble.bot {
+      background: #EEEEEE;
+      color: #333;
+      margin-right: auto; /* Alinha à esquerda */
+    }
   </style>
 </head>
 <body>
 
   <div id="login-screen" class="wrap">
-    <h1 style="text-align:center;margin-bottom:16px;">
-      <img src="logo.png?v=4" alt="CyberAgro Logo" height="250">
-    </h1>
+    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=4" alt="CyberAgro Logo" height="250"></h1>
     <div class="card">
       <h3 style="text-align: center;">Acesso Restrito</h3>
       <p class="muted" style="text-align: left;">Insira a senha de acesso para continuar.</p>
@@ -211,29 +187,12 @@
     <div class="card">
       <h3>Agente IA (Cotação de Preços)</h3>
       <div id="chatWindow" class="chat-window">
-        <div class="chat-bubble bot">Olá! Pergunte-me o preço de um produto agrícola. (Ex: "preço do Spander da Gran7")</div>
+        <div class="chat-bubble bot">Olá! Pergunte-me o preço de um produto agrícola. (Ex: "preço da manga tommy")</div>
       </div>
       <div class="row" style="margin-top: 10px;">
         <input type="text" id="chatInput" placeholder="Digite sua mensagem..." class="area-input" style="flex-grow: 1;">
         <button id="chatSendButton" style="min-width: 60px;">Enviar</button>
       </div>
-    </div>
-  </div>
-  
-  <div id="perfil-screen" class="wrap" style="display:none;">
-    <div class="profile-header card">
-      <img src="logo.png?v=4" alt="Foto de Perfil" class="profile-pic">
-      <div class="profile-info">
-        <div class="profile-name">Fazenda Takayasu</div>
-        <div class="profile-subtitle">São Carlo Acutis rogai por nós!</div>
-      </div>
-    </div>
-    <div class="menu-list card">
-      <a href="#" class="menu-item" id="navDadosFazenda"><span class="menu-icon">👤</span> <span>Dados da Fazenda</span> <span class="menu-chevron">&gt;</span></a>
-      <a href="#" class="menu-item" id="navMinhasContagens"><span class="menu-icon">📋</span> <span>Minhas Contagens</span> <span class="menu-chevron">&gt;</span></a>
-      <a href="#" class="menu-item" id="navConfigIA"><span class="menu-icon">⚙️</span> <span>Configurações</span> <span class="menu-chevron">&gt;</span></a>
-      <a href="#" class="menu-item" id="navAssinatura"><span class="menu-icon">💳</span> <span>Gerir Assinatura</span> <span class="menu-chevron">&gt;</span></a>
-      <a href="#" class="menu-item" id="navSuporte"><span class="menu-icon">💬</span> <span>Suporte Técnico</span> <span class="menu-chevron">&gt;</span></a>
     </div>
   </div>
 
@@ -249,15 +208,13 @@
     document.addEventListener("DOMContentLoaded", () => {
     
       // --- LÓGICA DE NAVEGAÇÃO ---
-      // (IDs de todas as 6 Telas)
       const SENHA_SECRETA = "cyberagro2025"; 
       const loginScreen = document.getElementById("login-screen");
       const dashboardScreen = document.getElementById("dashboard-screen"); 
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
       const chatScreen = document.getElementById("chat-screen");
-      const perfilScreen = document.getElementById("perfil-screen");
-      // (IDs dos Botões)
+      // ... (Resto dos botões de navegação)
       const loginButton = document.getElementById("loginButton");
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
@@ -271,14 +228,12 @@
       const btnChat = document.getElementById("btnChat");
       const appFooter = document.querySelector(".app-footer");
 
-      // Função de Navegação (controla telas e rodapé)
       function navigateTo(screenToShow) {
         loginScreen.style.display = 'none';
         dashboardScreen.style.display = 'none';
         appScreen.style.display = 'none';
         resultadoScreen.style.display = 'none';
         chatScreen.style.display = 'none';
-        perfilScreen.style.display = 'none';
         if (screenToShow === loginScreen) {
           appFooter.style.display = 'none';
           btnChat.style.display = 'none';
@@ -294,13 +249,10 @@
           navInicio.classList.add('active'); 
         } else if (screenToShow === resultadoScreen) {
           navRelatorios.classList.add('active'); 
-        } else if (screenToShow === perfilScreen) {
-          navPerfil.classList.add('active');
-        }
+        } 
       }
-      navigateTo(loginScreen); // Começa no Login
-
-      // (Lógica de clique dos botões de navegação)
+      navigateTo(loginScreen);
+      // ... (Lógica de clique dos botões de navegação não muda)
       loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) { navigateTo(dashboardScreen); } else { loginError.style.display = "block"; } };
       passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
       btnNovaContagem.onclick = () => { navigateTo(appScreen); };
@@ -309,17 +261,10 @@
       btnVoltarDashboardChat.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       navInicio.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); navigateTo(resultadoScreen); };
-      navPerfil.onclick = (e) => { e.preventDefault(); navigateTo(perfilScreen); };
+      navPerfil.onclick = (e) => { e.preventDefault(); alert("Tela 'Perfil' em construção."); };
       
-      // (Lógica dos botões do menu de Perfil)
-      document.getElementById("navDadosFazenda").onclick = (e) => { e.preventDefault(); alert("Tela 'Dados da Fazenda' em construção."); };
-      document.getElementById("navMinhasContagens").onclick = (e) => { e.preventDefault(); alert("Tela 'Minhas Contagens' em construção."); };
-      document.getElementById("navConfigIA").onclick = (e) => { e.preventDefault(); alert("Tela 'Configurações da IA' em construção."); };
-      document.getElementById("navAssinatura").onclick = (e) => { e.preventDefault(); alert("Tela 'Gerir Assinatura' em construção."); };
-      document.getElementById("navSuporte").onclick = (e) => { e.preventDefault(); alert("Tela 'Suporte Técnico' em construção."); };
-
       // --- LÓGICA DO CHATBOT ---
-      const N8N_WEBHOOK_URL = "https://nascoli.app.n8n.cloud/webhook/edcbe418-5081-45ed-a356-3c1fd6fa345e"; // <-- COLE A URL DO N8N AQUI
+      const N8N_WEBHOOK_URL = "COLE_A_URL_DO_SEU_WEBHOOK_DO_N8N_AQUI"; 
       const chatWindow = document.getElementById("chatWindow");
       const chatInput = document.getElementById("chatInput");
       const chatSendButton = document.getElementById("chatSendButton");
@@ -360,7 +305,6 @@
       // --- LÓGICA DO APP (Contagem) ---
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
-      // const PESO_MEDIO_GRAMAS = 500; <-- Não usamos mais, vem do JSON
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
       const fileInput = document.getElementById("fileInput");
@@ -435,6 +379,23 @@
       areaInput.addEventListener("input", checkInputs); 
       btnClear.addEventListener("click", resetUI);
       
+      // Função para gerar o link da agenda
+      function gerarLinkAgenda(contagem, estimativa_kg, preco_futuro) {
+          const dataIA = "20251215"; // Data fictícia
+          const titulo = "Melhor Dia Venda Manga (CyberAgro)";
+          const detalhes = `Contagem: ${contagem}. Estimativa: ${estimativa_kg} KG/HA. 
+Previsão de preço: R$ ${preco_futuro.toFixed(2)}. 
+Agendado via App CyberAgro.`;
+          
+          const url = new URL("https://calendar.google.com/calendar/render");
+          url.searchParams.append('action', 'TEMPLATE');
+          url.searchParams.append('text', titulo);
+          url.searchParams.append('dates', `${dataIA}/${dataIA}`);
+          url.searchParams.append('details', detalhes);
+          
+          window.open(url.href, '_blank'); // Abre o Google Calendar
+      }
+
       // O clique no botão "Enviar" agora chama esta função
       btnSend.addEventListener("click", iniciarContagem);
       
@@ -453,7 +414,7 @@
           dados_preco = await respPreco.json();
         } catch (err) {
           setStatus("Falha ao obter cotação. Usando valores padrão.");
-          dados_preco = { preco_kg: 0, peso_medio_g: 500 }; 
+          dados_preco = { preco_kg: 1.86, peso_medio_g: 500 }; // Fallback
         }
         
         // --- PASSO B: Enviar o ficheiro para a API ---
@@ -485,36 +446,41 @@
             setStatus("OK! Contagem recebida!");
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             
-            // --- PASSO C: Cálculo (agora com dados dinâmicos) ---
+            // --- PASSO C: Cálculo e Lógica de UI (v2.19) ---
             try {
               const data = JSON.parse(text);
-              const contagem_api = data.contagem_final; 
+              const contagem_api = data.contagem_final;
               
+              const preco_hoje = dados_preco.preco_kg;
+              const preco_futuro_ficticio = 2.50; // Valor fictício
+              let kg_por_hectare = 0; // Inicializa
+
               if (isVideoRequest) {
                 const peso_medio_kg = dados_preco.peso_medio_g / 1000;
-                const preco_por_kg = dados_preco.preco_kg;
-                
                 const kg_por_m2 = (contagem_api * peso_medio_kg) / area_video_m2;
-                
-                // **** CORREÇÃO DE ARREDONDAMENTO (v2.16-fix) ****
-                const kg_por_hectare = Math.round(kg_por_m2 * M2_POR_HECTARE); // Arredonda para inteiro
-                const faturamento_ha = (kg_por_hectare * preco_por_kg).toFixed(2);
+                kg_por_hectare = Math.round(kg_por_m2 * M2_POR_HECTARE);
+                const faturamento_ha = (kg_por_hectare * preco_hoje).toFixed(2);
                 
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
                 resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare + " KG/HA\n";
                 resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha;
-                // ******************************************************
-                
               } else {
                 resultadoDetalhado.textContent = "TIPO: IMAGEM\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
                 resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A";
               }
+
+              // 1. O NOVO POPUP (ALERT)
+              const popupMensagem = `A manga está cotada em R$ ${preco_hoje.toFixed(2)} hoje, porém dia 15 (data fictícia) a manga estará cotada em R$ ${preco_futuro_ficticio.toFixed(2)}. Será o melhor dia para venda!`;
+              alert(popupMensagem); 
+
+              // 2. O NOVO BOTÃO (AGENDA)
+              out.innerHTML = `<button id="btnAgenda" class="btn-nova-contagem" style="background-color: #f0ad4e; margin-top: 10px;">Deseja adicionar um lembrete na sua agenda?</button>`;
               
-              out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
-              document.getElementById("btnVerResultado").onclick = () => {
-                navigateTo(resultadoScreen); 
+              // 3. Adiciona o evento de clique ao botão Agenda
+              document.getElementById("btnAgenda").onclick = () => {
+                gerarLinkAgenda(contagem_api, kg_por_hectare, preco_futuro_ficticio);
               };
               
             } catch (e) {
@@ -535,6 +501,3 @@
   </script>
 </body>
 </html>
-
-
-
