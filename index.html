@@ -14,7 +14,7 @@
     }
   </script>
   <style>
-    /* (Todos os seus estilos .css continuam os mesmos) */
+    /* (Estilos gerais...) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -52,17 +52,59 @@
       font-size: 1.1rem;
       margin-top: 20px;
     }
+
+    /* --- ESTILO DO RODAPÉ (MODIFICADO) --- */
     .app-footer {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: #FFFFFF; border-top: 1px solid #E0E0E0;
-      display: flex; justify-content: space-around;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 999;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #FFFFFF;
+      border-top: 1px solid #E0E0E0;
+      display: flex;
+      justify-content: space-around; /* Distribui os 5 itens */
+      align-items: center; /* Alinha verticalmente */
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+      z-index: 999;
+      padding: 0 10px;
+      height: 60px; /* Altura base do rodapé */
     }
     .footer-btn {
-      flex-grow: 1; text-align: center; padding: 14px 10px;
-      font-size: 0.8rem; text-decoration: none; color: #888888; 
+      flex: 1; /* Faz os botões ocuparem espaço igual */
+      text-align: center;
+      padding: 10px 5px;
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #888888; /* Cinza (Inativo) */
+      background: none;
+      border: none;
     }
-    .footer-btn.active { color: #28a745; font-weight: 600; }
+    .footer-btn.active { 
+      color: #28a745; /* Verde (Ativo) */
+      font-weight: 600; 
+    }
+    
+    /* --- NOVO BOTÃO CENTRAL ("Sobressaltado") --- */
+    .footer-btn-central {
+      background: #000000; /* Preto */
+      color: white;
+      width: 60px;
+      height: 60px;
+      font-size: 1.6rem; /* Tamanho do ícone (emoji) */
+      line-height: 60px;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 50%; /* Redondo */
+      
+      /* O truque para "sobressaltar" */
+      position: relative; 
+      top: -20px; /* Puxa 20px para cima */
+      
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
+      border: 4px solid white; /* Cria o efeito de "corte" */
+    }
+    /* ------------------------------------------- */
+
     #grafico-placeholder {
       width: 100%; height: 250px; background: #EEEEEE;
       border-radius: 12px; display: flex; align-items: center;
@@ -99,14 +141,6 @@
       color: #333;
       margin-right: auto; /* Alinha à esquerda */
     }
-    
-    /* --- NOVO ESTILO (Secção da Agenda) --- */
-    #agenda-section {
-      margin-top: 20px; 
-      border-top: 1px solid #E0E0E0; 
-      padding-top: 15px;
-    }
-    /* ------------------------------------- */
   </style>
 </head>
 <body>
@@ -143,8 +177,7 @@
       <li class="data-row"><span>Fevereiro</span> <span>R$ 0,00</span></li>
       <li class="data-row"><span>Janeiro</span> <span>R$ 0,00</span></li>
     </ul>
-    <button id="btnNovaContagem" class="btn-nova-contagem">+ Nova Contagem</button>
-  </div>
+    </div>
 
   <div id="app-screen" class="wrap" style="display:none;">
     <button id="btnVoltarDashboard" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
@@ -183,20 +216,18 @@
     <div class="card">
       <h3>Resultado Detalhado</h3>
       <pre id="resultado-detalhado" class="mono"></pre>
-      
       <h3 style="margin-top: 20px;">Gráfico Demonstrativo</h3>
       <div id="grafico-placeholder">(Gráfico de Produtividade em breve)</div>
-      
       <div id="agenda-section" style="margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px;">
         <h3 style="margin-top: 0;">Previsão de Venda</h3>
-        <p id="forecast-message" class="mono" style="font-size: 0.9rem;">
-          </p>
+        <p id="forecast-message" class="mono" style="font-size: 0.9rem;"></p>
         <button id="btnAgenda" class="btn-nova-contagem" style="background-color: #f0ad4e; margin-top: 10px;">
           Deseja adicionar um lembrete na sua agenda?
         </button>
       </div>
-      </div>
+    </div>
   </div>
+  
   <div id="chat-screen" class="wrap" style="display:none;">
     <button id="btnVoltarDashboardChat" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
       VOLTAR AO INICIO
@@ -216,9 +247,10 @@
   <div class="app-footer">
     <a href="#" id="navInicio" class="footer-btn active">Início</a>
     <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
-    <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
+    <a href="#" id="btnNovaContagem" class="footer-btn-central">
+      📷 </a>
+    <a href="#" id="navRanking" class="footer-btn">Ranking</a> <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
   </div>
-  
   <button id="btnChat" class="chat-fab">💬</button>
 
   <script>
@@ -231,16 +263,20 @@
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
       const chatScreen = document.getElementById("chat-screen");
-      // ... (Resto dos botões de navegação)
       const loginButton = document.getElementById("loginButton");
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
+      
+      // O 'btnNovaContagem' agora é o botão da câmera no rodapé
       const btnNovaContagem = document.getElementById("btnNovaContagem"); 
+      
       const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
       const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
       const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
+      
       const navInicio = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
+      const navRanking = document.getElementById("navRanking"); // <-- NOVO
       const navPerfil = document.getElementById("navPerfil");
       const btnChat = document.getElementById("btnChat");
       const appFooter = document.querySelector(".app-footer");
@@ -251,6 +287,7 @@
         appScreen.style.display = 'none';
         resultadoScreen.style.display = 'none';
         chatScreen.style.display = 'none';
+        
         if (screenToShow === loginScreen) {
           appFooter.style.display = 'none';
           btnChat.style.display = 'none';
@@ -258,29 +295,41 @@
           appFooter.style.display = 'flex';
           btnChat.style.display = 'block';
         }
+        
         screenToShow.style.display = 'block';
+        
         navInicio.classList.remove('active');
         navRelatorios.classList.remove('active');
+        navRanking.classList.remove('active'); // <-- NOVO
         navPerfil.classList.remove('active');
+        
         if (screenToShow === dashboardScreen || screenToShow === appScreen || screenToShow === chatScreen) {
           navInicio.classList.add('active'); 
         } else if (screenToShow === resultadoScreen) {
           navRelatorios.classList.add('active'); 
-        } 
+        } else if (screenToShow === rankingScreen) { // <-- NOVO
+          navRanking.classList.add('active');
+        }
       }
       navigateTo(loginScreen);
-      // ... (Lógica de clique dos botões de navegação não muda)
+
       loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) { navigateTo(dashboardScreen); } else { loginError.style.display = "block"; } };
       passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
-      btnNovaContagem.onclick = () => { navigateTo(appScreen); };
+      
+      // O botão da câmera (antigo "Nova Contagem") leva para a tela do app
+      btnNovaContagem.onclick = (e) => { e.preventDefault(); navigateTo(appScreen); }; 
+      
       btnVoltarDashboard.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       btnVoltarDashboardChat.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
+      
       navInicio.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); navigateTo(resultadoScreen); };
+      navRanking.onclick = (e) => { e.preventDefault(); alert("Tela 'Ranking' em construção."); }; // <-- NOVO
       navPerfil.onclick = (e) => { e.preventDefault(); alert("Tela 'Perfil' em construção."); };
       
       // --- LÓGICA DO CHATBOT ---
+      // (Não muda)
       const N8N_WEBHOOK_URL = "COLE_A_URL_DO_SEU_WEBHOOK_DO_N8N_AQUI"; 
       const chatWindow = document.getElementById("chatWindow");
       const chatInput = document.getElementById("chatInput");
@@ -320,12 +369,11 @@
       chatInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); handleChatSend(); } });
 
       // --- LÓGICA DO APP (Contagem) ---
+      // (O JS da API de contagem não muda)
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
-      
-      // (IDs dos elementos do app...)
       const fileInput = document.getElementById("fileInput");
       const areaInput = document.getElementById("areaInput"); 
       const btnSend = document.getElementById("btnSend");
@@ -337,13 +385,10 @@
       const previewVideo = document.getElementById("previewVideo");
       const previewImage = document.getElementById("previewImage");
       const resultadoDetalhado = document.getElementById("resultado-detalhado");
-      // (Elementos da nova tela de resultado)
       const forecastMessage = document.getElementById("forecast-message");
       const btnAgenda = document.getElementById("btnAgenda");
-      
       let selectedFile = null;
 
-      // (Funções resetUI, checkInputs, fileInput.onchange... não mudam)
       function setStatus(s){ statusEl.textContent = s; }
       function setProgress(p){ pbar.style.width = Math.min(100, Math.max(0, p)) + "%"; }
       function resetUI(){
@@ -401,35 +446,26 @@
       });
       areaInput.addEventListener("input", checkInputs); 
       btnClear.addEventListener("click", resetUI);
-      
-      // --- NOVA FUNÇÃO (Gerador de Link da Agenda) ---
       function gerarLinkAgenda(contagem, estimativa_kg, preco_hoje, preco_futuro) {
-          const dataIA = "20251215"; // Data fictícia (Dia 15)
+          const dataIA = "20251215"; 
           const titulo = "Melhor Dia Venda Manga (CyberAgro)";
           const detalhes = `Contagem: ${contagem}.\nEstimativa: ${estimativa_kg} KG/HA.\n` +
                            `Preço hoje: R$ ${preco_hoje.toFixed(2)}\n` +
                            `Previsão (Dia 15): R$ ${preco_futuro.toFixed(2)}\n` +
                            `Agendado via App CyberAgro.`;
-          
           const url = new URL("https://calendar.google.com/calendar/render");
           url.searchParams.append('action', 'TEMPLATE');
           url.searchParams.append('text', titulo);
-          url.searchParams.append('dates', `${dataIA}/${dataIA}`); // Dia inteiro
+          url.searchParams.append('dates', `${dataIA}/${dataIA}`);
           url.searchParams.append('details', detalhes);
-          
-          window.open(url.href, '_blank'); // Abre o Google Calendar
+          window.open(url.href, '_blank'); 
       }
-      
-      // O clique no botão "Enviar" agora chama esta função
       btnSend.addEventListener("click", iniciarContagem);
-      
       async function iniciarContagem() {
         if (!selectedFile) return;
-        
         btnSend.disabled = true;
         setStatus("Passo 1/3: A obter cotação do dia...");
         setProgress(10);
-        
         let dados_preco;
         try {
           const respPreco = await fetch(`mango_prices.json?v=${Date.now()}`); 
@@ -437,53 +473,41 @@
           dados_preco = await respPreco.json();
         } catch (err) {
           setStatus("Falha ao obter cotação. Usando valores padrão.");
-          dados_preco = { preco_kg: 1.86, peso_medio_g: 500 }; // Fallback
+          dados_preco = { preco_kg: 1.86, peso_medio_g: 500 }; 
         }
-        
         const isVideoRequest = selectedFile.type.startsWith("video/");
         let target_url = ""; 
         const area_video_m2 = parseFloat(areaInput.value);
-        
         if (isVideoRequest && (!area_video_m2 || area_video_m2 <= 0)) {
             alert("Para vídeos, por favor, insira um valor válido para a área em metros quadrados (m²).");
             resetUI();
             return;
         }
-        
         setStatus("Passo 2/3: Enviando para IA…");
         setProgress(25);
-
         const form = new FormData();
         form.append("video", selectedFile, selectedFile.name || "mediafile"); 
         if (isVideoRequest) { target_url = API_URL_VIDEO; } 
         else { target_url = API_URL_IMAGEM; }
-        
         try {
           const resp = await fetch(target_url, { method: "POST", body: form });
           setProgress(75);
           const text = await resp.text().catch(()=> "");
           setProgress(100);
-          
           if (resp.ok) {
             setStatus("OK! Contagem recebida!");
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            
             try {
               const data = JSON.parse(text);
               const contagem_api = data.contagem_final; 
-              
-              // --- LÓGICA DE PREVISÃO (v2.20) ---
-              const preco_hoje = dados_preco.preco_kg; // ex: 1.86
-              const preco_futuro_ficticio = 2.50; // O seu valor fictício
+              const preco_hoje = dados_preco.preco_kg; 
+              const preco_futuro_ficticio = 2.50; 
               let kg_por_hectare = 0;
-              
-              // 1. Preenche a "página" de resultado (oculta)
               if (isVideoRequest) {
                 const peso_medio_kg = dados_preco.peso_medio_g / 1000;
                 const kg_por_m2 = (contagem_api * peso_medio_kg) / area_video_m2;
                 kg_por_hectare = Math.round(kg_por_m2 * M2_POR_HECTARE);
                 const faturamento_ha = (kg_por_hectare * preco_hoje).toFixed(2);
-                
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
                 resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare + " KG/HA\n";
@@ -493,23 +517,15 @@
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
                 resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A";
               }
-
-              // 2. Preenche a mensagem de previsão na Tela 4
               const forecastMsg = `A manga está cotada em R$ ${preco_hoje.toFixed(2)} hoje, porém dia 15 (data fictícia) a manga estará cotada em R$ ${preco_futuro_ficticio.toFixed(2)}. Será o melhor dia para venda!`;
               forecastMessage.textContent = forecastMsg;
-              
-              // 3. Adiciona o clique ao botão da agenda (que já está no HTML)
               btnAgenda.onclick = () => {
                   gerarLinkAgenda(contagem_api, kg_por_hectare, preco_hoje, preco_futuro_ficticio);
               };
-              // ------------------------------------
-
-              // 4. Cria o botão verde "Ver Resultado"
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
               document.getElementById("btnVerResultado").onclick = () => {
                 navigateTo(resultadoScreen); 
               };
-              
             } catch (e) {
               out.textContent = "Erro ao ler o JSON: " + text;
             }
@@ -523,7 +539,7 @@
         } finally {
           btnSend.disabled = false;
         }
-      } // Fim da função iniciarContagem
+      } 
     });
   </script>
 </body>
