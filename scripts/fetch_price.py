@@ -5,7 +5,7 @@ import time
 
 # --- CONFIGURAÇÃO ---
 NOME_DA_TABELA = "CyberAgro_Precos"
-NOME_DA_ABA = "Sheet1 (2)" # Baseado na sua imagem anterior [image_827be1.png]
+NOME_DA_ABA = "Sheet1" # Baseado na sua imagem anterior [image_827be1.png]
 PRODUTO_ALVO = "Tommy - produtor" # <-- CORRIGIDO
 PESO_MEDIO_FALLBACK = 500
 JSON_PATH = "mango_prices.json"
