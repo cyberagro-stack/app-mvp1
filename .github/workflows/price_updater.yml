@@ -1,4 +1,4 @@
-name: Atualizar Preços da Manga
+name: Atualizar Preços da Manga (via Google Sheets)
 
 on:
   schedule:
@@ -17,11 +17,15 @@ jobs:
         with:
           python-version: '3.10'
 
+      # --- A CORREÇÃO ESTÁ AQUI ---
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4
+          pip install gspread google-auth
+      # ---------------------------
           
-      - name: Run price fetcher
+      - name: Run price fetcher (from Google Sheets)
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
         run: python scripts/fetch_price.py
 
       - name: Commit and push if data changed
@@ -29,6 +33,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add mango_prices.json
-          # Só faz o commit se o ficheiro realmente mudou
-          git diff --staged --quiet || git commit -m "Atualização automática de preços da manga"
+          git diff --staged --quiet || git commit -m "Atualização automática de preços da manga (via GSheets)"
           git push
