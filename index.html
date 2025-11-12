@@ -99,6 +99,14 @@
       color: #333;
       margin-right: auto; /* Alinha à esquerda */
     }
+    
+    /* --- NOVO ESTILO (Secção da Agenda) --- */
+    #agenda-section {
+      margin-top: 20px; 
+      border-top: 1px solid #E0E0E0; 
+      padding-top: 15px;
+    }
+    /* ------------------------------------- */
   </style>
 </head>
 <body>
@@ -176,17 +184,18 @@
       <h3>Resultado Detalhado</h3>
       <pre id="resultado-detalhado" class="mono"></pre>
       
+      <h3 style="margin-top: 20px;">Gráfico Demonstrativo</h3>
+      <div id="grafico-placeholder">(Gráfico de Produtividade em breve)</div>
+      
       <div id="agenda-section" style="margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px;">
-        <h3 style="margin-top: 0;">Previsão de Venda (MVP)</h3>
+        <h3 style="margin-top: 0;">Previsão de Venda</h3>
         <p id="forecast-message" class="mono" style="font-size: 0.9rem;">
           </p>
         <button id="btnAgenda" class="btn-nova-contagem" style="background-color: #f0ad4e; margin-top: 10px;">
           Deseja adicionar um lembrete na sua agenda?
         </button>
       </div>
-      <h3 style="margin-top: 20px;">Gráfico Demonstrativo</h3>
-      <div id="grafico-placeholder">(Gráfico de Produtividade em breve)</div>
-    </div>
+      </div>
   </div>
   <div id="chat-screen" class="wrap" style="display:none;">
     <button id="btnVoltarDashboardChat" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
@@ -217,12 +226,12 @@
     
       // --- LÓGICA DE NAVEGAÇÃO ---
       const SENHA_SECRETA = "cyberagro2025"; 
-      // ... (IDs das telas e botões)
       const loginScreen = document.getElementById("login-screen");
       const dashboardScreen = document.getElementById("dashboard-screen"); 
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
       const chatScreen = document.getElementById("chat-screen");
+      // ... (Resto dos botões de navegação)
       const loginButton = document.getElementById("loginButton");
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
@@ -464,7 +473,7 @@
               const contagem_api = data.contagem_final; 
               
               // --- LÓGICA DE PREVISÃO (v2.20) ---
-              const preco_hoje = dados_preco.preco_kg;
+              const preco_hoje = dados_preco.preco_kg; // ex: 1.86
               const preco_futuro_ficticio = 2.50; // O seu valor fictício
               let kg_por_hectare = 0;
               
