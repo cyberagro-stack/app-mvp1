@@ -3,10 +3,10 @@ import json
 import os
 import time
 
-# --- CONFIGURAÇÃO ---
+# --- CONFIGURAÇÃO CORRIGIDA ---
 NOME_DA_TABELA = "CyberAgro_Precos"
-NOME_DA_ABA = "Sheet1" # Baseado na sua imagem anterior [image_827be1.png]
-PRODUTO_ALVO = "Tommy - produtor" # <-- CORRIGIDO
+NOME_DA_ABA = "Sheet1" # (Nome padrão após a importação)
+PRODUTO_ALVO = "Tommy - produtor" # <-- CORREÇÃO (Linha 3 da sua tabela)
 PESO_MEDIO_FALLBACK = 500
 JSON_PATH = "mango_prices.json"
 # --------------------
@@ -32,15 +32,17 @@ try:
         raise ValueError("Nenhum dado encontrado na tabela.")
         
     dados_manga = None
-    for registo in reversed(lista_de_registos):
-        # Procura pelo nome exato do produto
+    # Procura pela última (mais recente) entrada do produto
+    for registo in reversed(lista_de_registos): 
+        # Procura o nome exato do produto (Coluna 'Produto')
         if registo.get('Produto') and registo['Produto'].strip() == PRODUTO_ALVO:
             dados_manga = registo
-            break
+            break # Encontra o mais recente e para
             
     if not dados_manga:
         raise ValueError(f"Produto '{PRODUTO_ALVO}' não encontrado na tabela.")
 
+    # Pega o valor da Coluna 'Preço' (Coluna H)
     if 'Preço' not in dados_manga:
         raise ValueError("Coluna 'Preço' em falta na tabela.")
 
@@ -55,18 +57,11 @@ try:
         "ultima_atualizacao": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     }
 
-    print(f"Dados encontrados: Preço R${novos_dados['preco_kg']}, Peso {novos_dados['peso_medio_g']}g")
+    print(f"Dados encontrados: {PRODUTO_ALVO} - Preço R${novos_dados['preco_kg']}, Peso {novos_dados['peso_medio_g']}g")
     with open(JSON_PATH, 'w', encoding='utf-8') as f:
         json.dump(novos_dados, f, indent=2, ensure_ascii=False)
     print("Ficheiro mango_prices.json atualizado com sucesso.")
 
 except Exception as e:
     print(f"Erro fatal: {e}")
-    if not os.path.exists(JSON_PATH):
-        fallback_data = { "preco_kg": 0, "peso_medio_g": 500, "fonte": "Erro ao ler Google Sheet", "ultima_atualizacao": "N/A" }
-        with open(JSON_PATH, 'w', encoding='utf-8') as f:
-            json.dump(fallback_data, f, indent=2, ensure_ascii=False)
-    raise e
-finally:
-    if os.path.exists("gcp_key.json"):
-        os.remove("gcp_key.json")
+    if not os.path
