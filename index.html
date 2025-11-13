@@ -70,6 +70,8 @@
       background: none; border: none;
     }
     .footer-btn.active { color: #28a745; font-weight: 600; }
+    
+    /* --- CSS DO BOTÃO CENTRAL (CORRIGIDO) --- */
     .footer-btn-central {
       background: #000000; color: white;
       width: 60px; height: 60px;
@@ -79,35 +81,39 @@
       top: -20px;
       box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
       border: 4px solid white; 
-      padding: 12px; 
+      /* padding: 12px; <-- REMOVIDO */
       box-sizing: border-box; 
     }
     .footer-btn-central img {
       width: 100%;
       height: 100%;
-      object-fit: contain; 
+      object-fit: cover; /* 'cover' preenche o círculo */
+      border-radius: 50%; /* Garante que a imagem .jpeg seja redonda */
     }
+    /* ------------------------------------- */
+
     #agenda-section {
       margin-top: 20px; 
       border-top: 1px solid #E0E0E0; 
       padding-top: 15px;
     }
     
-    /* --- CSS DO CHAT (MODIFICADO) --- */
+    /* --- CSS DO CHAT (CORRIGIDO) --- */
     .chat-fab {
       position: fixed; bottom: 90px; right: 20px; background: #28a745;
       color: white; width: 50px; height: 50px; border-radius: 50%;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; padding: 0;
       
-      padding: 10px; /* Espaçamento interno */
+      /* padding: 10px; <-- REMOVIDO */
       box-sizing: border-box;
     }
     .chat-fab img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover; /* 'cover' preenche o círculo */
+      border-radius: 50%; /* Garante que a imagem .png seja redonda */
     }
-    /* --------------------------------- */
+    /* ------------------------------ */
 
     .chat-window {
       height: 400px;
@@ -276,7 +282,7 @@
   
   
   <button id="btnChat" class="chat-fab">
-    <img src="imagem2.png" alt="Chat">
+    <img src="imagem2.jpeg" alt="Chat">
   </button>
 
   <script>
@@ -286,7 +292,6 @@
       // (A lógica de navegação v2.23 está correta e não muda)
       const SENHA_SECRETA = "cyberagro2025"; 
       const loginScreen = document.getElementById("login-screen");
-      // ... (Resto do código JS não muda)
       const dashboardScreen = document.getElementById("dashboard-screen"); 
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
@@ -305,6 +310,7 @@
       const navPerfil = document.getElementById("navPerfil");
       const btnChat = document.getElementById("btnChat");
       const appFooter = document.querySelector(".app-footer");
+
       function navigateTo(screenToShow) {
         loginScreen.style.display = 'none';
         dashboardScreen.style.display = 'none';
@@ -393,7 +399,6 @@
       chatInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); handleChatSend(); } });
 
       // --- LÓGICA DO APP (Contagem) ---
-      // (A lógica de contagem v2.25 está correta)
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
@@ -563,7 +568,6 @@
               const preco_hoje = dados_preco.preco_kg; 
               const preco_futuro_ficticio = 2.50; 
               let kg_por_hectare_raw = 0;
-              
               if (isVideoRequest) {
                 const peso_medio_kg = dados_preco.peso_medio_g / 1000;
                 const kg_por_m2 = (contagem_api * peso_medio_kg) / area_video_m2;
