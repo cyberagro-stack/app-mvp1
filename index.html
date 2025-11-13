@@ -13,10 +13,10 @@
         .catch(err => console.log('Service Worker falhou:', err));
     }
   </script>
-  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <style>
-    /* (Todos os seus estilos .css continuam os mesmos) */
+    /* (Estilos gerais...) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -79,17 +79,19 @@
       top: -20px;
       box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
       border: 4px solid white; 
-      padding: 12px;
-      box-sizing: border-box;
+      padding: 12px; 
+      box-sizing: border-box; 
     }
     .footer-btn-central img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: contain; 
     }
-    
-    /* O placeholder agora é um canvas, não precisa de estilo */
-    
+    #agenda-section {
+      margin-top: 20px; 
+      border-top: 1px solid #E0E0E0; 
+      padding-top: 15px;
+    }
     .chat-fab {
       position: fixed; bottom: 90px; right: 20px; background: #28a745;
       color: white; width: 50px; height: 50px; border-radius: 50%;
@@ -114,11 +116,24 @@
     .chat-bubble.user { background: #2a7bf6; color: white; margin-left: auto; }
     .chat-bubble.bot { background: #EEEEEE; color: #333; margin-right: auto; }
     
-    #agenda-section {
-      margin-top: 20px; 
-      border-top: 1px solid #E0E0E0; 
-      padding-top: 15px;
+    /* --- ESTILOS DO PERFIL (v2.23) --- */
+    .profile-header { display: flex; align-items: center; gap: 16px; }
+    .profile-pic {
+      width: 60px; height: 60px; border-radius: 50%;
+      object-fit: cover; background: #DDD;
     }
+    .profile-name { font-size: 1.2rem; font-weight: 600; color: #333; }
+    .profile-subtitle { font-size: 0.9rem; color: #555; }
+    .menu-list { margin-top: 20px; padding: 0; }
+    .menu-item {
+      display: flex; align-items: center; padding: 16px;
+      text-decoration: none; color: #333; font-size: 1rem;
+      border-bottom: 1px solid #EEE;
+    }
+    .menu-item:last-child { border-bottom: none; }
+    .menu-item.danger { color: #D32F2F; } /* Cor para o botão Sair */
+    .menu-icon { font-size: 1.2rem; margin-right: 16px; width: 24px; text-align: center; }
+    .menu-chevron { margin-left: auto; color: #AAA; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -194,11 +209,8 @@
     <div class="card">
       <h3>Resultado Detalhado</h3>
       <pre id="resultado-detalhado" class="mono"></pre>
-      
       <h3 style="margin-top: 20px;">Gráfico Demonstrativo</h3>
-      
-      <canvas id="myChart" height="200"></canvas>
-      <div id="agenda-section" style="margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px;">
+      <canvas id="myChart" height="200"></canvas> <div id="agenda-section" style="margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px;">
         <h3 style="margin-top: 0;">Previsão de Venda</h3>
         <p id="forecast-message" class="mono" style="font-size: 0.9rem;"></p>
         <button id="btnAgenda" class="btn-nova-contagem" style="background-color: #f0ad4e; margin-top: 10px;">
@@ -207,6 +219,7 @@
       </div>
     </div>
   </div>
+  
   <div id="chat-screen" class="wrap" style="display:none;">
     <button id="btnVoltarDashboardChat" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
       VOLTAR AO INICIO
@@ -222,25 +235,21 @@
       </div>
     </div>
   </div>
-
+  
   <div id="perfil-screen" class="wrap" style="display:none;">
     <div class="profile-header card">
       <img src="logo.png?v=4" alt="Foto de Perfil" class="profile-pic">
       <div class="profile-info">
-        <div class="profile-name">Fazenda Takayasu</div>
-        <div class="profile-subtitle">São Carlo Acutis rogai por nós!</div>
+        <div class="profile-name">Wendell Nascoli</div>
+        <div class="profile-subtitle">uendeu.agro@gmail.com</div>
       </div>
     </div>
     <div class="menu-list card">
-      <a href="#" class="menu-item" id="navDadosFazenda"><span class="menu-icon">👤</span> <span>Dados da Fazenda</span> <span class="menu-chevron">&gt;</span></a>
-      <a href="#" class="menu-item" id="navMinhasContagens"><span class="menu-icon">📋</span> <span>Minhas Contagens</span> <span class="menu-chevron">&gt;</span></a>
-      <a href="#" class="menu-item" id="navConfigIA"><span class="menu-icon">⚙️</span> <span>Configurações</span> <span class="menu-chevron">&gt;</span></a>
-      <a href="#" class="menu-item" id="navAssinatura"><span class="menu-icon">💳</span> <span>Gerir Assinatura</span> <span class="menu-chevron">&gt;</span></a>
-      <a href="#" class="menu-item" id="navSuporte"><span class="menu-icon">💬</span> <span>Suporte Técnico</span> <span class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item" id="navMeusDados"><span class="menu-icon">👤</span> <span>Meus Dados</span> <span class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item" id="navConfig"><span class="menu-icon">⚙️</span> <span>Configurações</span> <span class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item danger" id="navSair"><span class="menu-icon">🚪</span> <span>Sair</span> <span class="menu-chevron">&gt;</span></a>
     </div>
   </div>
-
-
   <div class="app-footer">
     <a href="#" id="navInicio" class="footer-btn active">Início</a>
     <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
@@ -256,37 +265,40 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
     
-      // --- LÓGICA DE NAVEGAÇÃO ---
-      // (IDs das telas e botões...)
+      // --- LÓGICA DE NAVEGAÇÃO (v2.23 - Corrigida) ---
       const SENHA_SECRETA = "cyberagro2025"; 
       const loginScreen = document.getElementById("login-screen");
       const dashboardScreen = document.getElementById("dashboard-screen"); 
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
       const chatScreen = document.getElementById("chat-screen");
-      const perfilScreen = document.getElementById("perfil-screen");
+      const perfilScreen = document.getElementById("perfil-screen"); // <-- TELA PERFIL
+      
       const loginButton = document.getElementById("loginButton");
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
+      
       const btnNovaContagem = document.getElementById("btnNovaContagem"); 
       const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
       const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
       const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
+      
       const navInicio = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
       const navRanking = document.getElementById("navRanking");
-      const navPerfil = document.getElementById("navPerfil");
+      const navPerfil = document.getElementById("navPerfil"); // <-- Botão Perfil
       const btnChat = document.getElementById("btnChat");
       const appFooter = document.querySelector(".app-footer");
-      
-      // (Função de Navegação não muda)
+
+      // Esta função agora gere TODAS as 6 telas
       function navigateTo(screenToShow) {
         loginScreen.style.display = 'none';
         dashboardScreen.style.display = 'none';
         appScreen.style.display = 'none';
         resultadoScreen.style.display = 'none';
         chatScreen.style.display = 'none';
-        perfilScreen.style.display = 'none';
+        perfilScreen.style.display = 'none'; // <-- Esconde Perfil
+        
         if (screenToShow === loginScreen) {
           appFooter.style.display = 'none';
           btnChat.style.display = 'none';
@@ -294,21 +306,27 @@
           appFooter.style.display = 'flex';
           btnChat.style.display = 'block';
         }
+        
         screenToShow.style.display = 'block';
+        
+        // Reseta todos os botões do rodapé
         navInicio.classList.remove('active');
         navRelatorios.classList.remove('active');
         navRanking.classList.remove('active');
         navPerfil.classList.remove('active');
+        
+        // Ativa o botão correto
         if (screenToShow === dashboardScreen || screenToShow === appScreen || screenToShow === chatScreen) {
           navInicio.classList.add('active'); 
         } else if (screenToShow === resultadoScreen) {
           navRelatorios.classList.add('active'); 
-        } else if (screenToShow === perfilScreen) {
+        } else if (screenToShow === perfilScreen) { // <-- Ativa Perfil
           navPerfil.classList.add('active');
         }
       }
-      navigateTo(loginScreen);
-      // (Lógica de clique dos botões de navegação não muda)
+      navigateTo(loginScreen); // Estado inicial
+
+      // (Lógica de clique dos botões de navegação)
       loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) { navigateTo(dashboardScreen); } else { loginError.style.display = "block"; } };
       passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
       btnNovaContagem.onclick = (e) => { e.preventDefault(); navigateTo(appScreen); }; 
@@ -318,21 +336,26 @@
       navInicio.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); navigateTo(resultadoScreen); };
       navRanking.onclick = (e) => { e.preventDefault(); alert("Tela 'Ranking' em construção."); }; 
-      navPerfil.onclick = (e) => { e.preventDefault(); navigateTo(perfilScreen); };
-      document.getElementById("navDadosFazenda").onclick = (e) => { e.preventDefault(); alert("Tela 'Dados da Fazenda' em construção."); };
-      document.getElementById("navMinhasContagens").onclick = (e) => { e.preventDefault(); alert("Tela 'Minhas Contagens' em construção."); };
-      document.getElementById("navConfigIA").onclick = (e) => { e.preventDefault(); alert("Tela 'Configurações da IA' em construção."); };
-      document.getElementById("navAssinatura").onclick = (e) => { e.preventDefault(); alert("Tela 'Gerir Assinatura' em construção."); };
-      document.getElementById("navSuporte").onclick = (e) => { e.preventDefault(); alert("Tela 'Suporte Técnico' em construção."); };
+      navPerfil.onclick = (e) => { e.preventDefault(); navigateTo(perfilScreen); }; // <-- Liga o botão Perfil
+      
+      // --- LÓGICA DO NOVO MENU DE PERFIL (v2.23) ---
+      document.getElementById("navMeusDados").onclick = (e) => { e.preventDefault(); alert("Tela 'Meus Dados' em construção."); };
+      document.getElementById("navConfig").onclick = (e) => { e.preventDefault(); alert("Tela 'Configurações' em construção."); };
+      document.getElementById("navSair").onclick = (e) => { 
+        e.preventDefault(); 
+        if (confirm("Tem a certeza que deseja sair?")) {
+          resetUI();
+          navigateTo(loginScreen); 
+        }
+      };
       
       // --- LÓGICA DO CHATBOT ---
-      // (Não muda)
       const N8N_WEBHOOK_URL = "COLE_A_URL_DO_SEU_WEBHOOK_DO_N8N_AQUI"; 
       const chatWindow = document.getElementById("chatWindow");
       const chatInput = document.getElementById("chatInput");
       const chatSendButton = document.getElementById("chatSendButton");
       btnChat.onclick = (e) => { e.preventDefault(); navigateTo(chatScreen); };
-      // (funções addChatBubble e handleChatSend não mudam)
+      // (Resto da lógica do Chatbot...)
       function addChatBubble(message, isUser = false) {
           const bubble = document.createElement('div');
           bubble.classList.add('chat-bubble');
@@ -371,8 +394,6 @@
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
-      
-      // (IDs dos elementos do app...)
       const fileInput = document.getElementById("fileInput");
       const areaInput = document.getElementById("areaInput"); 
       const btnSend = document.getElementById("btnSend");
@@ -387,35 +408,28 @@
       const forecastMessage = document.getElementById("forecast-message");
       const btnAgenda = document.getElementById("btnAgenda");
       let selectedFile = null;
+      let myChart = null; // Guarda a instância do gráfico
       
       const formatterInt = new Intl.NumberFormat('pt-BR', { style: 'decimal', maximumFractionDigits: 0 });
       const formatterCurrency = new Intl.NumberFormat('pt-BR', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 });
       
-      // **** NOVA VARIÁVEL E FUNÇÃO (v2.23) ****
-      let myChart = null; // Guarda a instância do gráfico
-
       // Função que desenha (ou atualiza) o gráfico
       function renderChart(labels, dataPrices) {
-        // Usa o contexto do 'canvas'
         const ctx = document.getElementById('myChart').getContext('2d');
-        
-        // Se já existir um gráfico antigo, destrói-o
         if (myChart) {
             myChart.destroy();
         }
-
-        // Cria o novo gráfico
         myChart = new Chart(ctx, {
-            type: 'line', // Gráfico de linha (estilo mercado financeiro)
+            type: 'line', 
             data: {
-                labels: labels, // Eixo X
+                labels: labels,
                 datasets: [{
                     label: 'Preço R$/KG (Tommy)',
-                    data: dataPrices, // Eixo Y
+                    data: dataPrices,
                     fill: false,
-                    borderColor: '#28a745', // Linha Verde
+                    borderColor: '#28a745', 
                     backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                    tension: 0.1, // Linha levemente curvada
+                    tension: 0.1,
                     fill: true
                 }]
             },
@@ -425,7 +439,6 @@
                 scales: {
                     y: {
                         ticks: {
-                            // Adiciona "R$" aos ticks do eixo Y
                             callback: function(value, index, ticks) {
                                 return 'R$ ' + value.toFixed(2);
                             }
@@ -435,7 +448,6 @@
             }
         });
       }
-      // ********************************************
 
       function setStatus(s){ statusEl.textContent = s; }
       function setProgress(p){ pbar.style.width = Math.min(100, Math.max(0, p)) + "%"; }
@@ -551,22 +563,17 @@
               const preco_hoje = dados_preco.preco_kg; 
               const preco_futuro_ficticio = 2.50; 
               let kg_por_hectare_raw = 0;
-              
               if (isVideoRequest) {
                 const peso_medio_kg = dados_preco.peso_medio_g / 1000;
                 const kg_por_m2 = (contagem_api * peso_medio_kg) / area_video_m2;
                 kg_por_hectare_raw = Math.round(kg_por_m2 * M2_POR_HECTARE);
                 const faturamento_ha_raw = (kg_por_hectare_raw * preco_hoje);
-                
                 const kg_por_hectare_formatado = formatterInt.format(kg_por_hectare_raw);
                 const faturamento_ha_formatado = formatterCurrency.format(faturamento_ha_raw);
-                
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-                resultadoDetalhado.textContent += "ESTIMATIVA (QNTD): " + formatterInt.format(kg_por_hectare_raw * (1000 / dados_preco.peso_medio_g)) + " MANGAS/HA\n";
                 resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare_formatado + " KG/HA\n";
                 resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha_formatado;
-                
               } else {
                 resultadoDetalhado.textContent = "TIPO: IMAGEM\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
@@ -578,21 +585,13 @@
                   gerarLinkAgenda(contagem_api, kg_por_hectare_raw, preco_hoje, preco_futuro_ficticio);
               };
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
-              
-              // --- MUDANÇA AQUI (v2.23) ---
-              // Adiciona o evento de clique que desenha o gráfico e navega
               document.getElementById("btnVerResultado").onclick = () => {
                 // Prepara os dados fictícios para o gráfico (Ex: 5 últimas semanas)
                 const labels = ['Sem 41', 'Sem 42', 'Sem 43', 'Sem 44', 'Sem 45'];
                 const prices = [2.51, 2.14, 2.23, 2.35, 1.86]; // Dados da sua tabela
-                
-                // Desenha o gráfico
                 renderChart(labels, prices);
-                // Navega para a tela
                 navigateTo(resultadoScreen); 
               };
-              // -----------------------------
-              
             } catch (e) {
               out.textContent = "Erro ao ler o JSON: " + text;
             }
@@ -611,5 +610,3 @@
   </script>
 </body>
 </html>
-
-
