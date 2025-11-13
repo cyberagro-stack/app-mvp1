@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CyberAgro • Contador de Mangas</title>
+  <title>CyberAgro</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FFFFFF">
   <script>
@@ -581,7 +581,7 @@
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
                 resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A";
               }
-              const forecastMsg = `A manga está cotada em R$ ${formatterCurrency.format(preco_hoje)} hoje, porém dia 15 (data fictícia) a manga estará cotada em R$ ${formatterCurrency.format(preco_futuro_ficticio)}. Será o melhor dia para venda!`;
+              const forecastMsg = `A manga está cotada em R$ ${formatterCurrency.format(preco_hoje)} hoje. Porém dia 15/12/2025, a manga estará cotada em R$ ${formatterCurrency.format(preco_futuro_ficticio)}. Será o melhor dia para venda!`;
               forecastMessage.textContent = forecastMsg;
               btnAgenda.onclick = () => {
                   gerarLinkAgenda(contagem_api, kg_por_hectare_raw, preco_hoje, preco_futuro_ficticio);
@@ -613,3 +613,4 @@
   </script>
 </body>
 </html>
+
