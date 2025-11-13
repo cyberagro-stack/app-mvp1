@@ -14,7 +14,7 @@
     }
   </script>
   <style>
-    /* (Estilos gerais...) */
+    /* (Todos os seus estilos .css) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -52,59 +52,32 @@
       font-size: 1.1rem;
       margin-top: 20px;
     }
-
-    /* --- ESTILO DO RODAPÉ (MODIFICADO) --- */
     .app-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #FFFFFF;
-      border-top: 1px solid #E0E0E0;
-      display: flex;
-      justify-content: space-around; /* Distribui os 5 itens */
-      align-items: center; /* Alinha verticalmente */
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #FFFFFF; border-top: 1px solid #E0E0E0;
+      display: flex; justify-content: space-around;
+      align-items: center;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
       z-index: 999;
       padding: 0 10px;
-      height: 60px; /* Altura base do rodapé */
+      height: 60px;
     }
     .footer-btn {
-      flex: 1; /* Faz os botões ocuparem espaço igual */
-      text-align: center;
-      padding: 10px 5px;
-      font-size: 0.8rem;
-      text-decoration: none;
-      color: #888888; /* Cinza (Inativo) */
-      background: none;
-      border: none;
+      flex: 1; text-align: center; padding: 10px 5px;
+      font-size: 0.8rem; text-decoration: none; color: #888888; 
+      background: none; border: none;
     }
-    .footer-btn.active { 
-      color: #28a745; /* Verde (Ativo) */
-      font-weight: 600; 
-    }
-    
-    /* --- NOVO BOTÃO CENTRAL ("Sobressaltado") --- */
+    .footer-btn.active { color: #28a745; font-weight: 600; }
     .footer-btn-central {
-      background: #000000; /* Preto */
-      color: white;
-      width: 60px;
-      height: 60px;
-      font-size: 1.6rem; /* Tamanho do ícone (emoji) */
-      line-height: 60px;
-      text-align: center;
-      text-decoration: none;
-      border-radius: 50%; /* Redondo */
-      
-      /* O truque para "sobressaltar" */
+      background: #000000; color: white;
+      width: 60px; height: 60px; font-size: 1.6rem;
+      line-height: 60px; text-align: center; text-decoration: none;
+      border-radius: 50%;
       position: relative; 
-      top: -20px; /* Puxa 20px para cima */
-      
+      top: -20px;
       box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
-      border: 4px solid white; /* Cria o efeito de "corte" */
+      border: 4px solid white;
     }
-    /* ------------------------------------------- */
-
     #grafico-placeholder {
       width: 100%; height: 250px; background: #EEEEEE;
       border-radius: 12px; display: flex; align-items: center;
@@ -121,7 +94,7 @@
       background: #FFF;
       border: 1px solid #EEE;
       border-radius: 12px;
-      overflow-y: auto; /* Scroll */
+      overflow-y: auto;
       padding: 10px;
       margin-bottom: 10px;
     }
@@ -131,15 +104,13 @@
       margin-bottom: 8px;
       max-width: 80%;
     }
-    .chat-bubble.user {
-      background: #2a7bf6;
-      color: white;
-      margin-left: auto; /* Alinha à direita */
-    }
-    .chat-bubble.bot {
-      background: #EEEEEE;
-      color: #333;
-      margin-right: auto; /* Alinha à esquerda */
+    .chat-bubble.user { background: #2a7bf6; color: white; margin-left: auto; }
+    .chat-bubble.bot { background: #EEEEEE; color: #333; margin-right: auto; }
+    
+    #agenda-section {
+      margin-top: 20px; 
+      border-top: 1px solid #E0E0E0; 
+      padding-top: 15px;
     }
   </style>
 </head>
@@ -216,16 +187,19 @@
     <div class="card">
       <h3>Resultado Detalhado</h3>
       <pre id="resultado-detalhado" class="mono"></pre>
+      
       <h3 style="margin-top: 20px;">Gráfico Demonstrativo</h3>
       <div id="grafico-placeholder">(Gráfico de Produtividade em breve)</div>
+      
       <div id="agenda-section" style="margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px;">
         <h3 style="margin-top: 0;">Previsão de Venda</h3>
-        <p id="forecast-message" class="mono" style="font-size: 0.9rem;"></p>
+        <p id="forecast-message" class="mono" style="font-size: 0.9rem;">
+          </p>
         <button id="btnAgenda" class="btn-nova-contagem" style="background-color: #f0ad4e; margin-top: 10px;">
           Deseja adicionar um lembrete na sua agenda?
         </button>
       </div>
-    </div>
+      </div>
   </div>
   
   <div id="chat-screen" class="wrap" style="display:none;">
@@ -244,12 +218,31 @@
     </div>
   </div>
 
+  <div id="perfil-screen" class="wrap" style="display:none;">
+    <div class="profile-header card">
+      <img src="logo.png?v=4" alt="Foto de Perfil" class="profile-pic">
+      <div class="profile-info">
+        <div class="profile-name">Fazenda Takayasu</div>
+        <div class="profile-subtitle">São Carlo Acutis rogai por nós!</div>
+      </div>
+    </div>
+    <div class="menu-list card">
+      <a href="#" class="menu-item" id="navDadosFazenda"><span class="menu-icon">👤</span> <span>Dados da Fazenda</span> <span class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item" id="navMinhasContagens"><span class="menu-icon">📋</span> <span>Minhas Contagens</span> <span class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item" id="navConfigIA"><span class="menu-icon">⚙️</span> <span>Configurações</span> <span class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item" id="navAssinatura"><span class="menu-icon">💳</span> <span>Gerir Assinatura</span> <span class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item" id="navSuporte"><span class="menu-icon">💬</span> <span>Suporte Técnico</span> <span class="menu-chevron">&gt;</span></a>
+    </div>
+  </div>
+
+
   <div class="app-footer">
     <a href="#" id="navInicio" class="footer-btn active">Início</a>
     <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
     <a href="#" id="btnNovaContagem" class="footer-btn-central">
       📷 </a>
-    <a href="#" id="navRanking" class="footer-btn">Ranking</a> <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
+    <a href="#" id="navRanking" class="footer-btn">Ranking</a> 
+    <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
   </div>
   <button id="btnChat" class="chat-fab">💬</button>
 
@@ -263,20 +256,20 @@
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
       const chatScreen = document.getElementById("chat-screen");
+      const perfilScreen = document.getElementById("perfil-screen"); // <-- TELA PERFIL
+      
       const loginButton = document.getElementById("loginButton");
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
       
-      // O 'btnNovaContagem' agora é o botão da câmera no rodapé
       const btnNovaContagem = document.getElementById("btnNovaContagem"); 
-      
       const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
       const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
       const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
       
       const navInicio = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
-      const navRanking = document.getElementById("navRanking"); // <-- NOVO
+      const navRanking = document.getElementById("navRanking");
       const navPerfil = document.getElementById("navPerfil");
       const btnChat = document.getElementById("btnChat");
       const appFooter = document.querySelector(".app-footer");
@@ -287,6 +280,7 @@
         appScreen.style.display = 'none';
         resultadoScreen.style.display = 'none';
         chatScreen.style.display = 'none';
+        perfilScreen.style.display = 'none'; // <-- Esconde Perfil
         
         if (screenToShow === loginScreen) {
           appFooter.style.display = 'none';
@@ -300,41 +294,45 @@
         
         navInicio.classList.remove('active');
         navRelatorios.classList.remove('active');
-        navRanking.classList.remove('active'); // <-- NOVO
+        navRanking.classList.remove('active');
         navPerfil.classList.remove('active');
         
         if (screenToShow === dashboardScreen || screenToShow === appScreen || screenToShow === chatScreen) {
           navInicio.classList.add('active'); 
         } else if (screenToShow === resultadoScreen) {
           navRelatorios.classList.add('active'); 
-        } else if (screenToShow === rankingScreen) { // <-- NOVO
-          navRanking.classList.add('active');
+        } else if (screenToShow === perfilScreen) { // <-- Ativa Perfil
+          navPerfil.classList.add('active');
         }
       }
       navigateTo(loginScreen);
 
+      // (Lógica de clique dos botões de navegação)
       loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) { navigateTo(dashboardScreen); } else { loginError.style.display = "block"; } };
       passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
-      
-      // O botão da câmera (antigo "Nova Contagem") leva para a tela do app
       btnNovaContagem.onclick = (e) => { e.preventDefault(); navigateTo(appScreen); }; 
-      
       btnVoltarDashboard.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       btnVoltarDashboardChat.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
-      
       navInicio.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); navigateTo(resultadoScreen); };
-      navRanking.onclick = (e) => { e.preventDefault(); alert("Tela 'Ranking' em construção."); }; // <-- NOVO
-      navPerfil.onclick = (e) => { e.preventDefault(); alert("Tela 'Perfil' em construção."); };
+      navRanking.onclick = (e) => { e.preventDefault(); alert("Tela 'Ranking' em construção."); }; 
+      navPerfil.onclick = (e) => { e.preventDefault(); navigateTo(perfilScreen); }; // <-- Liga o botão Perfil
+      
+      // (Lógica dos botões do menu de Perfil)
+      document.getElementById("navDadosFazenda").onclick = (e) => { e.preventDefault(); alert("Tela 'Dados da Fazenda' em construção."); };
+      document.getElementById("navMinhasContagens").onclick = (e) => { e.preventDefault(); alert("Tela 'Minhas Contagens' em construção."); };
+      document.getElementById("navConfigIA").onclick = (e) => { e.preventDefault(); alert("Tela 'Configurações da IA' em construção."); };
+      document.getElementById("navAssinatura").onclick = (e) => { e.preventDefault(); alert("Tela 'Gerir Assinatura' em construção."); };
+      document.getElementById("navSuporte").onclick = (e) => { e.preventDefault(); alert("Tela 'Suporte Técnico' em construção."); };
       
       // --- LÓGICA DO CHATBOT ---
-      // (Não muda)
       const N8N_WEBHOOK_URL = "COLE_A_URL_DO_SEU_WEBHOOK_DO_N8N_AQUI"; 
       const chatWindow = document.getElementById("chatWindow");
       const chatInput = document.getElementById("chatInput");
       const chatSendButton = document.getElementById("chatSendButton");
       btnChat.onclick = (e) => { e.preventDefault(); navigateTo(chatScreen); };
+      // (Resto da lógica do Chatbot...)
       function addChatBubble(message, isUser = false) {
           const bubble = document.createElement('div');
           bubble.classList.add('chat-bubble');
@@ -369,7 +367,7 @@
       chatInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); handleChatSend(); } });
 
       // --- LÓGICA DO APP (Contagem) ---
-      // (O JS da API de contagem não muda)
+      // (A lógica de contagem v2.20 está correta e não muda)
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
