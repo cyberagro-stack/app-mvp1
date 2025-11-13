@@ -93,7 +93,7 @@
       padding-top: 15px;
     }
     
-    /* --- CSS DO CHAT (MODIFICADO) --- */
+    /* (CSS do Chat...) */
     .chat-fab {
       position: fixed; bottom: 90px; right: 20px; background: #28a745;
       color: white; width: 50px; height: 50px; border-radius: 50%;
@@ -107,8 +107,6 @@
       height: 100%;
       object-fit: contain;
     }
-    /* --------------------------------- */
-
     .chat-window {
       height: 400px;
       background: #FFF;
@@ -602,11 +600,11 @@
               };
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
               
-              // --- MODIFICAÇÃO DO GRÁFICO (v2.24) ---
+              // --- MODIFICAÇÃO DO GRÁFICO (v2.26) ---
               document.getElementById("btnVerResultado").onclick = () => {
-                // Dados reais da sua tabela (Tommy - produtor)
-                const labels = ['17/8/01', '23/8/01', '30/8/01', '5/9/01', '12/9/01', '19/9/01', '10/10/25', '17/10/25', '24/10/25', '31/10/25', '7/11/25'];
-                const prices = [0.96, 0.80, 0.59, 0.54, 0.48, 0.46, 1.26, 1.95, 1.88, 2.06, 1.86];
+                // Dados reais (2025) da sua tabela (Tommy - produtor)
+                const labels = ['10/10/25', '17/10/25', '24/10/25', '31/10/25', '7/11/25'];
+                const prices = [1.26, 1.95, 1.88, 2.06, 1.86];
                 
                 renderChart(labels, prices);
                 navigateTo(resultadoScreen); 
