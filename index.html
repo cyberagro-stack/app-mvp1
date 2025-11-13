@@ -93,7 +93,7 @@
       padding-top: 15px;
     }
     
-    /* (CSS do Chat...) */
+    /* --- CSS DO CHAT (MODIFICADO) --- */
     .chat-fab {
       position: fixed; bottom: 90px; right: 20px; background: #28a745;
       color: white; width: 50px; height: 50px; border-radius: 50%;
@@ -107,6 +107,8 @@
       height: 100%;
       object-fit: contain;
     }
+    /* --------------------------------- */
+
     .chat-window {
       height: 400px;
       background: #FFF;
@@ -569,7 +571,7 @@
                 kg_por_hectare_raw = Math.round(kg_por_m2 * M2_POR_HECTARE);
                 const faturamento_ha_raw = (kg_por_hectare_raw * preco_hoje);
                 
-                // --- 1. A LÓGICA QUE FALTAVA (QNTD) ---
+                // --- LÓGICA (QNTD) ---
                 const mangas_por_m2 = contagem_api / area_video_m2;
                 const mangas_por_hectare_raw = Math.round(mangas_por_m2 * M2_POR_HECTARE);
                 const mangas_por_hectare_formatado = formatterInt.format(mangas_por_hectare_raw);
@@ -581,7 +583,7 @@
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
                 
-                // --- 2. A LINHA DE EXIBIÇÃO QUE FALTAVA (v2.25) ---
+                // --- LINHA DE EXIBIÇÃO (QNTD) (v2.25) ---
                 resultadoDetalhado.textContent += "ESTIMATIVA (QNTD): " + mangas_por_hectare_formatado + " MANGAS/HA\n";
                 // --------------------------------------------------
                 
@@ -602,9 +604,9 @@
               
               // --- MODIFICAÇÃO DO GRÁFICO (v2.26) ---
               document.getElementById("btnVerResultado").onclick = () => {
-                // Dados reais (2025) da sua tabela (Tommy - produtor)
-                const labels = ['10/10/25', '17/10/25', '24/10/25', '31/10/25', '7/11/25'];
-                const prices = [1.26, 1.95, 1.88, 2.06, 1.86];
+                // Dados reais (APENAS 2025) da sua tabela (Tommy - produtor)
+                const labels = ['3/10/25', '10/10/25', '17/10/25', '24/10/25', '31/10/25', '7/11/25'];
+                const prices = [2.51, 1.26, 1.95, 1.88, 2.06, 1.86];
                 
                 renderChart(labels, prices);
                 navigateTo(resultadoScreen); 
