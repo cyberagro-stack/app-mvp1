@@ -93,7 +93,7 @@
       padding-top: 15px;
     }
     
-    /* --- CSS DO CHAT (MODIFICADO) --- */
+    /* (CSS do Chat...) */
     .chat-fab {
       position: fixed; bottom: 90px; right: 20px; background: #28a745;
       color: white; width: 50px; height: 50px; border-radius: 50%;
@@ -107,8 +107,6 @@
       height: 100%;
       object-fit: contain;
     }
-    /* --------------------------------- */
-
     .chat-window {
       height: 400px;
       background: #FFF;
@@ -571,7 +569,7 @@
                 kg_por_hectare_raw = Math.round(kg_por_m2 * M2_POR_HECTARE);
                 const faturamento_ha_raw = (kg_por_hectare_raw * preco_hoje);
                 
-                // --- LÓGICA (QNTD) ---
+                // --- 1. A LÓGICA (QNTD) ---
                 const mangas_por_m2 = contagem_api / area_video_m2;
                 const mangas_por_hectare_raw = Math.round(mangas_por_m2 * M2_POR_HECTARE);
                 const mangas_por_hectare_formatado = formatterInt.format(mangas_por_hectare_raw);
@@ -583,7 +581,7 @@
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
                 
-                // --- LINHA DE EXIBIÇÃO (QNTD) (v2.25) ---
+                // --- 2. A LINHA DE EXIBIÇÃO (v2.25) ---
                 resultadoDetalhado.textContent += "ESTIMATIVA (QNTD): " + mangas_por_hectare_formatado + " MANGAS/HA\n";
                 // --------------------------------------------------
                 
