@@ -16,7 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
-    /* (Estilos gerais...) */
+    /* (Todos os seus estilos .css continuam os mesmos) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -70,8 +70,6 @@
       background: none; border: none;
     }
     .footer-btn.active { color: #28a745; font-weight: 600; }
-    
-    /* --- CSS DO BOTÃO CENTRAL (CORRIGIDO) --- */
     .footer-btn-central {
       background: #000000; color: white;
       width: 60px; height: 60px;
@@ -81,39 +79,35 @@
       top: -20px;
       box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
       border: 4px solid white; 
-      /* padding: 12px; <-- REMOVIDO */
+      padding: 12px; 
       box-sizing: border-box; 
     }
     .footer-btn-central img {
       width: 100%;
       height: 100%;
-      object-fit: cover; /* 'cover' preenche o círculo */
-      border-radius: 50%; /* Garante que a imagem .jpeg seja redonda */
+      object-fit: contain; 
     }
-    /* ------------------------------------- */
-
     #agenda-section {
       margin-top: 20px; 
       border-top: 1px solid #E0E0E0; 
       padding-top: 15px;
     }
     
-    /* --- CSS DO CHAT (CORRIGIDO) --- */
+    /* --- CSS DO CHAT (MODIFICADO) --- */
     .chat-fab {
       position: fixed; bottom: 90px; right: 20px; background: #28a745;
       color: white; width: 50px; height: 50px; border-radius: 50%;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; padding: 0;
       
-      /* padding: 10px; <-- REMOVIDO */
+      padding: 10px; 
       box-sizing: border-box;
     }
     .chat-fab img {
       width: 100%;
       height: 100%;
-      object-fit: cover; /* 'cover' preenche o círculo */
-      border-radius: 50%; /* Garante que a imagem .png seja redonda */
+      object-fit: contain;
     }
-    /* ------------------------------ */
+    /* --------------------------------- */
 
     .chat-window {
       height: 400px;
@@ -226,7 +220,9 @@
     <div class="card">
       <h3>Resultado Detalhado</h3>
       <pre id="resultado-detalhado" class="mono"></pre>
-      <h3 style="margin-top: 20px;">Gráfico Demonstrativo</h3>
+      
+      <h3 style="margin-top: 20px;">Gráfico Anual</h3>
+      
       <canvas id="myChart" height="200"></canvas> 
       <div id="agenda-section" style="margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px;">
         <h3 style="margin-top: 0;">Previsão de Venda</h3>
@@ -280,9 +276,8 @@
     <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
   </div>
   
-  
   <button id="btnChat" class="chat-fab">
-    <img src="imagem2.jpeg" alt="Chat">
+    <img src="imagem2.png" alt="Chat">
   </button>
 
   <script>
@@ -365,6 +360,7 @@
       const chatInput = document.getElementById("chatInput");
       const chatSendButton = document.getElementById("chatSendButton");
       btnChat.onclick = (e) => { e.preventDefault(); navigateTo(chatScreen); };
+      // (Resto da lógica do Chatbot...)
       function addChatBubble(message, isUser = false) {
           const bubble = document.createElement('div');
           bubble.classList.add('chat-bubble');
@@ -399,6 +395,7 @@
       chatInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); handleChatSend(); } });
 
       // --- LÓGICA DO APP (Contagem) ---
+      // (A lógica de contagem v2.25 está correta)
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
