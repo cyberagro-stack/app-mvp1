@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CyberAgro</title>
+  <title>CyberAgro • Contador de Mangas</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FFFFFF">
   <script>
@@ -16,7 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
-    /* (Estilos gerais...) */
+    /* (Todos os seus estilos .css continuam os mesmos) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -72,8 +72,8 @@
     .footer-btn.active { color: #28a745; font-weight: 600; }
     .footer-btn-central {
       background: #000000; color: white;
-      width: 60px; height: 60px;
-      text-align: center; text-decoration: none;
+      width: 60px; height: 60px; font-size: 1.6rem;
+      line-height: 60px; text-align: center; text-decoration: none;
       border-radius: 50%;
       position: relative; 
       top: -20px;
@@ -92,26 +92,12 @@
       border-top: 1px solid #E0E0E0; 
       padding-top: 15px;
     }
-    
-    /* --- CSS DO CHAT (MODIFICADO) --- */
     .chat-fab {
       position: fixed; bottom: 90px; right: 20px; background: #28a745;
       color: white; width: 50px; height: 50px; border-radius: 50%;
-      /* font-size, line-height, text-align removidos */
+      font-size: 1.5rem; line-height: 50px; text-align: center;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; padding: 0;
-      
-      /* Novos estilos para a imagem */
-      padding: 10px; /* Espaçamento interno */
-      box-sizing: border-box;
     }
-    /* Novo estilo para a imagem dentro do chat-fab */
-    .chat-fab img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-    /* --------------------------------- */
-
     .chat-window {
       height: 400px;
       background: #FFF;
@@ -271,16 +257,16 @@
     <a href="#" id="navInicio" class="footer-btn active">Início</a>
     <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
     <a href="#" id="btnNovaContagem" class="footer-btn-central">
-      <img src="imagem1.jpeg" alt="Nova Contagem">
+      <img src="camera-icon.png" alt="Nova Contagem">
     </a>
     <a href="#" id="navRanking" class="footer-btn">Ranking</a> 
     <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
   </div>
   
-  
   <button id="btnChat" class="chat-fab">
-    <img src="imagem2.png" alt="Chat">
+    <img src="imagem2.jpeg" alt="Chat">
   </button>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
     
@@ -288,7 +274,6 @@
       // (A lógica de navegação v2.23 está correta e não muda)
       const SENHA_SECRETA = "cyberagro2025"; 
       const loginScreen = document.getElementById("login-screen");
-      // ... (Resto do código JS não muda)
       const dashboardScreen = document.getElementById("dashboard-screen"); 
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
@@ -307,6 +292,7 @@
       const navPerfil = document.getElementById("navPerfil");
       const btnChat = document.getElementById("btnChat");
       const appFooter = document.querySelector(".app-footer");
+
       function navigateTo(screenToShow) {
         loginScreen.style.display = 'none';
         dashboardScreen.style.display = 'none';
@@ -361,6 +347,7 @@
       const chatInput = document.getElementById("chatInput");
       const chatSendButton = document.getElementById("chatSendButton");
       btnChat.onclick = (e) => { e.preventDefault(); navigateTo(chatScreen); };
+      // (Resto da lógica do Chatbot...)
       function addChatBubble(message, isUser = false) {
           const bubble = document.createElement('div');
           bubble.classList.add('chat-bubble');
@@ -565,17 +552,32 @@
               const preco_hoje = dados_preco.preco_kg; 
               const preco_futuro_ficticio = 2.50; 
               let kg_por_hectare_raw = 0;
+              
               if (isVideoRequest) {
                 const peso_medio_kg = dados_preco.peso_medio_g / 1000;
                 const kg_por_m2 = (contagem_api * peso_medio_kg) / area_video_m2;
                 kg_por_hectare_raw = Math.round(kg_por_m2 * M2_POR_HECTARE);
                 const faturamento_ha_raw = (kg_por_hectare_raw * preco_hoje);
+                
+                // --- 1. A LÓGICA QUE FALTAVA (QNTD) ---
+                const mangas_por_m2 = contagem_api / area_video_m2;
+                const mangas_por_hectare_raw = Math.round(mangas_por_m2 * M2_POR_HECTARE);
+                const mangas_por_hectare_formatado = formatterInt.format(mangas_por_hectare_raw);
+                // ------------------------------------
+                
                 const kg_por_hectare_formatado = formatterInt.format(kg_por_hectare_raw);
                 const faturamento_ha_formatado = formatterCurrency.format(faturamento_ha_raw);
+                
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
+                
+                // --- 2. A LINHA DE EXIBIÇÃO QUE FALTAVA (v2.25) ---
+                resultadoDetalhado.textContent += "ESTIMATIVA (QNTD): " + mangas_por_hectare_formatado + " MANGAS/HA\n";
+                // --------------------------------------------------
+                
                 resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare_formatado + " KG/HA\n";
                 resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha_formatado;
+                
               } else {
                 resultadoDetalhado.textContent = "TIPO: IMAGEM\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
@@ -587,6 +589,8 @@
                   gerarLinkAgenda(contagem_api, kg_por_hectare_raw, preco_hoje, preco_futuro_ficticio);
               };
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
+              
+              // --- MODIFICAÇÃO DO GRÁFICO (v2.24) ---
               document.getElementById("btnVerResultado").onclick = () => {
                 // Dados reais da sua tabela (Tommy - produtor)
                 const labels = ['17/8/01', '23/8/01', '30/8/01', '5/9/01', '12/9/01', '19/9/01', '10/10/25', '17/10/25', '24/10/25', '31/10/25', '7/11/25'];
@@ -595,6 +599,8 @@
                 renderChart(labels, prices);
                 navigateTo(resultadoScreen); 
               };
+              // ------------------------------------
+              
             } catch (e) {
               out.textContent = "Erro ao ler o JSON: " + text;
             }
@@ -613,5 +619,3 @@
   </script>
 </body>
 </html>
-
-
