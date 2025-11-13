@@ -77,13 +77,13 @@
       top: -20px;
       box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
       border: 4px solid white; 
-      padding: 12px; /* Espaçamento interno para o ícone */
-      box-sizing: border-box; /* Garante que o padding não aumente o tamanho */
+      padding: 12px;
+      box-sizing: border-box;
     }
     .footer-btn-central img {
       width: 100%;
       height: 100%;
-      object-fit: contain; /* Garante que o ícone caiba sem distorcer */
+      object-fit: contain;
     }
     #grafico-placeholder {
       width: 100%; height: 250px; background: #EEEEEE;
@@ -386,12 +386,10 @@
       let selectedFile = null;
       
       // **** NOVOS FORMATADORES DE NÚMERO (v2.21) ****
-      // Formata o KG/HA (ex: 7.550)
       const formatterInt = new Intl.NumberFormat('pt-BR', { 
           style: 'decimal', 
           maximumFractionDigits: 0 
       });
-      // Formata o Faturamento (ex: 14.043,00)
       const formatterCurrency = new Intl.NumberFormat('pt-BR', { 
           style: 'decimal', 
           minimumFractionDigits: 2, 
@@ -520,12 +518,14 @@
                 kg_por_hectare_raw = Math.round(kg_por_m2 * M2_POR_HECTARE);
                 const faturamento_ha_raw = (kg_por_hectare_raw * preco_hoje);
                 
-                // --- 2. APLICA A FORMATAÇÃO (v2.21) ---
+                // --- APLICA A FORMATAÇÃO (v2.22) ---
                 const kg_por_hectare_formatado = formatterInt.format(kg_por_hectare_raw);
                 const faturamento_ha_formatado = formatterCurrency.format(faturamento_ha_raw);
                 
+                // --- CRIA A NOVA LINHA (v2.22) ---
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
+                resultadoDetalhado.textContent += "ESTIMATIVA (QNTD): " + formatterInt.format(kg_por_hectare_raw * (1000 / dados_preco.peso_medio_g)) + " MANGAS/HA\n"; // Assumindo peso médio para estimar QNTD/HA
                 resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare_formatado + " KG/HA\n";
                 resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha_formatado;
                 
