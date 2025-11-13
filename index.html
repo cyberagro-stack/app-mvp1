@@ -97,14 +97,11 @@
     .chat-fab {
       position: fixed; bottom: 90px; right: 20px; background: #28a745;
       color: white; width: 50px; height: 50px; border-radius: 50%;
-      /* font-size, line-height, text-align removidos */
       box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; padding: 0;
       
-      /* Novos estilos para a imagem */
       padding: 10px; /* Espaçamento interno */
       box-sizing: border-box;
     }
-    /* Novo estilo para a imagem dentro do chat-fab */
     .chat-fab img {
       width: 100%;
       height: 100%;
@@ -281,6 +278,7 @@
   <button id="btnChat" class="chat-fab">
     <img src="imagem2.png" alt="Chat">
   </button>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
     
@@ -395,7 +393,7 @@
       chatInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); handleChatSend(); } });
 
       // --- LÓGICA DO APP (Contagem) ---
-      // (A lógica de contagem v2.24 está correta e não muda)
+      // (A lógica de contagem v2.25 está correta)
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
@@ -565,17 +563,32 @@
               const preco_hoje = dados_preco.preco_kg; 
               const preco_futuro_ficticio = 2.50; 
               let kg_por_hectare_raw = 0;
+              
               if (isVideoRequest) {
                 const peso_medio_kg = dados_preco.peso_medio_g / 1000;
                 const kg_por_m2 = (contagem_api * peso_medio_kg) / area_video_m2;
                 kg_por_hectare_raw = Math.round(kg_por_m2 * M2_POR_HECTARE);
                 const faturamento_ha_raw = (kg_por_hectare_raw * preco_hoje);
+                
+                // --- 1. A LÓGICA QUE FALTAVA (QNTD) ---
+                const mangas_por_m2 = contagem_api / area_video_m2;
+                const mangas_por_hectare_raw = Math.round(mangas_por_m2 * M2_POR_HECTARE);
+                const mangas_por_hectare_formatado = formatterInt.format(mangas_por_hectare_raw);
+                // ------------------------------------
+                
                 const kg_por_hectare_formatado = formatterInt.format(kg_por_hectare_raw);
                 const faturamento_ha_formatado = formatterCurrency.format(faturamento_ha_raw);
+                
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
+                
+                // --- 2. A LINHA DE EXIBIÇÃO QUE FALTAVA (v2.25) ---
+                resultadoDetalhado.textContent += "ESTIMATIVA (QNTD): " + mangas_por_hectare_formatado + " MANGAS/HA\n";
+                // --------------------------------------------------
+                
                 resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare_formatado + " KG/HA\n";
                 resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha_formatado;
+                
               } else {
                 resultadoDetalhado.textContent = "TIPO: IMAGEM\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
@@ -587,6 +600,8 @@
                   gerarLinkAgenda(contagem_api, kg_por_hectare_raw, preco_hoje, preco_futuro_ficticio);
               };
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
+              
+              // --- MODIFICAÇÃO DO GRÁFICO (v2.24) ---
               document.getElementById("btnVerResultado").onclick = () => {
                 // Dados reais da sua tabela (Tommy - produtor)
                 const labels = ['17/8/01', '23/8/01', '30/8/01', '5/9/01', '12/9/01', '19/9/01', '10/10/25', '17/10/25', '24/10/25', '31/10/25', '7/11/25'];
@@ -595,6 +610,8 @@
                 renderChart(labels, prices);
                 navigateTo(resultadoScreen); 
               };
+              // ------------------------------------
+              
             } catch (e) {
               out.textContent = "Erro ao ler o JSON: " + text;
             }
