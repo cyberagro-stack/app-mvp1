@@ -14,7 +14,7 @@
     }
   </script>
   <style>
-    /* (Todos os seus estilos .css) */
+    /* (Todos os seus estilos .css continuam os mesmos) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -76,7 +76,14 @@
       position: relative; 
       top: -20px;
       box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
-      border: 4px solid white;
+      border: 4px solid white; 
+      padding: 12px; /* Espaçamento interno para o ícone */
+      box-sizing: border-box; /* Garante que o padding não aumente o tamanho */
+    }
+    .footer-btn-central img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* Garante que o ícone caiba sem distorcer */
     }
     #grafico-placeholder {
       width: 100%; height: 250px; background: #EEEEEE;
@@ -148,7 +155,7 @@
       <li class="data-row"><span>Fevereiro</span> <span>R$ 0,00</span></li>
       <li class="data-row"><span>Janeiro</span> <span>R$ 0,00</span></li>
     </ul>
-    </div>
+  </div>
 
   <div id="app-screen" class="wrap" style="display:none;">
     <button id="btnVoltarDashboard" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
@@ -187,19 +194,16 @@
     <div class="card">
       <h3>Resultado Detalhado</h3>
       <pre id="resultado-detalhado" class="mono"></pre>
-      
       <h3 style="margin-top: 20px;">Gráfico Demonstrativo</h3>
       <div id="grafico-placeholder">(Gráfico de Produtividade em breve)</div>
-      
       <div id="agenda-section" style="margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px;">
         <h3 style="margin-top: 0;">Previsão de Venda</h3>
-        <p id="forecast-message" class="mono" style="font-size: 0.9rem;">
-          </p>
+        <p id="forecast-message" class="mono" style="font-size: 0.9rem;"></p>
         <button id="btnAgenda" class="btn-nova-contagem" style="background-color: #f0ad4e; margin-top: 10px;">
           Deseja adicionar um lembrete na sua agenda?
         </button>
       </div>
-      </div>
+    </div>
   </div>
   
   <div id="chat-screen" class="wrap" style="display:none;">
@@ -240,10 +244,12 @@
     <a href="#" id="navInicio" class="footer-btn active">Início</a>
     <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
     <a href="#" id="btnNovaContagem" class="footer-btn-central">
-      📷 </a>
+      <img src="camera-icon.png" alt="Nova Contagem">
+    </a>
     <a href="#" id="navRanking" class="footer-btn">Ranking</a> 
     <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
   </div>
+  
   <button id="btnChat" class="chat-fab">💬</button>
 
   <script>
@@ -256,17 +262,14 @@
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
       const chatScreen = document.getElementById("chat-screen");
-      const perfilScreen = document.getElementById("perfil-screen"); // <-- TELA PERFIL
-      
+      const perfilScreen = document.getElementById("perfil-screen");
       const loginButton = document.getElementById("loginButton");
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
-      
       const btnNovaContagem = document.getElementById("btnNovaContagem"); 
       const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
       const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
       const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
-      
       const navInicio = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
       const navRanking = document.getElementById("navRanking");
@@ -280,8 +283,7 @@
         appScreen.style.display = 'none';
         resultadoScreen.style.display = 'none';
         chatScreen.style.display = 'none';
-        perfilScreen.style.display = 'none'; // <-- Esconde Perfil
-        
+        perfilScreen.style.display = 'none';
         if (screenToShow === loginScreen) {
           appFooter.style.display = 'none';
           btnChat.style.display = 'none';
@@ -289,25 +291,20 @@
           appFooter.style.display = 'flex';
           btnChat.style.display = 'block';
         }
-        
         screenToShow.style.display = 'block';
-        
         navInicio.classList.remove('active');
         navRelatorios.classList.remove('active');
         navRanking.classList.remove('active');
         navPerfil.classList.remove('active');
-        
         if (screenToShow === dashboardScreen || screenToShow === appScreen || screenToShow === chatScreen) {
           navInicio.classList.add('active'); 
         } else if (screenToShow === resultadoScreen) {
           navRelatorios.classList.add('active'); 
-        } else if (screenToShow === perfilScreen) { // <-- Ativa Perfil
+        } else if (screenToShow === perfilScreen) {
           navPerfil.classList.add('active');
         }
       }
       navigateTo(loginScreen);
-
-      // (Lógica de clique dos botões de navegação)
       loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) { navigateTo(dashboardScreen); } else { loginError.style.display = "block"; } };
       passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
       btnNovaContagem.onclick = (e) => { e.preventDefault(); navigateTo(appScreen); }; 
@@ -317,7 +314,7 @@
       navInicio.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); navigateTo(resultadoScreen); };
       navRanking.onclick = (e) => { e.preventDefault(); alert("Tela 'Ranking' em construção."); }; 
-      navPerfil.onclick = (e) => { e.preventDefault(); navigateTo(perfilScreen); }; // <-- Liga o botão Perfil
+      navPerfil.onclick = (e) => { e.preventDefault(); navigateTo(perfilScreen); };
       
       // (Lógica dos botões do menu de Perfil)
       document.getElementById("navDadosFazenda").onclick = (e) => { e.preventDefault(); alert("Tela 'Dados da Fazenda' em construção."); };
@@ -367,11 +364,12 @@
       chatInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); handleChatSend(); } });
 
       // --- LÓGICA DO APP (Contagem) ---
-      // (A lógica de contagem v2.20 está correta e não muda)
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
+      
+      // (IDs dos elementos do app...)
       const fileInput = document.getElementById("fileInput");
       const areaInput = document.getElementById("areaInput"); 
       const btnSend = document.getElementById("btnSend");
@@ -386,6 +384,20 @@
       const forecastMessage = document.getElementById("forecast-message");
       const btnAgenda = document.getElementById("btnAgenda");
       let selectedFile = null;
+      
+      // **** NOVOS FORMATADORES DE NÚMERO (v2.21) ****
+      // Formata o KG/HA (ex: 7.550)
+      const formatterInt = new Intl.NumberFormat('pt-BR', { 
+          style: 'decimal', 
+          maximumFractionDigits: 0 
+      });
+      // Formata o Faturamento (ex: 14.043,00)
+      const formatterCurrency = new Intl.NumberFormat('pt-BR', { 
+          style: 'decimal', 
+          minimumFractionDigits: 2, 
+          maximumFractionDigits: 2 
+      });
+      // **********************************************
 
       function setStatus(s){ statusEl.textContent = s; }
       function setProgress(p){ pbar.style.width = Math.min(100, Math.max(0, p)) + "%"; }
@@ -500,25 +512,32 @@
               const contagem_api = data.contagem_final; 
               const preco_hoje = dados_preco.preco_kg; 
               const preco_futuro_ficticio = 2.50; 
-              let kg_por_hectare = 0;
+              let kg_por_hectare_raw = 0; // O número puro
+              
               if (isVideoRequest) {
                 const peso_medio_kg = dados_preco.peso_medio_g / 1000;
                 const kg_por_m2 = (contagem_api * peso_medio_kg) / area_video_m2;
-                kg_por_hectare = Math.round(kg_por_m2 * M2_POR_HECTARE);
-                const faturamento_ha = (kg_por_hectare * preco_hoje).toFixed(2);
+                kg_por_hectare_raw = Math.round(kg_por_m2 * M2_POR_HECTARE);
+                const faturamento_ha_raw = (kg_por_hectare_raw * preco_hoje);
+                
+                // --- 2. APLICA A FORMATAÇÃO (v2.21) ---
+                const kg_por_hectare_formatado = formatterInt.format(kg_por_hectare_raw);
+                const faturamento_ha_formatado = formatterCurrency.format(faturamento_ha_raw);
+                
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-                resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare + " KG/HA\n";
-                resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha;
+                resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare_formatado + " KG/HA\n";
+                resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha_formatado;
+                
               } else {
                 resultadoDetalhado.textContent = "TIPO: IMAGEM\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
                 resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A";
               }
-              const forecastMsg = `A manga está cotada em R$ ${preco_hoje.toFixed(2)} hoje, porém dia 15 (data fictícia) a manga estará cotada em R$ ${preco_futuro_ficticio.toFixed(2)}. Será o melhor dia para venda!`;
+              const forecastMsg = `A manga está cotada em R$ ${formatterCurrency.format(preco_hoje)} hoje, porém dia 15 (data fictícia) a manga estará cotada em R$ ${formatterCurrency.format(preco_futuro_ficticio)}. Será o melhor dia para venda!`;
               forecastMessage.textContent = forecastMsg;
               btnAgenda.onclick = () => {
-                  gerarLinkAgenda(contagem_api, kg_por_hectare, preco_hoje, preco_futuro_ficticio);
+                  gerarLinkAgenda(contagem_api, kg_por_hectare_raw, preco_hoje, preco_futuro_ficticio);
               };
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
               document.getElementById("btnVerResultado").onclick = () => {
