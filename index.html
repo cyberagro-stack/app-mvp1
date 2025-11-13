@@ -16,7 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
-    /* (Estilos gerais...) */
+    /* (Todos os seus estilos .css continuam os mesmos) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -116,7 +116,7 @@
     .chat-bubble.user { background: #2a7bf6; color: white; margin-left: auto; }
     .chat-bubble.bot { background: #EEEEEE; color: #333; margin-right: auto; }
     
-    /* --- ESTILOS DO PERFIL (v2.23) --- */
+    /* (Estilos do Perfil...) */
     .profile-header { display: flex; align-items: center; gap: 16px; }
     .profile-pic {
       width: 60px; height: 60px; border-radius: 50%;
@@ -131,7 +131,7 @@
       border-bottom: 1px solid #EEE;
     }
     .menu-item:last-child { border-bottom: none; }
-    .menu-item.danger { color: #D32F2F; } /* Cor para o botão Sair */
+    .menu-item.danger { color: #D32F2F; } 
     .menu-icon { font-size: 1.2rem; margin-right: 16px; width: 24px; text-align: center; }
     .menu-chevron { margin-left: auto; color: #AAA; font-weight: 600; }
   </style>
@@ -210,7 +210,8 @@
       <h3>Resultado Detalhado</h3>
       <pre id="resultado-detalhado" class="mono"></pre>
       <h3 style="margin-top: 20px;">Gráfico Demonstrativo</h3>
-      <canvas id="myChart" height="200"></canvas> <div id="agenda-section" style="margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px;">
+      <canvas id="myChart" height="200"></canvas> 
+      <div id="agenda-section" style="margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px;">
         <h3 style="margin-top: 0;">Previsão de Venda</h3>
         <p id="forecast-message" class="mono" style="font-size: 0.9rem;"></p>
         <button id="btnAgenda" class="btn-nova-contagem" style="background-color: #f0ad4e; margin-top: 10px;">
@@ -250,6 +251,8 @@
       <a href="#" class="menu-item danger" id="navSair"><span class="menu-icon">🚪</span> <span>Sair</span> <span class="menu-chevron">&gt;</span></a>
     </div>
   </div>
+
+
   <div class="app-footer">
     <a href="#" id="navInicio" class="footer-btn active">Início</a>
     <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
@@ -265,40 +268,36 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
     
-      // --- LÓGICA DE NAVEGAÇÃO (v2.23 - Corrigida) ---
+      // --- LÓGICA DE NAVEGAÇÃO ---
+      // (A lógica de navegação v2.23 está correta e não muda)
       const SENHA_SECRETA = "cyberagro2025"; 
       const loginScreen = document.getElementById("login-screen");
       const dashboardScreen = document.getElementById("dashboard-screen"); 
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
       const chatScreen = document.getElementById("chat-screen");
-      const perfilScreen = document.getElementById("perfil-screen"); // <-- TELA PERFIL
-      
+      const perfilScreen = document.getElementById("perfil-screen");
       const loginButton = document.getElementById("loginButton");
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
-      
       const btnNovaContagem = document.getElementById("btnNovaContagem"); 
       const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
       const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
       const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
-      
       const navInicio = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
       const navRanking = document.getElementById("navRanking");
-      const navPerfil = document.getElementById("navPerfil"); // <-- Botão Perfil
+      const navPerfil = document.getElementById("navPerfil");
       const btnChat = document.getElementById("btnChat");
       const appFooter = document.querySelector(".app-footer");
 
-      // Esta função agora gere TODAS as 6 telas
       function navigateTo(screenToShow) {
         loginScreen.style.display = 'none';
         dashboardScreen.style.display = 'none';
         appScreen.style.display = 'none';
         resultadoScreen.style.display = 'none';
         chatScreen.style.display = 'none';
-        perfilScreen.style.display = 'none'; // <-- Esconde Perfil
-        
+        perfilScreen.style.display = 'none';
         if (screenToShow === loginScreen) {
           appFooter.style.display = 'none';
           btnChat.style.display = 'none';
@@ -306,27 +305,20 @@
           appFooter.style.display = 'flex';
           btnChat.style.display = 'block';
         }
-        
         screenToShow.style.display = 'block';
-        
-        // Reseta todos os botões do rodapé
         navInicio.classList.remove('active');
         navRelatorios.classList.remove('active');
         navRanking.classList.remove('active');
         navPerfil.classList.remove('active');
-        
-        // Ativa o botão correto
         if (screenToShow === dashboardScreen || screenToShow === appScreen || screenToShow === chatScreen) {
           navInicio.classList.add('active'); 
         } else if (screenToShow === resultadoScreen) {
           navRelatorios.classList.add('active'); 
-        } else if (screenToShow === perfilScreen) { // <-- Ativa Perfil
+        } else if (screenToShow === perfilScreen) {
           navPerfil.classList.add('active');
         }
       }
-      navigateTo(loginScreen); // Estado inicial
-
-      // (Lógica de clique dos botões de navegação)
+      navigateTo(loginScreen);
       loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) { navigateTo(dashboardScreen); } else { loginError.style.display = "block"; } };
       passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
       btnNovaContagem.onclick = (e) => { e.preventDefault(); navigateTo(appScreen); }; 
@@ -336,9 +328,7 @@
       navInicio.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); navigateTo(resultadoScreen); };
       navRanking.onclick = (e) => { e.preventDefault(); alert("Tela 'Ranking' em construção."); }; 
-      navPerfil.onclick = (e) => { e.preventDefault(); navigateTo(perfilScreen); }; // <-- Liga o botão Perfil
-      
-      // --- LÓGICA DO NOVO MENU DE PERFIL (v2.23) ---
+      navPerfil.onclick = (e) => { e.preventDefault(); navigateTo(perfilScreen); };
       document.getElementById("navMeusDados").onclick = (e) => { e.preventDefault(); alert("Tela 'Meus Dados' em construção."); };
       document.getElementById("navConfig").onclick = (e) => { e.preventDefault(); alert("Tela 'Configurações' em construção."); };
       document.getElementById("navSair").onclick = (e) => { 
@@ -408,7 +398,7 @@
       const forecastMessage = document.getElementById("forecast-message");
       const btnAgenda = document.getElementById("btnAgenda");
       let selectedFile = null;
-      let myChart = null; // Guarda a instância do gráfico
+      let myChart = null; 
       
       const formatterInt = new Intl.NumberFormat('pt-BR', { style: 'decimal', maximumFractionDigits: 0 });
       const formatterCurrency = new Intl.NumberFormat('pt-BR', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -585,13 +575,20 @@
                   gerarLinkAgenda(contagem_api, kg_por_hectare_raw, preco_hoje, preco_futuro_ficticio);
               };
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
+              
+              // --- MODIFICAÇÃO DO GRÁFICO (v2.24) ---
               document.getElementById("btnVerResultado").onclick = () => {
-                // Prepara os dados fictícios para o gráfico (Ex: 5 últimas semanas)
-                const labels = ['Sem 41', 'Sem 42', 'Sem 43', 'Sem 44', 'Sem 45'];
-                const prices = [2.51, 2.14, 2.23, 2.35, 1.86]; // Dados da sua tabela
+                // Dados reais da sua tabela (Tommy - produtor), do mais antigo ao mais novo
+                const labels = ['17/8/01', '23/8/01', '30/8/01', '5/9/01', '12/9/01', '19/9/01', '10/10/25', '17/10/25', '24/10/25', '31/10/25', '7/11/25'];
+                const prices = [0.96, 0.80, 0.59, 0.54, 0.48, 0.46, 1.26, 1.95, 1.88, 2.06, 1.86];
+                
+                // Desenha o gráfico
                 renderChart(labels, prices);
+                // Navega para a tela
                 navigateTo(resultadoScreen); 
               };
+              // ------------------------------------
+              
             } catch (e) {
               out.textContent = "Erro ao ler o JSON: " + text;
             }
