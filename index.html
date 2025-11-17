@@ -16,7 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
-    /* (Todos os seus estilos .css continuam os mesmos) */
+    /* (Estilos gerais...) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -143,6 +143,41 @@
     .menu-item.danger { color: #D32F2F; } 
     .menu-icon { font-size: 1.2rem; margin-right: 16px; width: 24px; text-align: center; }
     .menu-chevron { margin-left: auto; color: #AAA; font-weight: 600; }
+    
+    /* --- NOVOS ESTILOS (Seleção de Cultura) --- */
+    .cultura-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr; /* Três colunas */
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .cultura-btn {
+      background: #F8F8F8;
+      border: 1px solid #E0E0E0;
+      border-radius: 16px;
+      padding: 20px 10px;
+      text-decoration: none;
+      color: #333;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cultura-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    }
+    .cultura-btn img {
+      width: 100%;
+      max-width: 80px; /* Tamanho máximo do ícone */
+      height: 80px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+    /* ------------------------------------------- */
+    
   </style>
 </head>
 <body>
@@ -157,7 +192,27 @@
       <button id="loginButton" style="width:100%; margin-top: 12px;">Entrar</button>
     </div>
   </div>
-
+  
+  <div id="selecao-cultura-screen" class="wrap" style="display:none;">
+    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=4" alt="CyberAgro Logo" height="250"></h1>
+    <div class="card">
+      <h3 style="text-align: center;">Selecione a Cultura</h3>
+      <div class="cultura-grid">
+        <a href="#" id="btnIconeManga" class="cultura-btn">
+          <img src="manga.png" alt="Manga">
+          <span>Contador de Manga</span>
+        </a>
+        <a href="#" id="btnIconeUva" class="cultura-btn">
+          <img src="uva.png" alt="Uva">
+          <span>Contador de Uva</span>
+        </a>
+        <a href="#" id="btnIconePitaya" class="cultura-btn">
+          <img src="pitaya.png" alt="Pitaya">
+          <span>Contador de Pitaya</span>
+        </a>
+      </div>
+    </div>
+  </div>
   <div id="dashboard-screen" class="wrap" style="display:none;">
     <h3>Visão Geral</h3>
     <div class="summary-grid">
@@ -218,9 +273,7 @@
     <div class="card">
       <h3>Resultado Detalhado</h3>
       <pre id="resultado-detalhado" class="mono"></pre>
-      
       <h3 style="margin-top: 20px;">Gráfico Anual</h3>
-      
       <canvas id="myChart" height="200"></canvas> 
       <div id="agenda-section" style="margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px;">
         <h3 style="margin-top: 0;">Previsão de Venda</h3>
@@ -281,22 +334,31 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
     
-      // --- LÓGICA DE NAVEGAÇÃO ---
-      // (A lógica de navegação v2.23 está correta e não muda)
+      // --- LÓGICA DE NAVEGAÇÃO (MODIFICADA) ---
       const SENHA_SECRETA = "cyberagro2025"; 
+      
       const loginScreen = document.getElementById("login-screen");
+      const selecaoCulturaScreen = document.getElementById("selecao-cultura-screen"); // <-- NOVA TELA
       const dashboardScreen = document.getElementById("dashboard-screen"); 
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
       const chatScreen = document.getElementById("chat-screen");
       const perfilScreen = document.getElementById("perfil-screen");
+      
       const loginButton = document.getElementById("loginButton");
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
+      
+      // Botões da nova tela
+      const btnIconeManga = document.getElementById("btnIconeManga");
+      const btnIconeUva = document.getElementById("btnIconeUva");
+      const btnIconePitaya = document.getElementById("btnIconePitaya");
+      
       const btnNovaContagem = document.getElementById("btnNovaContagem"); 
       const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
       const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
       const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
+      
       const navInicio = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
       const navRanking = document.getElementById("navRanking");
@@ -305,24 +367,32 @@
       const appFooter = document.querySelector(".app-footer");
 
       function navigateTo(screenToShow) {
+        // Esconde todas as 7 telas
         loginScreen.style.display = 'none';
+        selecaoCulturaScreen.style.display = 'none'; // <-- Esconde a nova tela
         dashboardScreen.style.display = 'none';
         appScreen.style.display = 'none';
         resultadoScreen.style.display = 'none';
         chatScreen.style.display = 'none';
         perfilScreen.style.display = 'none';
-        if (screenToShow === loginScreen) {
+        
+        // Esconde rodapé e chat nas telas de login/seleção
+        if (screenToShow === loginScreen || screenToShow === selecaoCulturaScreen) {
           appFooter.style.display = 'none';
           btnChat.style.display = 'none';
         } else {
           appFooter.style.display = 'flex';
           btnChat.style.display = 'block';
         }
+        
         screenToShow.style.display = 'block';
+        
+        // Ativa o ícone correto no rodapé
         navInicio.classList.remove('active');
         navRelatorios.classList.remove('active');
         navRanking.classList.remove('active');
         navPerfil.classList.remove('active');
+        
         if (screenToShow === dashboardScreen || screenToShow === appScreen || screenToShow === chatScreen) {
           navInicio.classList.add('active'); 
         } else if (screenToShow === resultadoScreen) {
@@ -331,9 +401,29 @@
           navPerfil.classList.add('active');
         }
       }
-      navigateTo(loginScreen);
-      loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) { navigateTo(dashboardScreen); } else { loginError.style.display = "block"; } };
+      navigateTo(loginScreen); // Começa no Login
+
+      // --- LÓGICA DE CLIQUE ATUALIZADA ---
+      
+      // 1. Login leva para a Seleção de Cultura
+      loginButton.onclick = () => { 
+        if (passwordInput.value === SENHA_SECRETA) { 
+          navigateTo(selecaoCulturaScreen); // <-- MUDANÇA
+        } else { 
+          loginError.style.display = "block"; 
+        } 
+      };
       passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
+      
+      // 2. Botões da Seleção de Cultura
+      btnIconeManga.onclick = (e) => { 
+        e.preventDefault();
+        navigateTo(dashboardScreen); // <-- Continua o fluxo normal
+      };
+      btnIconeUva.onclick = (e) => { e.preventDefault(); alert("Contador de Uva em construção."); };
+      btnIconePitaya.onclick = (e) => { e.preventDefault(); alert("Contador de Pitaya em construção."); };
+      
+      // 3. Resto da navegação (não muda)
       btnNovaContagem.onclick = (e) => { e.preventDefault(); navigateTo(appScreen); }; 
       btnVoltarDashboard.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
@@ -353,12 +443,12 @@
       };
       
       // --- LÓGICA DO CHATBOT ---
+      // (Não muda)
       const N8N_WEBHOOK_URL = "COLE_A_URL_DO_SEU_WEBHOOK_DO_N8N_AQUI"; 
       const chatWindow = document.getElementById("chatWindow");
       const chatInput = document.getElementById("chatInput");
       const chatSendButton = document.getElementById("chatSendButton");
       btnChat.onclick = (e) => { e.preventDefault(); navigateTo(chatScreen); };
-      // (Resto da lógica do Chatbot...)
       function addChatBubble(message, isUser = false) {
           const bubble = document.createElement('div');
           bubble.classList.add('chat-bubble');
@@ -393,7 +483,7 @@
       chatInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); handleChatSend(); } });
 
       // --- LÓGICA DO APP (Contagem) ---
-      // (A lógica de contagem v2.25 está correta)
+      // (A lógica de contagem v2.25 não muda)
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
@@ -569,22 +659,16 @@
                 kg_por_hectare_raw = Math.round(kg_por_m2 * M2_POR_HECTARE);
                 const faturamento_ha_raw = (kg_por_hectare_raw * preco_hoje);
                 
-                // --- 1. A LÓGICA (QNTD) ---
                 const mangas_por_m2 = contagem_api / area_video_m2;
                 const mangas_por_hectare_raw = Math.round(mangas_por_m2 * M2_POR_HECTARE);
                 const mangas_por_hectare_formatado = formatterInt.format(mangas_por_hectare_raw);
-                // ------------------------------------
                 
                 const kg_por_hectare_formatado = formatterInt.format(kg_por_hectare_raw);
                 const faturamento_ha_formatado = formatterCurrency.format(faturamento_ha_raw);
                 
                 resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
                 resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-                
-                // --- 2. A LINHA DE EXIBIÇÃO (v2.25) ---
                 resultadoDetalhado.textContent += "ESTIMATIVA (QNTD): " + mangas_por_hectare_formatado + " MANGAS/HA\n";
-                // --------------------------------------------------
-                
                 resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare_formatado + " KG/HA\n";
                 resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha_formatado;
                 
@@ -600,7 +684,7 @@
               };
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
               
-              // --- MODIFICAÇÃO DO GRÁFICO (v2.26) ---
+              // --- MODIFICAÇÃO DO GRÁFICO (v2.24) ---
               document.getElementById("btnVerResultado").onclick = () => {
                 // Dados reais (APENAS 2025) da sua tabela (Tommy - produtor)
                 const labels = ['3/10/25', '10/10/25', '17/10/25', '24/10/25', '31/10/25', '7/11/25'];
