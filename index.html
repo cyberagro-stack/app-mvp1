@@ -16,7 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
-    /* (Estilos gerais...) */
+    /* --- ESTILOS GERAIS --- */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -43,140 +43,84 @@
     .data-row span:first-child { color: #333; }
     .data-row span:last-child { color: #555; font-weight: 500; }
     .btn-nova-contagem {
-      background: #28a745; /* Verde */
-      color: white;
-      border: 0;
-      border-radius: 12px;
-      padding: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      font-size: 1.1rem;
-      margin-top: 20px;
+      background: #28a745; color: white; border: 0; border-radius: 12px;
+      padding: 16px; font-weight: 600; cursor: pointer; width: 100%;
+      font-size: 1.1rem; margin-top: 20px;
     }
+
+    /* --- CORREÇÃO DO BUG VISUAL (v2.28) --- */
+    /* O rodapé agora começa INVISÍVEL (display: none) */
     .app-footer {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: #FFFFFF; border-top: 1px solid #E0E0E0;
-      display: flex; justify-content: space-around;
-      align-items: center;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-      z-index: 999;
-      padding: 0 10px;
-      height: 60px;
+      display: none; /* <-- MUDADO DE FLEX PARA NONE */
+      justify-content: space-around; align-items: center;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 999;
+      padding: 0 10px; height: 60px;
     }
+
+    /* O botão de chat agora começa INVISÍVEL */
+    .chat-fab {
+      position: fixed; bottom: 90px; right: 20px; background: #28a745;
+      color: white; width: 50px; height: 50px; border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; padding: 0;
+      display: none; /* <-- ADICIONADO DISPLAY NONE */
+      box-sizing: border-box;
+      padding: 10px; 
+    }
+    /* -------------------------------------- */
+
     .footer-btn {
       flex: 1; text-align: center; padding: 10px 5px;
       font-size: 0.8rem; text-decoration: none; color: #888888; 
       background: none; border: none;
     }
     .footer-btn.active { color: #28a745; font-weight: 600; }
+    
     .footer-btn-central {
       background: #000000; color: white;
       width: 60px; height: 60px;
       text-align: center; text-decoration: none;
       border-radius: 50%;
-      position: relative; 
-      top: -20px;
+      position: relative; top: -20px;
       box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
       border: 4px solid white; 
-      padding: 0; /* Sem padding para a imagem preencher */
-      box-sizing: border-box; 
-      overflow: hidden;
-    }
-    .footer-btn-central img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover; 
-    }
-    #agenda-section {
-      margin-top: 20px; 
-      border-top: 1px solid #E0E0E0; 
-      padding-top: 15px;
-    }
-    
-    /* CSS do Chat */
-    .chat-fab {
-      position: fixed; bottom: 90px; right: 20px; background: #28a745;
-      width: 50px; height: 50px; border-radius: 50%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; 
       padding: 0; box-sizing: border-box; overflow: hidden;
-      border: none;
     }
-    .chat-fab img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .chat-window {
-      height: 400px;
-      background: #FFF;
-      border: 1px solid #EEE;
-      border-radius: 12px;
-      overflow-y: auto;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-    .chat-bubble {
-      padding: 10px 14px;
-      border-radius: 16px;
-      margin-bottom: 8px;
-      max-width: 80%;
-    }
+    .footer-btn-central img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    
+    .chat-fab img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    #agenda-section { margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px; }
+    #grafico-placeholder { width: 100%; height: 250px; background: #EEEEEE; border-radius: 12px; }
+    
+    .chat-window { height: 400px; background: #FFF; border: 1px solid #EEE; border-radius: 12px; overflow-y: auto; padding: 10px; margin-bottom: 10px; }
+    .chat-bubble { padding: 10px 14px; border-radius: 16px; margin-bottom: 8px; max-width: 80%; }
     .chat-bubble.user { background: #2a7bf6; color: white; margin-left: auto; }
     .chat-bubble.bot { background: #EEEEEE; color: #333; margin-right: auto; }
     
-    /* Estilos do Perfil */
-    .profile-header { display: flex; align-items: center; gap: 16px; }
-    .profile-pic {
-      width: 60px; height: 60px; border-radius: 50%;
-      object-fit: cover; background: #DDD;
+    /* CSS da Seleção de Cultura */
+    .cultura-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 20px; }
+    .cultura-btn {
+      background: #F8F8F8; border: 1px solid #E0E0E0; border-radius: 12px;
+      padding: 15px 5px; text-decoration: none; color: #333;
+      font-size: 0.8rem; font-weight: 600; text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
+    .cultura-btn img { width: 50px; height: 50px; object-fit: contain; margin-bottom: 8px; }
+    
+    /* Estilos Perfil */
+    .profile-header { display: flex; align-items: center; gap: 16px; }
+    .profile-pic { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #DDD; }
     .profile-name { font-size: 1.2rem; font-weight: 600; color: #333; }
     .profile-subtitle { font-size: 0.9rem; color: #555; }
     .menu-list { margin-top: 20px; padding: 0; }
-    .menu-item {
-      display: flex; align-items: center; padding: 16px;
-      text-decoration: none; color: #333; font-size: 1rem;
-      border-bottom: 1px solid #EEE;
-    }
+    .menu-item { display: flex; align-items: center; padding: 16px; text-decoration: none; color: #333; font-size: 1rem; border-bottom: 1px solid #EEE; }
     .menu-item:last-child { border-bottom: none; }
     .menu-item.danger { color: #D32F2F; } 
     .menu-icon { font-size: 1.2rem; margin-right: 16px; width: 24px; text-align: center; }
     .menu-chevron { margin-left: auto; color: #AAA; font-weight: 600; }
-    
-    /* CSS da Seleção de Cultura */
-    .cultura-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-      margin-top: 20px;
-    }
-    .cultura-btn {
-      background: #F8F8F8;
-      border: 1px solid #E0E0E0;
-      border-radius: 16px;
-      padding: 20px 10px;
-      text-decoration: none;
-      color: #333;
-      font-size: 0.9rem;
-      font-weight: 600;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      display: flex; flex-direction: column; align-items: center;
-    }
-    .cultura-btn:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-    }
-    .cultura-btn img {
-      width: 100%;
-      max-width: 60px;
-      height: 60px;
-      object-fit: contain;
-      margin-bottom: 10px;
-    }
   </style>
 </head>
 <body>
@@ -237,9 +181,7 @@
   </div>
 
   <div id="app-screen" class="wrap" style="display:none;">
-    <button id="btnVoltarDashboard" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
-      VOLTAR AO INICIO
-    </button>
+    <button id="btnVoltarDashboard" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">VOLTAR AO INICIO</button>
     <p class="muted">Anexe um vídeo ou imagem para a contagem da IA.</p>
     <div class="card" id="app">
       <div class="row">
@@ -267,9 +209,7 @@
   </div>
 
   <div id="resultado-screen" class="wrap" style="display:none;">
-    <button id="btnVoltarDashboardResultado" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
-      VOLTAR AO INICIO
-    </button>
+    <button id="btnVoltarDashboardResultado" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">VOLTAR AO INICIO</button>
     <div class="card">
       <h3>Resultado Detalhado</h3>
       <pre id="resultado-detalhado" class="mono"></pre>
@@ -286,9 +226,7 @@
   </div>
   
   <div id="chat-screen" class="wrap" style="display:none;">
-    <button id="btnVoltarDashboardChat" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">
-      VOLTAR AO INICIO
-    </button>
+    <button id="btnVoltarDashboardChat" class="btn-nova-contagem" style="background-color: #777; width: 100%; margin-bottom: 15px; margin-top: 0;">VOLTAR AO INICIO</button>
     <div class="card">
       <h3>Agente IA (Cotação de Preços)</h3>
       <div id="chatWindow" class="chat-window">
@@ -319,16 +257,12 @@
   <div class="app-footer">
     <a href="#" id="navInicio" class="footer-btn active">Início</a>
     <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
-    <a href="#" id="btnNovaContagem" class="footer-btn-central">
-      <img src="imagem1.jpeg" alt="Nova Contagem">
-    </a>
+    <a href="#" id="btnNovaContagem" class="footer-btn-central"><img src="imagem1.jpeg" alt="Nova"></a>
     <a href="#" id="navRanking" class="footer-btn">Ranking</a> 
     <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
   </div>
   
-  <button id="btnChat" class="chat-fab">
-    <img src="imagem2.png" alt="Chat">
-  </button>
+  <button id="btnChat" class="chat-fab"><img src="imagem2.png" alt="Chat"></button>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -392,8 +326,6 @@
 
       // Eventos de Login e Seleção
       loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) navigateTo(selecaoCulturaScreen); else loginError.style.display = "block"; };
-      passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
-
       btnIconeManga.onclick = () => navigateTo(dashboardScreen);
       btnIconeUva.onclick = () => alert("Em breve!");
       btnIconePitaya.onclick = () => alert("Em breve!");
@@ -581,7 +513,9 @@
       });
 
       // --- CHATBOT ---
-      const N8N_WEBHOOK_URL = http://localhost:5678/webhook-test/agent-ia; #AQUI ESTA O LINK DO WEBKOOK
+      // ATUALIZADO: URL PÚBLICA DO n8n
+      const N8N_WEBHOOK_URL = "https://n8n-agent-476522137012.us-central1.run.app/webhook/agente-ia"; 
+      
       const chatWindow = document.getElementById("chatWindow");
       const chatInput = document.getElementById("chatInput");
       const chatSendButton = document.getElementById("chatSendButton");
@@ -624,4 +558,3 @@
   </script>
 </body>
 </html>
-
