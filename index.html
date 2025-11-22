@@ -10,9 +10,8 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/app-mvp1/sw.js')
         .then(reg => {
-            // Força atualização do Service Worker
             reg.update();
-            console.log('Service Worker Registrado v7');
+            console.log('Service Worker Registrado v8');
         })
         .catch(err => console.log('Service Worker falhou:', err));
     }
@@ -20,7 +19,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
-    /* (Estilos inalterados...) */
+    /* (Estilos gerais...) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -63,7 +62,7 @@
     .app-footer {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: #FFFFFF; border-top: 1px solid #E0E0E0;
-      display: none; /* GARANTIDO NO CSS */
+      display: none;
       justify-content: space-around; align-items: center;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 999;
       padding: 0 10px; height: 60px;
@@ -74,7 +73,7 @@
       position: fixed; bottom: 90px; right: 20px; background: #28a745;
       color: white; width: 50px; height: 50px; border-radius: 50%;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; 
-      display: none; /* GARANTIDO NO CSS */
+      display: none;
       box-sizing: border-box;
       padding: 10px; 
     }
@@ -108,17 +107,42 @@
     .chat-bubble.user { background: #2a7bf6; color: white; margin-left: auto; }
     .chat-bubble.bot { background: #EEEEEE; color: #333; margin-right: auto; }
     
-    /* CSS da Seleção de Cultura */
-    .cultura-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 20px; }
-    .cultura-btn {
-      background: #F8F8F8; border: 1px solid #E0E0E0; border-radius: 12px;
-      padding: 15px 5px; text-decoration: none; color: #333;
-      font-size: 0.8rem; font-weight: 600; text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    /* --- ESTILOS DA NOVA TELA DE SELEÇÃO --- */
+    .culture-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 20px;
     }
-    .cultura-btn img { width: 50px; height: 50px; object-fit: contain; margin-bottom: 8px; }
+    .culture-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #FFFFFF;
+      border: 1px solid #E0E0E0;
+      border-radius: 12px;
+      padding: 15px 5px;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.1s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .culture-item:active { transform: scale(0.95); }
+    .culture-item img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      margin-bottom: 8px;
+    }
+    .culture-item span {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #333;
+    }
+    /* --------------------------------------- */
     
+    /* Estilos Perfil */
     .profile-header { display: flex; align-items: center; gap: 16px; }
     .profile-pic { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #DDD; }
     .profile-name { font-size: 1.2rem; font-weight: 600; color: #333; }
@@ -144,27 +168,30 @@
     </div>
   </div>
 
-  <div id="selecao-cultura-screen" class="wrap" style="display:none;">
+  <div id="culture-screen" class="wrap" style="display:none;">
     <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=7" alt="CyberAgro Logo" height="250"></h1>
     <div class="card">
       <h3 style="text-align: center;">Selecione a Cultura</h3>
-      <div class="cultura-grid">
-        <div id="btnIconeManga" class="cultura-btn">
+      <p class="muted">Escolha qual produto deseja analisar:</p>
+      
+      <div class="culture-grid">
+        <div id="btnSelectManga" class="culture-item">
           <img src="manga.png" alt="Manga">
           <span>Manga</span>
         </div>
-        <div id="btnIconeUva" class="cultura-btn">
+        
+        <div id="btnSelectUva" class="culture-item">
           <img src="uva.png" alt="Uva">
           <span>Uva</span>
         </div>
-        <div id="btnIconePitaya" class="cultura-btn">
+        
+        <div id="btnSelectPitaya" class="culture-item">
           <img src="pitaya.png" alt="Pitaya">
           <span>Pitaya</span>
         </div>
       </div>
     </div>
   </div>
-
   <div id="dashboard-screen" class="wrap" style="display:none;">
     <h3>Visão Geral</h3>
     <div class="summary-grid">
@@ -262,20 +289,23 @@
     </div>
   </div>
 
-  <div class="app-footer" style="display:none;"> <a href="#" id="navInicio" class="footer-btn active">Início</a>
+  <div class="app-footer" style="display:none;"> 
+    <a href="#" id="navInicio" class="footer-btn active">Início</a>
     <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
     <a href="#" id="btnNovaContagem" class="footer-btn-central"><img src="imagem1.jpeg" alt="Nova"></a>
     <a href="#" id="navRanking" class="footer-btn">Ranking</a> 
     <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
   </div>
   
-  <button id="btnChat" class="chat-fab" style="display:none;"><img src="imagem2.png" alt="Chat"></button> <script>
+  <button id="btnChat" class="chat-fab" style="display:none;"><img src="imagem2.png" alt="Chat"></button>
+
+  <script>
     document.addEventListener("DOMContentLoaded", () => {
       const SENHA_SECRETA = "cyberagro2025"; 
       
       // Telas
       const loginScreen = document.getElementById("login-screen");
-      const selecaoCulturaScreen = document.getElementById("selecao-cultura-screen");
+      const cultureScreen = document.getElementById("culture-screen"); // <-- NOVA TELA
       const dashboardScreen = document.getElementById("dashboard-screen"); 
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
@@ -289,26 +319,28 @@
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
       
+      // Botões da Seleção de Cultura
+      const btnSelectManga = document.getElementById("btnSelectManga");
+      const btnSelectUva = document.getElementById("btnSelectUva");
+      const btnSelectPitaya = document.getElementById("btnSelectPitaya");
+      
       // Navegação
       const navInicio = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
       const navRanking = document.getElementById("navRanking");
       const navPerfil = document.getElementById("navPerfil");
       
-      // Botões
-      const btnIconeManga = document.getElementById("btnIconeManga");
-      const btnIconeUva = document.getElementById("btnIconeUva");
-      const btnIconePitaya = document.getElementById("btnIconePitaya");
       const btnNovaContagem = document.getElementById("btnNovaContagem");
       const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
       const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
       const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
 
       function navigateTo(screenToShow) {
-        [loginScreen, selecaoCulturaScreen, dashboardScreen, appScreen, resultadoScreen, chatScreen, perfilScreen].forEach(s => s.style.display = 'none');
+        // Esconde tudo
+        [loginScreen, cultureScreen, dashboardScreen, appScreen, resultadoScreen, chatScreen, perfilScreen].forEach(s => s.style.display = 'none');
         
-        // Lógica do Rodapé e Chat
-        if (screenToShow === loginScreen || screenToShow === selecaoCulturaScreen) {
+        // Lógica do Rodapé e Chat (Só aparecem depois da seleção de cultura)
+        if (screenToShow === loginScreen || screenToShow === cultureScreen) {
           appFooter.style.display = 'none';
           btnChat.style.display = 'none';
         } else {
@@ -318,22 +350,33 @@
         
         screenToShow.style.display = 'block';
         
+        // Atualiza Rodapé
         [navInicio, navRelatorios, navRanking, navPerfil].forEach(n => n.classList.remove('active'));
         if ([dashboardScreen, appScreen, chatScreen].includes(screenToShow)) navInicio.classList.add('active');
         else if (screenToShow === resultadoScreen) navRelatorios.classList.add('active');
         else if (screenToShow === perfilScreen) navPerfil.classList.add('active');
       }
       
+      // Inicialização
       navigateTo(loginScreen);
 
-      // --- Eventos ---
-      loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) navigateTo(selecaoCulturaScreen); else loginError.style.display = "block"; };
+      // --- NOVO FLUXO: Login -> Seleção -> Dashboard ---
+      loginButton.onclick = () => { 
+        if (passwordInput.value === SENHA_SECRETA) {
+            navigateTo(cultureScreen); // Vai para a seleção
+        } else { 
+            loginError.style.display = "block"; 
+        }
+      };
       passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
 
-      btnIconeManga.onclick = () => navigateTo(dashboardScreen);
-      btnIconeUva.onclick = () => alert("Em breve!");
-      btnIconePitaya.onclick = () => alert("Em breve!");
+      // Eventos da Tela de Seleção
+      btnSelectManga.onclick = () => navigateTo(dashboardScreen); // Manga = Entra no App
+      btnSelectUva.onclick = () => alert("IA para Uvas em desenvolvimento.");
+      btnSelectPitaya.onclick = () => alert("IA para Pitayas em desenvolvimento.");
+      // -------------------------------------------------
 
+      // Eventos de Navegação Rodapé e Voltar
       btnNovaContagem.onclick = (e) => { e.preventDefault(); navigateTo(appScreen); };
       navInicio.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); navigateTo(resultadoScreen); };
@@ -344,54 +387,12 @@
       btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       btnVoltarDashboardChat.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       
-      document.getElementById("navSair").onclick = (e) => { e.preventDefault(); if(confirm("Sair?")) { resetUI(); navigateTo(loginScreen); } };
-
-      // --- CHATBOT CONFIG (COLE SUA URL DE TESTE AQUI) ---
-      const N8N_WEBHOOK_URL = "https://n8n-agent-476522137012.us-central1.run.app/webhook/agent-ia" // URL PÚBLICA DO WEBHOOK NO CLOUD RUN
-const N8N_WEBHOOK_URL = "https://n8n-agent-476522137012.us-central1.run.app/webhook/agent-ia";
-";
-      // Ex: "https://n8n-agent-xyz.run.app/webhook-test/agente-ia"
-
-      const chatWindow = document.getElementById("chatWindow");
-      const chatInput = document.getElementById("chatInput");
-      const chatSendButton = document.getElementById("chatSendButton");
-      
-      btnChat.onclick = () => navigateTo(chatScreen);
-
-      chatSendButton.onclick = async () => {
-         const msg = chatInput.value.trim();
-         if(!msg) return;
-         
-         const userBubble = document.createElement('div');
-         userBubble.className = 'chat-bubble user';
-         userBubble.textContent = msg;
-         chatWindow.appendChild(userBubble);
-         
-         chatInput.value = "";
-         chatSendButton.disabled = true;
-
-         try {
-            const resp = await fetch(N8N_WEBHOOK_URL, {
-               method: 'POST',
-               headers: {'Content-Type': 'application/json'},
-               body: JSON.stringify({text: msg})
-            });
-            const json = await resp.json();
-            const botBubble = document.createElement('div');
-            botBubble.className = 'chat-bubble bot';
-            botBubble.textContent = json.response || "Sem resposta.";
-            chatWindow.appendChild(botBubble);
-         } catch {
-            const errBubble = document.createElement('div');
-            errBubble.className = 'chat-bubble bot';
-            errBubble.textContent = "Erro de conexão. Verifique se o n8n está em modo 'Listen'.";
-            chatWindow.appendChild(errBubble);
-         }
-         chatSendButton.disabled = false;
-         chatWindow.scrollTop = chatWindow.scrollHeight;
+      document.getElementById("navSair").onclick = (e) => { 
+        e.preventDefault(); 
+        if(confirm("Sair?")) { resetUI(); navigateTo(loginScreen); } 
       };
 
-      // --- Resto do código da API de Contagem (mantido igual) ---
+      // --- LÓGICA DO APP DE CONTAGEM (MANTIDA IGUAL) ---
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
@@ -527,9 +528,45 @@ const N8N_WEBHOOK_URL = "https://n8n-agent-476522137012.us-central1.run.app/webh
           } else { statusEl.textContent = "Erro no processamento."; out.textContent = text; }
         } catch (e) { statusEl.textContent = "Erro de rede."; } finally { btnSend.disabled = false; }
       });
+
+      // --- CHATBOT ---
+      const N8N_WEBHOOK_URL = "https://n8n-agent-476522137012.us-central1.run.app/webhook/agent-ia"; 
+      const chatWindow = document.getElementById("chatWindow");
+      const chatInput = document.getElementById("chatInput");
+      const chatSendButton = document.getElementById("chatSendButton");
+      
+      btnChat.onclick = () => navigateTo(chatScreen);
+
+      chatSendButton.onclick = async () => {
+         const msg = chatInput.value.trim();
+         if(!msg) return;
+         const userBubble = document.createElement('div');
+         userBubble.className = 'chat-bubble user';
+         userBubble.textContent = msg;
+         chatWindow.appendChild(userBubble);
+         chatInput.value = "";
+         chatSendButton.disabled = true;
+         try {
+            const resp = await fetch(N8N_WEBHOOK_URL, {
+               method: 'POST',
+               headers: {'Content-Type': 'application/json'},
+               body: JSON.stringify({text: msg})
+            });
+            const json = await resp.json();
+            const botBubble = document.createElement('div');
+            botBubble.className = 'chat-bubble bot';
+            botBubble.textContent = json.response || "Sem resposta.";
+            chatWindow.appendChild(botBubble);
+         } catch {
+            const errBubble = document.createElement('div');
+            errBubble.className = 'chat-bubble bot';
+            errBubble.textContent = "Erro de conexão.";
+            chatWindow.appendChild(errBubble);
+         }
+         chatSendButton.disabled = false;
+         chatWindow.scrollTop = chatWindow.scrollHeight;
+      };
     });
   </script>
 </body>
 </html>
-
-
