@@ -9,7 +9,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/app-mvp1/sw.js')
-        .then(() => console.log('Service Worker Registrado v4'))
+        .then(() => console.log('Service Worker Registrado v5'))
         .catch(err => console.log('Service Worker falhou:', err));
     }
   </script>
@@ -79,13 +79,14 @@
       top: -20px;
       box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
       border: 4px solid white; 
-      padding: 12px; 
+      padding: 0; /* Sem padding para a imagem preencher */
       box-sizing: border-box; 
+      overflow: hidden;
     }
     .footer-btn-central img {
       width: 100%;
       height: 100%;
-      object-fit: contain; 
+      object-fit: cover; 
     }
     #agenda-section {
       margin-top: 20px; 
@@ -93,19 +94,18 @@
       padding-top: 15px;
     }
     
-    /* (CSS do Chat...) */
+    /* CSS do Chat */
     .chat-fab {
       position: fixed; bottom: 90px; right: 20px; background: #28a745;
-      color: white; width: 50px; height: 50px; border-radius: 50%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; padding: 0;
-      
-      padding: 10px; 
-      box-sizing: border-box;
+      width: 50px; height: 50px; border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; 
+      padding: 0; box-sizing: border-box; overflow: hidden;
+      border: none;
     }
     .chat-fab img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover;
     }
     .chat-window {
       height: 400px;
@@ -125,7 +125,7 @@
     .chat-bubble.user { background: #2a7bf6; color: white; margin-left: auto; }
     .chat-bubble.bot { background: #EEEEEE; color: #333; margin-right: auto; }
     
-    /* (Estilos do Perfil...) */
+    /* Estilos do Perfil */
     .profile-header { display: flex; align-items: center; gap: 16px; }
     .profile-pic {
       width: 60px; height: 60px; border-radius: 50%;
@@ -144,10 +144,10 @@
     .menu-icon { font-size: 1.2rem; margin-right: 16px; width: 24px; text-align: center; }
     .menu-chevron { margin-left: auto; color: #AAA; font-weight: 600; }
     
-    /* --- NOVOS ESTILOS (Seleção de Cultura) --- */
+    /* CSS da Seleção de Cultura */
     .cultura-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr; /* Três colunas */
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 16px;
       margin-top: 20px;
     }
@@ -164,6 +164,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
+      display: flex; flex-direction: column; align-items: center;
     }
     .cultura-btn:hover {
       transform: translateY(-4px);
@@ -171,19 +172,17 @@
     }
     .cultura-btn img {
       width: 100%;
-      max-width: 80px; /* Tamanho máximo do ícone */
-      height: 80px;
+      max-width: 60px;
+      height: 60px;
       object-fit: contain;
       margin-bottom: 10px;
     }
-    /* ------------------------------------------- */
-    
   </style>
 </head>
 <body>
 
   <div id="login-screen" class="wrap">
-    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=4" alt="CyberAgro Logo" height="250"></h1>
+    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=6" alt="CyberAgro Logo" height="250"></h1>
     <div class="card">
       <h3 style="text-align: center;">Acesso Restrito</h3>
       <p class="muted" style="text-align: left;">Insira a senha de acesso para continuar.</p>
@@ -192,27 +191,28 @@
       <button id="loginButton" style="width:100%; margin-top: 12px;">Entrar</button>
     </div>
   </div>
-  
+
   <div id="selecao-cultura-screen" class="wrap" style="display:none;">
-    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=4" alt="CyberAgro Logo" height="250"></h1>
+    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=6" alt="CyberAgro Logo" height="250"></h1>
     <div class="card">
       <h3 style="text-align: center;">Selecione a Cultura</h3>
       <div class="cultura-grid">
-        <a href="#" id="btnIconeManga" class="cultura-btn">
+        <div id="btnIconeManga" class="cultura-btn">
           <img src="manga.png" alt="Manga">
           <span>Manga</span>
-        </a>
-        <a href="#" id="btnIconeUva" class="cultura-btn">
+        </div>
+        <div id="btnIconeUva" class="cultura-btn">
           <img src="uva.png" alt="Uva">
           <span>Uva</span>
-        </a>
-        <a href="#" id="btnIconePitaya" class="cultura-btn">
+        </div>
+        <div id="btnIconePitaya" class="cultura-btn">
           <img src="pitaya.png" alt="Pitaya">
           <span>Pitaya</span>
-        </a>
+        </div>
       </div>
     </div>
   </div>
+
   <div id="dashboard-screen" class="wrap" style="display:none;">
     <h3>Visão Geral</h3>
     <div class="summary-grid">
@@ -290,9 +290,9 @@
       VOLTAR AO INICIO
     </button>
     <div class="card">
-      <h3>Agente IA - Gran7</h3>
+      <h3>Agente IA (Cotação de Preços)</h3>
       <div id="chatWindow" class="chat-window">
-        <div class="chat-bubble bot">Olá, Diego! Pergunte-me o preço de um produto agrícola. (Ex: "Qual preço da manga tommy hoje ou Quanto esta o produto Spander da Gran7")</div>
+        <div class="chat-bubble bot">Olá! Pergunte-me o preço de um produto agrícola.</div>
       </div>
       <div class="row" style="margin-top: 10px;">
         <input type="text" id="chatInput" placeholder="Digite sua mensagem..." class="area-input" style="flex-grow: 1;">
@@ -303,10 +303,10 @@
   
   <div id="perfil-screen" class="wrap" style="display:none;">
     <div class="profile-header card">
-      <img src="logo.png?v=4" alt="Foto de Perfil" class="profile-pic">
+      <img src="logo.png?v=6" alt="Foto de Perfil" class="profile-pic">
       <div class="profile-info">
-        <div class="profile-name">CyberAgro</div>
-        <div class="profile-subtitle">cyberagro.contato@gmail.com</div>
+        <div class="profile-name">Wendell Nascoli</div>
+        <div class="profile-subtitle">uendeu.agro@gmail.com</div>
       </div>
     </div>
     <div class="menu-list card">
@@ -316,14 +316,13 @@
     </div>
   </div>
 
-
   <div class="app-footer">
     <a href="#" id="navInicio" class="footer-btn active">Início</a>
     <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
     <a href="#" id="btnNovaContagem" class="footer-btn-central">
       <img src="imagem1.jpeg" alt="Nova Contagem">
     </a>
-    <a href="#" id="navRanking" class="footer-btn">Irrigação</a> 
+    <a href="#" id="navRanking" class="footer-btn">Ranking</a> 
     <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
   </div>
   
@@ -333,50 +332,44 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-    
-      // --- LÓGICA DE NAVEGAÇÃO (MODIFICADA) ---
       const SENHA_SECRETA = "cyberagro2025"; 
       
+      // Telas
       const loginScreen = document.getElementById("login-screen");
-      const selecaoCulturaScreen = document.getElementById("selecao-cultura-screen"); // <-- NOVA TELA
+      const selecaoCulturaScreen = document.getElementById("selecao-cultura-screen");
       const dashboardScreen = document.getElementById("dashboard-screen"); 
       const appScreen = document.getElementById("app-screen");
       const resultadoScreen = document.getElementById("resultado-screen");
       const chatScreen = document.getElementById("chat-screen");
       const perfilScreen = document.getElementById("perfil-screen");
       
+      // Elementos UI
+      const appFooter = document.querySelector(".app-footer");
+      const btnChat = document.getElementById("btnChat");
       const loginButton = document.getElementById("loginButton");
       const passwordInput = document.getElementById("passwordInput");
       const loginError = document.getElementById("loginError");
       
-      // Botões da nova tela
-      const btnIconeManga = document.getElementById("btnIconeManga");
-      const btnIconeUva = document.getElementById("btnIconeUva");
-      const btnIconePitaya = document.getElementById("btnIconePitaya");
-      
-      const btnNovaContagem = document.getElementById("btnNovaContagem"); 
-      const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
-      const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
-      const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
-      
+      // Navegação
       const navInicio = document.getElementById("navInicio");
       const navRelatorios = document.getElementById("navRelatorios");
       const navRanking = document.getElementById("navRanking");
       const navPerfil = document.getElementById("navPerfil");
-      const btnChat = document.getElementById("btnChat");
-      const appFooter = document.querySelector(".app-footer");
+      
+      // Botões
+      const btnIconeManga = document.getElementById("btnIconeManga");
+      const btnIconeUva = document.getElementById("btnIconeUva");
+      const btnIconePitaya = document.getElementById("btnIconePitaya");
+      const btnNovaContagem = document.getElementById("btnNovaContagem");
+      const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
+      const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
+      const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
 
       function navigateTo(screenToShow) {
-        // Esconde todas as 7 telas
-        loginScreen.style.display = 'none';
-        selecaoCulturaScreen.style.display = 'none'; // <-- Esconde a nova tela
-        dashboardScreen.style.display = 'none';
-        appScreen.style.display = 'none';
-        resultadoScreen.style.display = 'none';
-        chatScreen.style.display = 'none';
-        perfilScreen.style.display = 'none';
+        // Esconde tudo
+        [loginScreen, selecaoCulturaScreen, dashboardScreen, appScreen, resultadoScreen, chatScreen, perfilScreen].forEach(s => s.style.display = 'none');
         
-        // Esconde rodapé e chat nas telas de login/seleção
+        // Lógica do Rodapé e Chat
         if (screenToShow === loginScreen || screenToShow === selecaoCulturaScreen) {
           appFooter.style.display = 'none';
           btnChat.style.display = 'none';
@@ -387,107 +380,47 @@
         
         screenToShow.style.display = 'block';
         
-        // Ativa o ícone correto no rodapé
-        navInicio.classList.remove('active');
-        navRelatorios.classList.remove('active');
-        navRanking.classList.remove('active');
-        navPerfil.classList.remove('active');
-        
-        if (screenToShow === dashboardScreen || screenToShow === appScreen || screenToShow === chatScreen) {
-          navInicio.classList.add('active'); 
-        } else if (screenToShow === resultadoScreen) {
-          navRelatorios.classList.add('active'); 
-        } else if (screenToShow === perfilScreen) {
-          navPerfil.classList.add('active');
-        }
+        // Atualiza Rodapé
+        [navInicio, navRelatorios, navRanking, navPerfil].forEach(n => n.classList.remove('active'));
+        if ([dashboardScreen, appScreen, chatScreen].includes(screenToShow)) navInicio.classList.add('active');
+        else if (screenToShow === resultadoScreen) navRelatorios.classList.add('active');
+        else if (screenToShow === perfilScreen) navPerfil.classList.add('active');
       }
-      navigateTo(loginScreen); // Começa no Login
+      
+      // Inicialização
+      navigateTo(loginScreen);
 
-      // --- LÓGICA DE CLIQUE ATUALIZADA ---
-      
-      // 1. Login leva para a Seleção de Cultura
-      loginButton.onclick = () => { 
-        if (passwordInput.value === SENHA_SECRETA) { 
-          navigateTo(selecaoCulturaScreen); // <-- MUDANÇA
-        } else { 
-          loginError.style.display = "block"; 
-        } 
-      };
+      // Eventos de Login e Seleção
+      loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) navigateTo(selecaoCulturaScreen); else loginError.style.display = "block"; };
       passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
+
+      btnIconeManga.onclick = () => navigateTo(dashboardScreen);
+      btnIconeUva.onclick = () => alert("Em breve!");
+      btnIconePitaya.onclick = () => alert("Em breve!");
+
+      // Eventos de Navegação Rodapé e Voltar
+      btnNovaContagem.onclick = (e) => { e.preventDefault(); navigateTo(appScreen); };
+      navInicio.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
+      navRelatorios.onclick = (e) => { e.preventDefault(); navigateTo(resultadoScreen); };
+      navPerfil.onclick = (e) => { e.preventDefault(); navigateTo(perfilScreen); };
+      navRanking.onclick = (e) => { e.preventDefault(); alert("Ranking em breve"); };
       
-      // 2. Botões da Seleção de Cultura
-      btnIconeManga.onclick = (e) => { 
-        e.preventDefault();
-        navigateTo(dashboardScreen); // <-- Continua o fluxo normal
-      };
-      btnIconeUva.onclick = (e) => { e.preventDefault(); alert("Contador de Uva em construção."); };
-      btnIconePitaya.onclick = (e) => { e.preventDefault(); alert("Contador de Pitaya em construção."); };
-      
-      // 3. Resto da navegação (não muda)
-      btnNovaContagem.onclick = (e) => { e.preventDefault(); navigateTo(appScreen); }; 
       btnVoltarDashboard.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       btnVoltarDashboardChat.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
-      navInicio.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
-      navRelatorios.onclick = (e) => { e.preventDefault(); navigateTo(resultadoScreen); };
-      navRanking.onclick = (e) => { e.preventDefault(); alert("Tela 'Irrigação' em construção."); }; 
-      navPerfil.onclick = (e) => { e.preventDefault(); navigateTo(perfilScreen); };
-      document.getElementById("navMeusDados").onclick = (e) => { e.preventDefault(); alert("Tela 'Meus Dados' em construção."); };
-      document.getElementById("navConfig").onclick = (e) => { e.preventDefault(); alert("Tela 'Configurações' em construção."); };
+      
+      // Perfil Sair
       document.getElementById("navSair").onclick = (e) => { 
         e.preventDefault(); 
-        if (confirm("Tem a certeza que deseja sair?")) {
-          resetUI();
-          navigateTo(loginScreen); 
-        }
+        if(confirm("Sair?")) { resetUI(); navigateTo(loginScreen); } 
       };
-      
-      // --- LÓGICA DO CHATBOT ---
-      // (Não muda)
-      const N8N_WEBHOOK_URL = "COLE_A_URL_DO_SEU_WEBHOOK_DO_N8N_AQUI"; 
-      const chatWindow = document.getElementById("chatWindow");
-      const chatInput = document.getElementById("chatInput");
-      const chatSendButton = document.getElementById("chatSendButton");
-      btnChat.onclick = (e) => { e.preventDefault(); navigateTo(chatScreen); };
-      function addChatBubble(message, isUser = false) {
-          const bubble = document.createElement('div');
-          bubble.classList.add('chat-bubble');
-          bubble.classList.add(isUser ? 'user' : 'bot');
-          bubble.textContent = message;
-          chatWindow.appendChild(bubble);
-          chatWindow.scrollTop = chatWindow.scrollHeight;
-      }
-      async function handleChatSend() {
-          const message = chatInput.value.trim();
-          if (!message) return;
-          addChatBubble(message, true); 
-          chatInput.value = ""; 
-          chatSendButton.disabled = true; 
-          try {
-              const resp = await fetch(N8N_WEBHOOK_URL, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ text: message })
-              });
-              if (!resp.ok) { throw new Error(`O servidor n8n respondeu com ${resp.status}`); }
-              const data = await resp.json();
-              addChatBubble(data.response || "Não entendi."); 
-          } catch (err) {
-              console.error(err);
-              addChatBubble("Desculpe, estou com problemas de conexão com o agente.");
-          } finally {
-              chatSendButton.disabled = false; 
-          }
-      }
-      chatSendButton.onclick = handleChatSend;
-      chatInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); handleChatSend(); } });
 
-      // --- LÓGICA DO APP (Contagem) ---
-      // (A lógica de contagem v2.25 não muda)
+      // --- LÓGICA DO APP DE CONTAGEM ---
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
       const MAX_MB = 30;
+      
       const fileInput = document.getElementById("fileInput");
       const areaInput = document.getElementById("areaInput"); 
       const btnSend = document.getElementById("btnSend");
@@ -503,86 +436,56 @@
       const btnAgenda = document.getElementById("btnAgenda");
       let selectedFile = null;
       let myChart = null; 
+
       const formatterInt = new Intl.NumberFormat('pt-BR', { style: 'decimal', maximumFractionDigits: 0 });
       const formatterCurrency = new Intl.NumberFormat('pt-BR', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
       function renderChart(labels, dataPrices) {
         const ctx = document.getElementById('myChart').getContext('2d');
-        if (myChart) {
-            myChart.destroy();
-        }
+        if (myChart) myChart.destroy();
         myChart = new Chart(ctx, {
             type: 'line', 
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Preço R$/KG (Tommy)',
-                    data: dataPrices,
-                    fill: false,
-                    borderColor: '#28a745', 
-                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                    tension: 0.1,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                scales: {
-                    y: {
-                        ticks: {
-                            callback: function(value, index, ticks) {
-                                return 'R$ ' + value.toFixed(2);
-                            }
-                        }
-                    }
-                }
-            }
+            data: { labels: labels, datasets: [{ label: 'Preço R$/KG (Tommy)', data: dataPrices, fill: true, borderColor: '#28a745', backgroundColor: 'rgba(40, 167, 69, 0.1)', tension: 0.1 }] },
+            options: { responsive: true, maintainAspectRatio: true, scales: { y: { ticks: { callback: function(value) { return 'R$ ' + value.toFixed(2); } } } } }
         });
       }
-      function setStatus(s){ statusEl.textContent = s; }
-      function setProgress(p){ pbar.style.width = Math.min(100, Math.max(0, p)) + "%"; }
+
       function resetUI(){
         selectedFile = null; fileInput.value = ""; areaInput.value = ""; 
         btnSend.disabled = true; btnClear.disabled = true;
         fileInfo.textContent = "Nenhum ficheiro selecionado.";
-        previewVideo.src = ""; previewVideo.style.display = "none";
-        previewImage.src = ""; previewImage.style.display = "none";
+        previewVideo.style.display = "none"; previewImage.style.display = "none";
         areaInput.style.display = "none"; 
-        out.innerHTML = "—"; 
-        setProgress(0);
-        setStatus("aguardando ficheiro (vídeo ou imagem)...");
+        out.innerHTML = "—"; pbar.style.width = "0%";
+        statusEl.textContent = "aguardando ficheiro...";
       }
+
       function checkInputs() {
         const area = parseFloat(areaInput.value);
         const isVideo = selectedFile && selectedFile.type.startsWith("video/");
         const isImage = selectedFile && selectedFile.type.startsWith("image/");
         if ((isVideo && area > 0) || isImage) {
-          btnSend.disabled = false; setStatus("Pronto para enviar.");
+          btnSend.disabled = false; statusEl.textContent = "Pronto para enviar.";
         } else {
           btnSend.disabled = true;
         }
       }
+
       fileInput.addEventListener("change", (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
         const isVideo = file.type.startsWith("video/");
         const isImage = file.type.startsWith("image/");
+        
         if (!isVideo && !isImage) {
-            setStatus("Erro: Apenas arquivos de VÍDEO ou IMAGEM são permitidos.");
-            fileInfo.textContent = "Erro: Apenas arquivos de VÍDEO ou IMAGEM.";
-            btnSend.disabled = true; btnClear.disabled = true; selectedFile = null;
-            previewVideo.style.display = "none"; previewImage.style.display = "none";
+            alert("Erro: Apenas arquivos de VÍDEO ou IMAGEM são permitidos.");
+            resetUI();
             return;
         }
         selectedFile = file;
-        const mb = (file.size/1024/1024).toFixed(2);
-        fileInfo.textContent = `${file.name} • ${mb} MB`;
+        fileInfo.textContent = `${file.name} • ${(file.size/1024/1024).toFixed(2)} MB`;
         btnClear.disabled = false;
-        if (file.size > MAX_MB*1024*1024) {
-          setStatus(`arquivo muito grande (> ${MAX_MB} MB)`); btnSend.disabled = true;
-        } else {
-          checkInputs();
-        }
+        
         const previewURL = URL.createObjectURL(file);
         if (isVideo) {
           previewVideo.src = previewURL; previewVideo.style.display = "block";
@@ -596,123 +499,128 @@
       });
       areaInput.addEventListener("input", checkInputs); 
       btnClear.addEventListener("click", resetUI);
-      function gerarLinkAgenda(contagem, estimativa_kg, preco_hoje, preco_futuro) {
-          const dataIA = "20251215"; 
-          const titulo = "Melhor Dia Venda Manga (CyberAgro)";
-          const detalhes = `Contagem: ${contagem}.\nEstimativa: ${estimativa_kg} KG/HA.\n` +
-                           `Preço hoje: R$ ${preco_hoje.toFixed(2)}\n` +
-                           `Previsão (Dia 15): R$ ${preco_futuro.toFixed(2)}\n` +
-                           `Agendado via App CyberAgro.`;
-          const url = new URL("https://calendar.google.com/calendar/render");
-          url.searchParams.append('action', 'TEMPLATE');
-          url.searchParams.append('text', titulo);
-          url.searchParams.append('dates', `${dataIA}/${dataIA}`);
-          url.searchParams.append('details', detalhes);
-          window.open(url.href, '_blank'); 
-      }
-      btnSend.addEventListener("click", iniciarContagem);
-      async function iniciarContagem() {
+
+      btnSend.addEventListener("click", async () => {
         if (!selectedFile) return;
         btnSend.disabled = true;
-        setStatus("Passo 1/3: A obter cotação do dia...");
-        setProgress(10);
+        statusEl.textContent = "Obtendo cotação...";
+        pbar.style.width = "10%";
+        
         let dados_preco;
         try {
-          const respPreco = await fetch(`mango_prices.json?v=${Date.now()}`); 
-          if (!respPreco.ok) throw new Error("Não foi possível buscar o arquivo de preços.");
+          const respPreco = await fetch(`mango_prices.json?v=${Date.now()}`);
+          if (!respPreco.ok) throw new Error();
           dados_preco = await respPreco.json();
-        } catch (err) {
-          setStatus("Falha ao obter cotação. Usando valores padrão.");
-          dados_preco = { preco_kg: 1.86, peso_medio_g: 500 }; 
+        } catch {
+          dados_preco = { preco_kg: 1.86, peso_medio_g: 500 };
         }
+
         const isVideoRequest = selectedFile.type.startsWith("video/");
-        let target_url = ""; 
-        const area_video_m2 = parseFloat(areaInput.value);
-        if (isVideoRequest && (!area_video_m2 || area_video_m2 <= 0)) {
-            alert("Para vídeos, por favor, insira um valor válido para a área em metros quadrados (m²).");
-            resetUI();
-            return;
-        }
-        setStatus("Passo 2/3: Enviando para IA…");
-        setProgress(25);
+        let target_url = isVideoRequest ? API_URL_VIDEO : API_URL_IMAGEM;
+        
+        statusEl.textContent = "Enviando para IA...";
+        pbar.style.width = "30%";
+
         const form = new FormData();
-        form.append("video", selectedFile, selectedFile.name || "mediafile"); 
-        if (isVideoRequest) { target_url = API_URL_VIDEO; } 
-        else { target_url = API_URL_IMAGEM; }
+        form.append("video", selectedFile, selectedFile.name || "mediafile");
+
         try {
           const resp = await fetch(target_url, { method: "POST", body: form });
-          setProgress(75);
-          const text = await resp.text().catch(()=> "");
-          setProgress(100);
+          const text = await resp.text();
+          pbar.style.width = "100%";
+
           if (resp.ok) {
-            setStatus("OK! Contagem recebida!");
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            try {
-              const data = JSON.parse(text);
-              const contagem_api = data.contagem_final; 
-              const preco_hoje = dados_preco.preco_kg; 
-              const preco_futuro_ficticio = 2.50; 
-              let kg_por_hectare_raw = 0;
-              if (isVideoRequest) {
-                const peso_medio_kg = dados_preco.peso_medio_g / 1000;
-                const kg_por_m2 = (contagem_api * peso_medio_kg) / area_video_m2;
-                kg_por_hectare_raw = Math.round(kg_por_m2 * M2_POR_HECTARE);
-                const faturamento_ha_raw = (kg_por_hectare_raw * preco_hoje);
-                
-                const mangas_por_m2 = contagem_api / area_video_m2;
-                const mangas_por_hectare_raw = Math.round(mangas_por_m2 * M2_POR_HECTARE);
-                const mangas_por_hectare_formatado = formatterInt.format(mangas_por_hectare_raw);
-                
-                const kg_por_hectare_formatado = formatterInt.format(kg_por_hectare_raw);
-                const faturamento_ha_formatado = formatterCurrency.format(faturamento_ha_raw);
-                
-                resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
-                resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-                resultadoDetalhado.textContent += "ESTIMATIVA (QNTD): " + mangas_por_hectare_formatado + " MANGAS/HA\n";
-                resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare_formatado + " KG/HA\n";
-                resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha_formatado;
-                
-              } else {
-                resultadoDetalhado.textContent = "TIPO: IMAGEM\n";
-                resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
-                resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A";
-              }
-              const forecastMsg = `A manga está cotada em R$ ${formatterCurrency.format(preco_hoje)} hoje. Porém dia 15/12/2025, a manga estará cotada em R$ ${formatterCurrency.format(preco_futuro_ficticio)}. Será o melhor dia para venda!`;
-              forecastMessage.textContent = forecastMsg;
-              btnAgenda.onclick = () => {
-                  gerarLinkAgenda(contagem_api, kg_por_hectare_raw, preco_hoje, preco_futuro_ficticio);
-              };
-              out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Contagem concluída! Clique aqui para acessar o resultado.</button>`;
-              
-              // --- MODIFICAÇÃO DO GRÁFICO (v2.24) ---
-              document.getElementById("btnVerResultado").onclick = () => {
-                // Dados reais (APENAS 2025) da sua tabela (Tommy - produtor)
-                const labels = ['3/10/25', '10/10/25', '17/10/25', '24/10/25', '31/10/25', '7/11/25'];
-                const prices = [2.51, 1.26, 1.95, 1.88, 2.06, 1.86];
-                
-                renderChart(labels, prices);
-                navigateTo(resultadoScreen); 
-              };
-              // ------------------------------------
-              
-            } catch (e) {
-              out.textContent = "Erro ao ler o JSON: " + text;
+            statusEl.textContent = "Concluído!";
+            const data = JSON.parse(text);
+            const contagem = data.contagem_final;
+            const area = parseFloat(areaInput.value);
+            const preco = dados_preco.preco_kg;
+            const peso = dados_preco.peso_medio_g / 1000;
+
+            let html = `TIPO: ${isVideoRequest ? "VÍDEO" : "IMAGEM"}\n`;
+            html += `CONTAGEM: ${contagem}\n\n`;
+            
+            let kg_ha = 0;
+            if (isVideoRequest) {
+               const kg_m2 = (contagem * peso) / area;
+               kg_ha = Math.round(kg_m2 * M2_POR_HECTARE);
+               const qntd_ha = Math.round((contagem / area) * M2_POR_HECTARE);
+               html += `ESTIMATIVA (QNTD): ${formatterInt.format(qntd_ha)} MANGAS/HA\n`;
+               html += `ESTIMATIVA (KG/HA): ${formatterInt.format(kg_ha)} KG/HA\n`;
+               html += `FATURAMENTO: R$ ${formatterCurrency.format(kg_ha * preco)}`;
+            } else {
+               html += "ESTIMATIVA: N/A (Requer vídeo)";
             }
+            resultadoDetalhado.textContent = html;
+
+            const futuro = 2.50;
+            forecastMessage.textContent = `Hoje: R$ ${formatterCurrency.format(preco)}. Dia 15/12: R$ ${formatterCurrency.format(futuro)}. Venda recomendada!`;
+            
+            btnAgenda.onclick = () => {
+               const url = new URL("https://calendar.google.com/calendar/render?action=TEMPLATE");
+               url.searchParams.append('text', "Venda Manga (CyberAgro)");
+               url.searchParams.append('details', html);
+               window.open(url.href, '_blank');
+            };
+
+            out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Ver Resultado</button>`;
+            document.getElementById("btnVerResultado").onclick = () => {
+               // DADOS DO GRÁFICO 2025
+               renderChart(['3/10','10/10','17/10','24/10','31/10','7/11'], [2.51, 1.26, 1.95, 1.88, 2.06, 1.86]);
+               navigateTo(resultadoScreen);
+            };
           } else {
-            setStatus(`erro ${resp.status}`);
-            out.textContent = text || "Sem corpo de resposta.";
+             statusEl.textContent = "Erro no processamento.";
+             out.textContent = text;
           }
-        } catch (err) {
-          setStatus("falha de rede");
-          out.textContent = String(err);
+        } catch (e) {
+           statusEl.textContent = "Erro de rede.";
         } finally {
-          btnSend.disabled = false;
+           btnSend.disabled = false;
         }
-      } 
+      });
+
+      // --- CHATBOT ---
+      const N8N_WEBHOOK_URL = "COLE_A_URL_DO_SEU_WEBHOOK_DO_N8N_AQUI"; 
+      const chatWindow = document.getElementById("chatWindow");
+      const chatInput = document.getElementById("chatInput");
+      const chatSendButton = document.getElementById("chatSendButton");
+      
+      btnChat.onclick = () => navigateTo(chatScreen);
+
+      chatSendButton.onclick = async () => {
+         const msg = chatInput.value.trim();
+         if(!msg) return;
+         
+         const userBubble = document.createElement('div');
+         userBubble.className = 'chat-bubble user';
+         userBubble.textContent = msg;
+         chatWindow.appendChild(userBubble);
+         
+         chatInput.value = "";
+         chatSendButton.disabled = true;
+
+         try {
+            const resp = await fetch(N8N_WEBHOOK_URL, {
+               method: 'POST',
+               headers: {'Content-Type': 'application/json'},
+               body: JSON.stringify({text: msg})
+            });
+            const json = await resp.json();
+            const botBubble = document.createElement('div');
+            botBubble.className = 'chat-bubble bot';
+            botBubble.textContent = json.response || "Sem resposta.";
+            chatWindow.appendChild(botBubble);
+         } catch {
+            const errBubble = document.createElement('div');
+            errBubble.className = 'chat-bubble bot';
+            errBubble.textContent = "Erro de conexão.";
+            chatWindow.appendChild(errBubble);
+         }
+         chatSendButton.disabled = false;
+         chatWindow.scrollTop = chatWindow.scrollHeight;
+      };
     });
   </script>
 </body>
 </html>
-
-
-
