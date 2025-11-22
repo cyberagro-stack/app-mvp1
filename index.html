@@ -9,14 +9,18 @@
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/app-mvp1/sw.js')
-        .then(() => console.log('Service Worker Registrado v5'))
+        .then(reg => {
+            // Força atualização do Service Worker
+            reg.update();
+            console.log('Service Worker Registrado v7');
+        })
         .catch(err => console.log('Service Worker falhou:', err));
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
-    /* --- ESTILOS GERAIS --- */
+    /* (Estilos inalterados...) */
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
     body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -43,32 +47,37 @@
     .data-row span:first-child { color: #333; }
     .data-row span:last-child { color: #555; font-weight: 500; }
     .btn-nova-contagem {
-      background: #28a745; color: white; border: 0; border-radius: 12px;
-      padding: 16px; font-weight: 600; cursor: pointer; width: 100%;
-      font-size: 1.1rem; margin-top: 20px;
+      background: #28a745; /* Verde */
+      color: white;
+      border: 0;
+      border-radius: 12px;
+      padding: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1.1rem;
+      margin-top: 20px;
     }
-
-    /* --- CORREÇÃO DO BUG VISUAL (v2.28) --- */
-    /* O rodapé agora começa INVISÍVEL (display: none) */
+    
+    /* Rodapé começa oculto */
     .app-footer {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: #FFFFFF; border-top: 1px solid #E0E0E0;
-      display: none; /* <-- MUDADO DE FLEX PARA NONE */
+      display: none; /* GARANTIDO NO CSS */
       justify-content: space-around; align-items: center;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 999;
       padding: 0 10px; height: 60px;
     }
 
-    /* O botão de chat agora começa INVISÍVEL */
+    /* Chat começa oculto */
     .chat-fab {
       position: fixed; bottom: 90px; right: 20px; background: #28a745;
       color: white; width: 50px; height: 50px; border-radius: 50%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; padding: 0;
-      display: none; /* <-- ADICIONADO DISPLAY NONE */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; 
+      display: none; /* GARANTIDO NO CSS */
       box-sizing: border-box;
       padding: 10px; 
     }
-    /* -------------------------------------- */
 
     .footer-btn {
       flex: 1; text-align: center; padding: 10px 5px;
@@ -110,7 +119,6 @@
     }
     .cultura-btn img { width: 50px; height: 50px; object-fit: contain; margin-bottom: 8px; }
     
-    /* Estilos Perfil */
     .profile-header { display: flex; align-items: center; gap: 16px; }
     .profile-pic { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #DDD; }
     .profile-name { font-size: 1.2rem; font-weight: 600; color: #333; }
@@ -126,7 +134,7 @@
 <body>
 
   <div id="login-screen" class="wrap">
-    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=6" alt="CyberAgro Logo" height="250"></h1>
+    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=7" alt="CyberAgro Logo" height="250"></h1>
     <div class="card">
       <h3 style="text-align: center;">Acesso Restrito</h3>
       <p class="muted" style="text-align: left;">Insira a senha de acesso para continuar.</p>
@@ -137,7 +145,7 @@
   </div>
 
   <div id="selecao-cultura-screen" class="wrap" style="display:none;">
-    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=6" alt="CyberAgro Logo" height="250"></h1>
+    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=7" alt="CyberAgro Logo" height="250"></h1>
     <div class="card">
       <h3 style="text-align: center;">Selecione a Cultura</h3>
       <div class="cultura-grid">
@@ -241,7 +249,7 @@
   
   <div id="perfil-screen" class="wrap" style="display:none;">
     <div class="profile-header card">
-      <img src="logo.png?v=6" alt="Foto de Perfil" class="profile-pic">
+      <img src="logo.png?v=7" alt="Foto de Perfil" class="profile-pic">
       <div class="profile-info">
         <div class="profile-name">Wendell Nascoli</div>
         <div class="profile-subtitle">uendeu.agro@gmail.com</div>
@@ -254,17 +262,14 @@
     </div>
   </div>
 
-  <div class="app-footer">
-    <a href="#" id="navInicio" class="footer-btn active">Início</a>
+  <div class="app-footer" style="display:none;"> <a href="#" id="navInicio" class="footer-btn active">Início</a>
     <a href="#" id="navRelatorios" class="footer-btn">Relatórios</a>
     <a href="#" id="btnNovaContagem" class="footer-btn-central"><img src="imagem1.jpeg" alt="Nova"></a>
     <a href="#" id="navRanking" class="footer-btn">Ranking</a> 
     <a href="#" id="navPerfil" class="footer-btn">Perfil</a>
   </div>
   
-  <button id="btnChat" class="chat-fab"><img src="imagem2.png" alt="Chat"></button>
-
-  <script>
+  <button id="btnChat" class="chat-fab" style="display:none;"><img src="imagem2.png" alt="Chat"></button> <script>
     document.addEventListener("DOMContentLoaded", () => {
       const SENHA_SECRETA = "cyberagro2025"; 
       
@@ -300,7 +305,6 @@
       const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
 
       function navigateTo(screenToShow) {
-        // Esconde tudo
         [loginScreen, selecaoCulturaScreen, dashboardScreen, appScreen, resultadoScreen, chatScreen, perfilScreen].forEach(s => s.style.display = 'none');
         
         // Lógica do Rodapé e Chat
@@ -314,23 +318,22 @@
         
         screenToShow.style.display = 'block';
         
-        // Atualiza Rodapé
         [navInicio, navRelatorios, navRanking, navPerfil].forEach(n => n.classList.remove('active'));
         if ([dashboardScreen, appScreen, chatScreen].includes(screenToShow)) navInicio.classList.add('active');
         else if (screenToShow === resultadoScreen) navRelatorios.classList.add('active');
         else if (screenToShow === perfilScreen) navPerfil.classList.add('active');
       }
       
-      // Inicialização
       navigateTo(loginScreen);
 
-      // Eventos de Login e Seleção
+      // --- Eventos ---
       loginButton.onclick = () => { if (passwordInput.value === SENHA_SECRETA) navigateTo(selecaoCulturaScreen); else loginError.style.display = "block"; };
+      passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); loginButton.click(); } });
+
       btnIconeManga.onclick = () => navigateTo(dashboardScreen);
       btnIconeUva.onclick = () => alert("Em breve!");
       btnIconePitaya.onclick = () => alert("Em breve!");
 
-      // Eventos de Navegação Rodapé e Voltar
       btnNovaContagem.onclick = (e) => { e.preventDefault(); navigateTo(appScreen); };
       navInicio.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       navRelatorios.onclick = (e) => { e.preventDefault(); navigateTo(resultadoScreen); };
@@ -341,18 +344,55 @@
       btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); resetUI(); };
       btnVoltarDashboardChat.onclick = (e) => { e.preventDefault(); navigateTo(dashboardScreen); };
       
-      // Perfil Sair
-      document.getElementById("navSair").onclick = (e) => { 
-        e.preventDefault(); 
-        if(confirm("Sair?")) { resetUI(); navigateTo(loginScreen); } 
+      document.getElementById("navSair").onclick = (e) => { e.preventDefault(); if(confirm("Sair?")) { resetUI(); navigateTo(loginScreen); } };
+
+      // --- CHATBOT CONFIG (COLE SUA URL DE TESTE AQUI) ---
+      const N8N_WEBHOOK_URL = "http://localhost:5678/webhook-test/agent-ia";
+      // Ex: "https://n8n-agent-xyz.run.app/webhook-test/agente-ia"
+
+      const chatWindow = document.getElementById("chatWindow");
+      const chatInput = document.getElementById("chatInput");
+      const chatSendButton = document.getElementById("chatSendButton");
+      
+      btnChat.onclick = () => navigateTo(chatScreen);
+
+      chatSendButton.onclick = async () => {
+         const msg = chatInput.value.trim();
+         if(!msg) return;
+         
+         const userBubble = document.createElement('div');
+         userBubble.className = 'chat-bubble user';
+         userBubble.textContent = msg;
+         chatWindow.appendChild(userBubble);
+         
+         chatInput.value = "";
+         chatSendButton.disabled = true;
+
+         try {
+            const resp = await fetch(N8N_WEBHOOK_URL, {
+               method: 'POST',
+               headers: {'Content-Type': 'application/json'},
+               body: JSON.stringify({text: msg})
+            });
+            const json = await resp.json();
+            const botBubble = document.createElement('div');
+            botBubble.className = 'chat-bubble bot';
+            botBubble.textContent = json.response || "Sem resposta.";
+            chatWindow.appendChild(botBubble);
+         } catch {
+            const errBubble = document.createElement('div');
+            errBubble.className = 'chat-bubble bot';
+            errBubble.textContent = "Erro de conexão. Verifique se o n8n está em modo 'Listen'.";
+            chatWindow.appendChild(errBubble);
+         }
+         chatSendButton.disabled = false;
+         chatWindow.scrollTop = chatWindow.scrollHeight;
       };
 
-      // --- LÓGICA DO APP DE CONTAGEM ---
+      // --- Resto do código da API de Contagem (mantido igual) ---
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
-      const MAX_MB = 30;
-      
       const fileInput = document.getElementById("fileInput");
       const areaInput = document.getElementById("areaInput"); 
       const btnSend = document.getElementById("btnSend");
@@ -386,7 +426,8 @@
         selectedFile = null; fileInput.value = ""; areaInput.value = ""; 
         btnSend.disabled = true; btnClear.disabled = true;
         fileInfo.textContent = "Nenhum ficheiro selecionado.";
-        previewVideo.style.display = "none"; previewImage.style.display = "none";
+        previewVideo.src = ""; previewVideo.style.display = "none";
+        previewImage.src = ""; previewImage.style.display = "none";
         areaInput.style.display = "none"; 
         out.innerHTML = "—"; pbar.style.width = "0%";
         statusEl.textContent = "aguardando ficheiro...";
@@ -408,16 +449,10 @@
         if (!file) return;
         const isVideo = file.type.startsWith("video/");
         const isImage = file.type.startsWith("image/");
-        
-        if (!isVideo && !isImage) {
-            alert("Erro: Apenas arquivos de VÍDEO ou IMAGEM são permitidos.");
-            resetUI();
-            return;
-        }
+        if (!isVideo && !isImage) { alert("Erro: Apenas arquivos de VÍDEO ou IMAGEM são permitidos."); resetUI(); return; }
         selectedFile = file;
         fileInfo.textContent = `${file.name} • ${(file.size/1024/1024).toFixed(2)} MB`;
         btnClear.disabled = false;
-        
         const previewURL = URL.createObjectURL(file);
         if (isVideo) {
           previewVideo.src = previewURL; previewVideo.style.display = "block";
@@ -437,22 +472,17 @@
         btnSend.disabled = true;
         statusEl.textContent = "Obtendo cotação...";
         pbar.style.width = "10%";
-        
         let dados_preco;
         try {
           const respPreco = await fetch(`mango_prices.json?v=${Date.now()}`);
           if (!respPreco.ok) throw new Error();
           dados_preco = await respPreco.json();
-        } catch {
-          dados_preco = { preco_kg: 1.86, peso_medio_g: 500 };
-        }
+        } catch { dados_preco = { preco_kg: 1.86, peso_medio_g: 500 }; }
 
         const isVideoRequest = selectedFile.type.startsWith("video/");
         let target_url = isVideoRequest ? API_URL_VIDEO : API_URL_IMAGEM;
-        
         statusEl.textContent = "Enviando para IA...";
         pbar.style.width = "30%";
-
         const form = new FormData();
         form.append("video", selectedFile, selectedFile.name || "mediafile");
 
@@ -460,7 +490,6 @@
           const resp = await fetch(target_url, { method: "POST", body: form });
           const text = await resp.text();
           pbar.style.width = "100%";
-
           if (resp.ok) {
             statusEl.textContent = "Concluído!";
             const data = JSON.parse(text);
@@ -468,10 +497,8 @@
             const area = parseFloat(areaInput.value);
             const preco = dados_preco.preco_kg;
             const peso = dados_preco.peso_medio_g / 1000;
-
             let html = `TIPO: ${isVideoRequest ? "VÍDEO" : "IMAGEM"}\n`;
             html += `CONTAGEM: ${contagem}\n\n`;
-            
             let kg_ha = 0;
             if (isVideoRequest) {
                const kg_m2 = (contagem * peso) / area;
@@ -480,83 +507,25 @@
                html += `ESTIMATIVA (QNTD): ${formatterInt.format(qntd_ha)} MANGAS/HA\n`;
                html += `ESTIMATIVA (KG/HA): ${formatterInt.format(kg_ha)} KG/HA\n`;
                html += `FATURAMENTO: R$ ${formatterCurrency.format(kg_ha * preco)}`;
-            } else {
-               html += "ESTIMATIVA: N/A (Requer vídeo)";
-            }
+            } else { html += "ESTIMATIVA: N/A (Requer vídeo)"; }
             resultadoDetalhado.textContent = html;
-
             const futuro = 2.50;
             forecastMessage.textContent = `Hoje: R$ ${formatterCurrency.format(preco)}. Dia 15/12: R$ ${formatterCurrency.format(futuro)}. Venda recomendada!`;
-            
             btnAgenda.onclick = () => {
                const url = new URL("https://calendar.google.com/calendar/render?action=TEMPLATE");
                url.searchParams.append('text', "Venda Manga (CyberAgro)");
                url.searchParams.append('details', html);
                window.open(url.href, '_blank');
             };
-
             out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Ver Resultado</button>`;
             document.getElementById("btnVerResultado").onclick = () => {
-               // DADOS DO GRÁFICO 2025
                renderChart(['3/10','10/10','17/10','24/10','31/10','7/11'], [2.51, 1.26, 1.95, 1.88, 2.06, 1.86]);
                navigateTo(resultadoScreen);
             };
-          } else {
-             statusEl.textContent = "Erro no processamento.";
-             out.textContent = text;
-          }
-        } catch (e) {
-           statusEl.textContent = "Erro de rede.";
-        } finally {
-           btnSend.disabled = false;
-        }
+          } else { statusEl.textContent = "Erro no processamento."; out.textContent = text; }
+        } catch (e) { statusEl.textContent = "Erro de rede."; } finally { btnSend.disabled = false; }
       });
-
-      // --- CHATBOT ---
-      // ATUALIZADO: URL PÚBLICA DO n8n
-      const N8N_WEBHOOK_URL = "https://n8n-agent-476522137012.us-central1.run.app/webhook/agente-ia";
-      
-      const chatWindow = document.getElementById("chatWindow");
-      const chatInput = document.getElementById("chatInput");
-      const chatSendButton = document.getElementById("chatSendButton");
-      
-      btnChat.onclick = () => navigateTo(chatScreen);
-
-      chatSendButton.onclick = async () => {
-         const msg = chatInput.value.trim();
-         if(!msg) return;
-         
-         const userBubble = document.createElement('div');
-         userBubble.className = 'chat-bubble user';
-         userBubble.textContent = msg;
-         chatWindow.appendChild(userBubble);
-         
-         chatInput.value = "";
-         chatSendButton.disabled = true;
-
-         try {
-            const resp = await fetch(N8N_WEBHOOK_URL, {
-               method: 'POST',
-               headers: {'Content-Type': 'application/json'},
-               body: JSON.stringify({text: msg})
-            });
-            const json = await resp.json();
-            const botBubble = document.createElement('div');
-            botBubble.className = 'chat-bubble bot';
-            botBubble.textContent = json.response || "Sem resposta.";
-            chatWindow.appendChild(botBubble);
-         } catch {
-            const errBubble = document.createElement('div');
-            errBubble.className = 'chat-bubble bot';
-            errBubble.textContent = "Erro de conexão.";
-            chatWindow.appendChild(errBubble);
-         }
-         chatSendButton.disabled = false;
-         chatWindow.scrollTop = chatWindow.scrollHeight;
-      };
     });
   </script>
 </body>
 </html>
-
-
