@@ -347,7 +347,9 @@
       document.getElementById("navSair").onclick = (e) => { e.preventDefault(); if(confirm("Sair?")) { resetUI(); navigateTo(loginScreen); } };
 
       // --- CHATBOT CONFIG (COLE SUA URL DE TESTE AQUI) ---
-      const N8N_WEBHOOK_URL = "http://localhost:5678/webhook-test/agent-ia";
+      const N8N_WEBHOOK_URL = "// URL PÚBLICA DO WEBHOOK NO CLOUD RUN
+const N8N_WEBHOOK_URL = "https://n8n-agent-476522137012.us-central1.run.app/webhook/agent-ia";
+";
       // Ex: "https://n8n-agent-xyz.run.app/webhook-test/agente-ia"
 
       const chatWindow = document.getElementById("chatWindow");
@@ -529,3 +531,4 @@
   </script>
 </body>
 </html>
+
