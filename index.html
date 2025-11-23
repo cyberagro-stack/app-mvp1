@@ -11,7 +11,7 @@
       navigator.serviceWorker.register('/app-mvp1/sw.js')
         .then(reg => {
             reg.update();
-            console.log('Service Worker Registrado v10');
+            console.log('Service Worker Registrado v11');
         })
         .catch(err => console.log('Service Worker falhou:', err));
     }
@@ -190,6 +190,7 @@
         font-size: 0.85rem;
         box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
         border: 2px solid white;
+        overflow: hidden; 
     }
     
     .chat-message.user .chat-message-avatar {
@@ -462,13 +463,16 @@
       <h3 style="text-align: center;">Selecione a Cultura</h3>
       <div class="cultura-grid">
         <div id="btnIconeManga" class="cultura-btn">
-          <img src="manga.png" alt="Manga"><span>Manga</span>
+          <img src="manga.png" alt="Manga">
+          <span>Manga</span>
         </div>
         <div id="btnIconeUva" class="cultura-btn">
-          <img src="uva.png" alt="Uva"><span>Uva</span>
+          <img src="uva.png" alt="Uva">
+          <span>Uva</span>
         </div>
         <div id="btnIconePitaya" class="cultura-btn">
-          <img src="pitaya.png" alt="Pitaya"><span>Pitaya</span>
+          <img src="pitaya.png" alt="Pitaya">
+          <span>Pitaya</span>
         </div>
       </div>
     </div>
@@ -484,6 +488,15 @@
     <ul class="data-list card">
       <li class="data-row"><span>Dezembro</span> <span>R$ 0,00</span></li>
       <li class="data-row"><span>Novembro</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Outubro</span> <span>R$ 12.029.994,00</span></li>
+      <li class="data-row"><span>Setembro</span> <span>R$ 1.104.513,91</span></li>
+      <li class="data-row"><span>Agosto</span> <span>R$ 356.644,48</span></li>
+      <li class="data-row"><span>Julho</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Junho</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Maio</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Abril</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Março</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Fevereiro</span> <span>R$ 0,00</span></li>
       <li class="data-row"><span>Janeiro</span> <span>R$ 0,00</span></li>
     </ul>
   </div>
@@ -568,7 +581,7 @@
     </div>
   </div>
 
-  <div class="app-footer">
+  <div class="app-footer" style="display:none;"> 
     <a onclick="nav('dashboard-screen')" class="footer-btn active">Início</a>
     <a onclick="nav('resultado-screen')" class="footer-btn">Relatórios</a>
     <a onclick="nav('app-screen')" class="footer-btn-central"><img src="imagem1.jpeg" alt="Nova"></a>
@@ -576,7 +589,7 @@
     <a onclick="nav('perfil-screen')" class="footer-btn">Perfil</a>
   </div>
   
-  <button id="btnChat" class="chat-fab" onclick="nav('chat-screen')">
+  <button id="btnChat" class="chat-fab" style="display:none;" onclick="nav('chat-screen')">
     <img src="imagem2.png" alt="Chat">
   </button>
 
@@ -585,7 +598,7 @@
       const SENHA_SECRETA = "cyberagro2025"; 
       
       // *** URL DO WEBHOOK DO N8N (PRODUÇÃO) ***
-      const N8N_CHAT_URL = "https://n8n-agent-476522137012.us-central1.run.app/webhook/chat"; 
+      const N8N_WEBHOOK_URL = "https://n8n-agent-476522137012.us-central1.run.app/webhook/agente-ia"; 
       
       // Telas
       const loginScreen = document.getElementById("login-screen");
@@ -626,7 +639,6 @@
         } else if (telaId === 'chat-screen') {
            appFooter.style.display = 'none';
            btnChat.style.display = 'none';
-           // Foca no input quando abre o chat
            setTimeout(() => {
              const chatInput = document.getElementById('chatInput');
              if (chatInput) chatInput.focus();
@@ -653,16 +665,171 @@
       btnIconeUva.onclick = () => alert("Em breve!");
       btnIconePitaya.onclick = () => alert("Em breve!");
       
+      const btnNovaContagem = document.getElementById("btnNovaContagem");
+      const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
+      const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
+      const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
+      const navInicio = document.getElementById("navInicio");
+      const navRelatorios = document.getElementById("navRelatorios");
+      const navRanking = document.getElementById("navRanking");
+      const navPerfil = document.getElementById("navPerfil");
+
+      btnNovaContagem.onclick = (e) => { e.preventDefault(); nav('app-screen'); };
+      navInicio.onclick = (e) => { e.preventDefault(); nav('dashboard-screen'); };
+      navRelatorios.onclick = (e) => { e.preventDefault(); nav('resultado-screen'); };
+      navPerfil.onclick = (e) => { e.preventDefault(); nav('perfil-screen'); };
+      navRanking.onclick = (e) => { e.preventDefault(); alert("Ranking em breve"); };
+      
+      btnVoltarDashboard.onclick = (e) => { e.preventDefault(); nav('dashboard-screen'); resetUI(); };
+      btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); nav('dashboard-screen'); resetUI(); };
+      btnVoltarDashboardChat.onclick = (e) => { e.preventDefault(); nav('dashboard-screen'); };
+      
       document.getElementById("navSair").onclick = (e) => { 
         e.preventDefault(); 
-        if(confirm("Sair?")) window.location.reload(); 
+        if(confirm("Sair?")) { resetUI(); nav('login-screen'); } 
       };
 
-      // --- LÓGICA DO APP DE CONTAGEM ---
+      // --- LÓGICA DO CHATBOT NATIVO ---
+      const chatMessages = document.getElementById('chatMessages');
+      const chatInput = document.getElementById('chatInput');
+      const chatSendBtn = document.getElementById('chatSendBtn');
+      let isTyping = false;
+      
+      function formatTime() {
+        const now = new Date();
+        return now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      }
+      
+      function addMessage(text, isUser = false) {
+        const emptyState = document.querySelector('.chat-empty-state');
+        if (emptyState) emptyState.remove();
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'chat-message-avatar';
+        
+        if (!isUser) {
+           // *** AQUI A MUDANÇA: LOGO NO AVATAR ***
+           avatar.innerHTML = '<img src="logo.png?v=9" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">';
+           avatar.style.background = 'white';
+        } else {
+           avatar.textContent = 'Você';
+        }
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'chat-message-content';
+        contentDiv.innerHTML = text.replace(/\n/g, '<br>');
+        
+        const time = document.createElement('div');
+        time.className = 'chat-message-time';
+        time.textContent = formatTime();
+        
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'column';
+        
+        wrapper.appendChild(contentDiv);
+        wrapper.appendChild(time);
+        
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(wrapper);
+        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function showTypingIndicator() {
+        if (isTyping) return;
+        isTyping = true;
+        
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-message bot';
+        typingDiv.id = 'typingIndicator';
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'chat-message-avatar';
+        // *** AQUI TAMBÉM: LOGO NA ANIMAÇÃO ***
+        avatar.innerHTML = '<img src="logo.png?v=9" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">';
+        avatar.style.background = 'white';
+        
+        const indicator = document.createElement('div');
+        indicator.className = 'chat-typing-indicator';
+        indicator.innerHTML = '<div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div>';
+        
+        typingDiv.appendChild(avatar);
+        typingDiv.appendChild(indicator);
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+      
+      function hideTypingIndicator() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) {
+          indicator.remove();
+          isTyping = false;
+        }
+      }
+      
+      async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message || isTyping) return;
+        
+        addMessage(message, true);
+        chatInput.value = '';
+        chatSendBtn.disabled = true;
+        
+        showTypingIndicator();
+        
+        try {
+          let chatId = localStorage.getItem('chatSessionId');
+          if (!chatId) {
+            chatId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            localStorage.setItem('chatSessionId', chatId);
+          }
+          
+          const payload = { message: message, text: message, chatId: chatId, sessionId: chatId };
+          
+          const response = await fetch(N8N_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          
+          hideTypingIndicator();
+          
+          if (response.ok) {
+            const data = await response.json();
+            const botMessage = data.output || data.response || data.text || "Desculpe, não entendi.";
+            addMessage(botMessage, false);
+          } else {
+            addMessage("Erro no servidor da IA. Tente novamente.", false);
+          }
+        } catch (error) {
+          hideTypingIndicator();
+          addMessage("Erro de conexão com a IA.", false);
+        } finally {
+          chatSendBtn.disabled = false;
+          chatInput.focus();
+        }
+      }
+      
+      if (chatSendBtn && chatInput) {
+        chatSendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
+        });
+      }
+
+      // --- LÓGICA DO APP DE CONTAGEM (MANTIDA IGUAL) ---
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
-      
+      const MAX_MB = 30;
       const fileInput = document.getElementById("fileInput");
       const areaInput = document.getElementById("areaInput"); 
       const btnSend = document.getElementById("btnSend");
@@ -678,20 +845,44 @@
       const btnAgenda = document.getElementById("btnAgenda");
       let selectedFile = null;
       let myChart = null; 
-
       const formatterInt = new Intl.NumberFormat('pt-BR', { style: 'decimal', maximumFractionDigits: 0 });
       const formatterCurrency = new Intl.NumberFormat('pt-BR', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
       function renderChart(labels, dataPrices) {
         const ctx = document.getElementById('myChart').getContext('2d');
-        if (myChart) myChart.destroy();
+        if (myChart) {
+            myChart.destroy();
+        }
         myChart = new Chart(ctx, {
             type: 'line', 
-            data: { labels: labels, datasets: [{ label: 'Preço R$/KG (Tommy)', data: dataPrices, fill: true, borderColor: '#28a745', backgroundColor: 'rgba(40, 167, 69, 0.1)', tension: 0.1 }] },
-            options: { responsive: true, maintainAspectRatio: true, scales: { y: { ticks: { callback: function(value) { return 'R$ ' + value.toFixed(2); } } } } }
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Preço R$/KG (Tommy)',
+                    data: dataPrices,
+                    fill: false,
+                    borderColor: '#28a745', 
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: function(value, index, ticks) {
+                                return 'R$ ' + value.toFixed(2);
+                            }
+                        }
+                    }
+                }
+            }
         });
       }
-
+      function setStatus(s){ statusEl.textContent = s; }
+      function setProgress(p){ pbar.style.width = Math.min(100, Math.max(0, p)) + "%"; }
       function resetUI(){
         selectedFile = null; fileInput.value = ""; areaInput.value = ""; 
         btnSend.disabled = true; btnClear.disabled = true;
@@ -699,30 +890,41 @@
         previewVideo.src = ""; previewVideo.style.display = "none";
         previewImage.src = ""; previewImage.style.display = "none";
         areaInput.style.display = "none"; 
-        out.innerHTML = "—"; pbar.style.width = "0%";
-        statusEl.textContent = "aguardando ficheiro...";
+        out.innerHTML = "—"; 
+        setProgress(0);
+        setStatus("aguardando ficheiro (vídeo ou imagem)...");
       }
-
       function checkInputs() {
         const area = parseFloat(areaInput.value);
         const isVideo = selectedFile && selectedFile.type.startsWith("video/");
         const isImage = selectedFile && selectedFile.type.startsWith("image/");
         if ((isVideo && area > 0) || isImage) {
-          btnSend.disabled = false; statusEl.textContent = "Pronto para enviar.";
+          btnSend.disabled = false; setStatus("Pronto para enviar.");
         } else {
           btnSend.disabled = true;
         }
       }
-
       fileInput.addEventListener("change", (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
         const isVideo = file.type.startsWith("video/");
         const isImage = file.type.startsWith("image/");
-        if (!isVideo && !isImage) { alert("Erro: Apenas arquivos de VÍDEO ou IMAGEM são permitidos."); resetUI(); return; }
+        if (!isVideo && !isImage) {
+            setStatus("Erro: Apenas arquivos de VÍDEO ou IMAGEM são permitidos.");
+            fileInfo.textContent = "Erro: Apenas arquivos de VÍDEO ou IMAGEM.";
+            btnSend.disabled = true; btnClear.disabled = true; selectedFile = null;
+            previewVideo.style.display = "none"; previewImage.style.display = "none";
+            return;
+        }
         selectedFile = file;
-        fileInfo.textContent = `${file.name} • ${(file.size/1024/1024).toFixed(2)} MB`;
+        const mb = (file.size/1024/1024).toFixed(2);
+        fileInfo.textContent = `${file.name} • ${mb} MB`;
         btnClear.disabled = false;
+        if (file.size > MAX_MB*1024*1024) {
+          setStatus(`arquivo muito grande (> ${MAX_MB} MB)`); btnSend.disabled = true;
+        } else {
+          checkInputs();
+        }
         const previewURL = URL.createObjectURL(file);
         if (isVideo) {
           previewVideo.src = previewURL; previewVideo.style.display = "block";
@@ -736,300 +938,114 @@
       });
       areaInput.addEventListener("input", checkInputs); 
       btnClear.addEventListener("click", resetUI);
-
-      btnSend.addEventListener("click", async () => {
+      function gerarLinkAgenda(contagem, estimativa_kg, preco_hoje, preco_futuro) {
+          const dataIA = "20251215"; 
+          const titulo = "Melhor Dia Venda Manga (CyberAgro)";
+          const detalhes = `Contagem: ${contagem}.\nEstimativa: ${estimativa_kg} KG/HA.\n` +
+                           `Preço hoje: R$ ${preco_hoje.toFixed(2)}\n` +
+                           `Previsão (Dia 15): R$ ${preco_futuro.toFixed(2)}\n` +
+                           `Agendado via App CyberAgro.`;
+          const url = new URL("https://calendar.google.com/calendar/render");
+          url.searchParams.append('action', 'TEMPLATE');
+          url.searchParams.append('text', titulo);
+          url.searchParams.append('dates', `${dataIA}/${dataIA}`);
+          url.searchParams.append('details', detalhes);
+          window.open(url.href, '_blank'); 
+      }
+      btnSend.addEventListener("click", iniciarContagem);
+      async function iniciarContagem() {
         if (!selectedFile) return;
         btnSend.disabled = true;
-        statusEl.textContent = "Obtendo cotação...";
-        pbar.style.width = "10%";
+        setStatus("Passo 1/3: A obter cotação do dia...");
+        setProgress(10);
         let dados_preco;
         try {
-          const respPreco = await fetch(`mango_prices.json?v=${Date.now()}`);
-          if (!respPreco.ok) throw new Error();
+          const respPreco = await fetch(`mango_prices.json?v=${Date.now()}`); 
+          if (!respPreco.ok) throw new Error("Não foi possível buscar o arquivo de preços.");
           dados_preco = await respPreco.json();
-        } catch { dados_preco = { preco_kg: 1.86, peso_medio_g: 500 }; }
-
+        } catch (err) {
+          setStatus("Falha ao obter cotação. Usando valores padrão.");
+          dados_preco = { preco_kg: 1.86, peso_medio_g: 500 }; 
+        }
         const isVideoRequest = selectedFile.type.startsWith("video/");
-        let target_url = isVideoRequest ? API_URL_VIDEO : API_URL_IMAGEM;
-        statusEl.textContent = "Enviando para IA...";
-        pbar.style.width = "30%";
+        let target_url = ""; 
+        const area_video_m2 = parseFloat(areaInput.value);
+        if (isVideoRequest && (!area_video_m2 || area_video_m2 <= 0)) {
+            alert("Para vídeos, por favor, insira um valor válido para a área em metros quadrados (m²).");
+            resetUI();
+            return;
+        }
+        setStatus("Passo 2/3: Enviando para IA…");
+        setProgress(25);
         const form = new FormData();
-        form.append("video", selectedFile, selectedFile.name || "mediafile");
-
+        form.append("video", selectedFile, selectedFile.name || "mediafile"); 
+        if (isVideoRequest) { target_url = API_URL_VIDEO; } 
+        else { target_url = API_URL_IMAGEM; }
         try {
           const resp = await fetch(target_url, { method: "POST", body: form });
-          const text = await resp.text();
-          pbar.style.width = "100%";
+          setProgress(75);
+          const text = await resp.text().catch(()=> "");
+          setProgress(100);
           if (resp.ok) {
-            statusEl.textContent = "Concluído!";
-            const data = JSON.parse(text);
-            const contagem = data.contagem_final;
-            const area = parseFloat(areaInput.value);
-            const preco = dados_preco.preco_kg;
-            const peso = dados_preco.peso_medio_g / 1000;
-            let html = `TIPO: ${isVideoRequest ? "VÍDEO" : "IMAGEM"}\n`;
-            html += `CONTAGEM: ${contagem}\n\n`;
-            let kg_ha = 0;
-            if (isVideoRequest) {
-               const kg_m2 = (contagem * peso) / area;
-               kg_ha = Math.round(kg_m2 * M2_POR_HECTARE);
-               const qntd_ha = Math.round((contagem / area) * M2_POR_HECTARE);
-               html += `ESTIMATIVA (QNTD): ${formatterInt.format(qntd_ha)} MANGAS/HA\n`;
-               html += `ESTIMATIVA (KG/HA): ${formatterInt.format(kg_ha)} KG/HA\n`;
-               html += `FATURAMENTO: R$ ${formatterCurrency.format(kg_ha * preco)}`;
-            } else { html += "ESTIMATIVA: N/A (Requer vídeo)"; }
-            resultadoDetalhado.textContent = html;
-            const futuro = 2.50;
-            forecastMessage.textContent = `Hoje: R$ ${formatterCurrency.format(preco)}. Dia 15/12: R$ ${formatterCurrency.format(futuro)}. Venda recomendada!`;
-            btnAgenda.onclick = () => {
-               const url = new URL("https://calendar.google.com/calendar/render?action=TEMPLATE");
-               url.searchParams.append('text', "Venda Manga (CyberAgro)");
-               url.searchParams.append('details', html);
-               window.open(url.href, '_blank');
-            };
-            out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Ver Resultado</button>`;
-            document.getElementById("btnVerResultado").onclick = () => {
-               renderChart(['3/10','10/10','17/10','24/10','31/10','7/11'], [2.51, 1.26, 1.95, 1.88, 2.06, 1.86]);
-               nav('resultado-screen');
-            };
-          } else { statusEl.textContent = "Erro no processamento."; out.textContent = text; }
-        } catch (e) { statusEl.textContent = "Erro de rede."; } finally { btnSend.disabled = false; }
-      });
-      
-      // --- LÓGICA DO CHAT NATIVO COM WEBHOOK ---
-      const chatMessages = document.getElementById('chatMessages');
-      const chatInput = document.getElementById('chatInput');
-      const chatSendBtn = document.getElementById('chatSendBtn');
-      let isTyping = false;
-      
-      function formatTime() {
-        const now = new Date();
-        return now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      }
-      
-      function addMessage(text, isUser = false) {
-        // Remove empty state se existir
-        const emptyState = chatMessages.querySelector('.chat-empty-state');
-        if (emptyState) emptyState.remove();
-        
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
-        
-        const avatar = document.createElement('div');
-        avatar.className = 'chat-message-avatar';
-        avatar.textContent = isUser ? 'Você' : '🤖';
-        
-        const contentWrapper = document.createElement('div');
-        contentWrapper.style.display = 'flex';
-        contentWrapper.style.flexDirection = 'column';
-        contentWrapper.style.maxWidth = '100%';
-        
-        const content = document.createElement('div');
-        content.className = 'chat-message-content';
-        // Suporta quebras de linha e formatação básica
-        content.innerHTML = text.replace(/\n/g, '<br>');
-        
-        const time = document.createElement('div');
-        time.className = 'chat-message-time';
-        time.textContent = formatTime();
-        
-        contentWrapper.appendChild(content);
-        contentWrapper.appendChild(time);
-        
-        messageDiv.appendChild(avatar);
-        messageDiv.appendChild(contentWrapper);
-        chatMessages.appendChild(messageDiv);
-        
-        // Scroll suave para o final
-        setTimeout(() => {
-          chatMessages.scrollTo({
-            top: chatMessages.scrollHeight,
-            behavior: 'smooth'
-          });
-        }, 100);
-      }
-      
-      function showTypingIndicator() {
-        if (isTyping) return;
-        isTyping = true;
-        
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'chat-message bot';
-        typingDiv.id = 'typingIndicator';
-        
-        const avatar = document.createElement('div');
-        avatar.className = 'chat-message-avatar';
-        avatar.textContent = '🤖';
-        
-        const indicator = document.createElement('div');
-        indicator.className = 'chat-typing-indicator';
-        indicator.innerHTML = '<div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div>';
-        
-        typingDiv.appendChild(avatar);
-        typingDiv.appendChild(indicator);
-        chatMessages.appendChild(typingDiv);
-        
-        setTimeout(() => {
-          chatMessages.scrollTo({
-            top: chatMessages.scrollHeight,
-            behavior: 'smooth'
-          });
-        }, 100);
-      }
-      
-      function hideTypingIndicator() {
-        const indicator = document.getElementById('typingIndicator');
-        if (indicator) {
-          indicator.remove();
-          isTyping = false;
-        }
-      }
-      
-      async function sendMessage() {
-        const message = chatInput.value.trim();
-        if (!message || isTyping) return;
-        
-        // Adiciona mensagem do usuário
-        addMessage(message, true);
-        chatInput.value = '';
-        chatSendBtn.disabled = true;
-        
-        // Mostra indicador de digitação
-        showTypingIndicator();
-        
-        try {
-          // Obtém ou cria um chatId para manter a sessão
-          let chatId = localStorage.getItem('chatSessionId');
-          if (!chatId) {
-            chatId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            localStorage.setItem('chatSessionId', chatId);
-          }
-          
-          // Prepara o payload para o webhook do n8n
-          const payload = {
-            message: message,
-            text: message,
-            chatId: chatId,
-            sessionId: chatId
-          };
-          
-          console.log('Enviando para webhook:', N8N_CHAT_URL);
-          console.log('Payload:', payload);
-          
-          // Envia para o Webhook do n8n via HTTP POST
-          // O n8n webhook espera os dados no body da requisição
-          const response = await fetch(N8N_CHAT_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            mode: 'cors', // Permite CORS
-            credentials: 'omit', // Não envia cookies
-            body: JSON.stringify(payload)
-          });
-          
-          // Verifica se a requisição foi feita
-          if (!response) {
-            throw new Error('Nenhuma resposta recebida do servidor');
-          }
-          
-          console.log('Response status:', response.status);
-          console.log('Response headers:', response.headers);
-          
-          hideTypingIndicator();
-          
-          if (response.ok) {
-            let data;
-            const contentType = response.headers.get('content-type');
-            const responseText = await response.text();
-            
-            console.log('Response text:', responseText);
-            console.log('Content-Type:', contentType);
-            
-            if (contentType && contentType.includes('application/json')) {
-              try {
-                data = JSON.parse(responseText);
-                console.log('Response data:', data);
-              } catch (e) {
-                console.error('Erro ao parsear JSON:', e);
-                data = { output: responseText, response: responseText };
-              }
-            } else {
-              try {
-                data = JSON.parse(responseText);
-              } catch {
-                data = { output: responseText, response: responseText };
-              }
-            }
-            
-            // Webhook do n8n retorna em diferentes formatos
-            const botMessage = data.output || 
-                              data.response || 
-                              data.message || 
-                              data.text || 
-                              data.answer || 
-                              (typeof data === 'string' ? data : 'Desculpe, não consegui processar sua mensagem.');
-            
-            console.log('Mensagem extraída:', botMessage);
-            addMessage(botMessage, false);
-            
-            // Atualiza chatId se fornecido na resposta
-            if (data.chatId) {
-              localStorage.setItem('chatSessionId', data.chatId);
-            }
-          } else {
-            const errorText = await response.text();
-            console.error('Erro HTTP:', response.status, errorText);
-            
-            let errorMessage = 'Desculpe, ocorreu um erro ao processar sua mensagem.';
-            
+            setStatus("OK! Contagem recebida!");
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             try {
-              const errorData = JSON.parse(errorText);
-              errorMessage = errorData.message || errorData.error || errorMessage;
-              console.error('Erro parseado:', errorData);
-            } catch {
-              if (errorText) {
-                console.error('Erro detalhado (texto):', errorText);
+              const data = JSON.parse(text);
+              const contagem_api = data.contagem_final; 
+              const preco_hoje = dados_preco.preco_kg; 
+              const preco_futuro_ficticio = 2.50; 
+              let kg_por_hectare_raw = 0;
+              if (isVideoRequest) {
+                const peso_medio_kg = dados_preco.peso_medio_g / 1000;
+                const kg_por_m2 = (contagem_api * peso_medio_kg) / area_video_m2;
+                kg_por_hectare_raw = Math.round(kg_por_m2 * M2_POR_HECTARE);
+                const faturamento_ha_raw = (kg_por_hectare_raw * preco_hoje);
+                
+                const mangas_por_m2 = contagem_api / area_video_m2;
+                const mangas_por_hectare_raw = Math.round(mangas_por_m2 * M2_POR_HECTARE);
+                const mangas_por_hectare_formatado = formatterInt.format(mangas_por_hectare_raw);
+                
+                const kg_por_hectare_formatado = formatterInt.format(kg_por_hectare_raw);
+                const faturamento_ha_formatado = formatterCurrency.format(faturamento_ha_raw);
+                
+                resultadoDetalhado.textContent = "TIPO: VÍDEO\n";
+                resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
+                resultadoDetalhado.textContent += "ESTIMATIVA (QNTD): " + mangas_por_hectare_formatado + " MANGAS/HA\n";
+                resultadoDetalhado.textContent += "ESTIMATIVA (KG/HA): " + kg_por_hectare_formatado + " KG/HA\n";
+                resultadoDetalhado.textContent += "FATURAMENTO (R$/HA): R$ " + faturamento_ha_formatado;
+                
+              } else {
+                resultadoDetalhado.textContent = "TIPO: IMAGEM\n";
+                resultadoDetalhado.textContent += "RESULTADO DA CONTAGEM: " + contagem_api + "\n\n";
+                resultadoDetalhado.textContent += "ESTIMATIVA DE PRODUTIVIDADE: N/A";
               }
+              const forecastMsg = `A manga está cotada em R$ ${formatterCurrency.format(preco_hoje)} hoje. Porém dia 15/12/2025, a manga estará cotada em R$ ${formatterCurrency.format(preco_futuro_ficticio)}. Será o melhor dia para venda!`;
+              forecastMessage.textContent = forecastMsg;
+              btnAgenda.onclick = () => {
+                  gerarLinkAgenda(contagem_api, kg_por_hectare_raw, preco_hoje, preco_futuro_ficticio);
+              };
+              out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Ver Resultado</button>`;
+              document.getElementById("btnVerResultado").onclick = () => {
+                renderChart(['3/10','10/10','17/10','24/10','31/10','7/11'], [2.51, 1.26, 1.95, 1.88, 2.06, 1.86]);
+                navigateTo(resultadoScreen); 
+              };
+            } catch (e) {
+              out.textContent = "Erro ao ler o JSON: " + text;
             }
-            
-            addMessage(`Erro ${response.status}: ${errorMessage}. Tente novamente.`, false);
-          }
-        } catch (error) {
-          hideTypingIndicator();
-          console.error('Erro completo no chat:', error);
-          console.error('Stack trace:', error.stack);
-          
-          let errorMsg = 'Erro de conexão. ';
-          if (error.message) {
-            errorMsg += error.message;
-          } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            errorMsg += 'Não foi possível conectar ao servidor. Verifique se o webhook está ativo no n8n.';
           } else {
-            errorMsg += 'Verifique sua internet e tente novamente.';
+            setStatus(`erro ${resp.status}`);
+            out.textContent = text || "Sem corpo de resposta.";
           }
-          
-          addMessage(errorMsg, false);
+        } catch (err) {
+          setStatus("falha de rede");
+          out.textContent = String(err);
         } finally {
-          chatSendBtn.disabled = false;
-          chatInput.focus();
+          btnSend.disabled = false;
         }
-      }
-      
-      // Event listeners do chat
-      if (chatSendBtn && chatInput) {
-        chatSendBtn.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', (e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-          }
-        });
-      }
+      } 
       
       // Funções Globais para os botões onclick do HTML
-      window.nav = nav;
+      window.nav = navigateTo;
       window.resetUI = resetUI;
     });
   </script>
