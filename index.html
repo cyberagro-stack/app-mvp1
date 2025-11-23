@@ -11,7 +11,7 @@
       navigator.serviceWorker.register('/app-mvp1/sw.js')
         .then(reg => {
             reg.update();
-            console.log('Service Worker Registrado v11'); // Atualizei versão para forçar refresh
+            console.log('Service Worker Registrado v13');
         })
         .catch(err => console.log('Service Worker falhou:', err));
     }
@@ -63,7 +63,7 @@
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
         background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
-        z-index: 900;
+        z-index: 2000; /* Garante que fica acima de tudo */
         display: flex;
         flex-direction: column;
         height: 100vh;
@@ -135,22 +135,9 @@
         background: transparent;
     }
     
-    .chat-messages::-webkit-scrollbar {
-        width: 6px;
-    }
-    
-    .chat-messages::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    
-    .chat-messages::-webkit-scrollbar-thumb {
-        background: rgba(0,0,0,0.2);
-        border-radius: 10px;
-    }
-    
-    .chat-messages::-webkit-scrollbar-thumb:hover {
-        background: rgba(0,0,0,0.3);
-    }
+    .chat-messages::-webkit-scrollbar { width: 6px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
     
     .chat-message {
         display: flex;
@@ -166,31 +153,17 @@
     }
     
     @keyframes messageSlideIn {
-        from {
-            opacity: 0;
-            transform: translateY(15px) scale(0.95);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
+        from { opacity: 0; transform: translateY(15px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
     
     .chat-message-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
+        width: 40px; height: 40px; border-radius: 50%;
         background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 600;
-        flex-shrink: 0;
-        font-size: 0.85rem;
-        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
-        border: 2px solid white;
-        overflow: hidden; 
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-weight: 600; flex-shrink: 0;
+        font-size: 0.85rem; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        border: 2px solid white; overflow: hidden; 
     }
     
     .chat-message.user .chat-message-avatar {
@@ -209,167 +182,61 @@
     }
     
     .chat-message.bot .chat-message-content {
-        background: white;
-        color: #2c3e50;
-        border-bottom-left-radius: 6px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        background: white; color: #2c3e50; border-bottom-left-radius: 6px;
     }
     
     .chat-message.user .chat-message-content {
         background: linear-gradient(135deg, #2a7bf6 0%, #1e5fd4 100%);
-        color: white;
-        border-bottom-right-radius: 6px;
-        box-shadow: 0 4px 12px rgba(42, 123, 246, 0.25);
+        color: white; border-bottom-right-radius: 6px;
     }
     
     .chat-message-time {
-        font-size: 0.7rem;
-        opacity: 0.6;
-        margin-top: 4px;
-        padding-left: 2px;
+        font-size: 0.7rem; opacity: 0.6; margin-top: 4px; padding-left: 2px;
     }
     
     .chat-input-container {
-        background: white;
-        border-top: 1px solid rgba(0,0,0,0.08);
-        padding: 16px 20px;
-        display: flex;
-        gap: 12px;
-        align-items: center;
+        background: white; border-top: 1px solid rgba(0,0,0,0.08);
+        padding: 16px 20px; display: flex; gap: 12px; align-items: center;
         box-shadow: 0 -2px 12px rgba(0,0,0,0.05);
     }
     
     .chat-input {
-        flex: 1;
-        border: 2px solid #e9ecef;
-        border-radius: 26px;
-        padding: 12px 20px;
-        font-size: 0.95rem;
-        outline: none;
-        transition: all 0.2s ease;
-        font-family: inherit;
-        background: #f8f9fa;
+        flex: 1; border: 2px solid #e9ecef; border-radius: 26px;
+        padding: 12px 20px; font-size: 0.95rem; outline: none;
+        transition: all 0.2s ease; font-family: inherit; background: #f8f9fa;
     }
     
-    .chat-input:focus {
-        border-color: #28a745;
-        background: white;
-        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
-    }
+    .chat-input:focus { border-color: #28a745; background: white; }
     
     .chat-send-btn {
         background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        color: white;
-        border: none;
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-        font-weight: 600;
-    }
-    
-    .chat-send-btn:hover:not(:disabled) {
-        transform: scale(1.08);
-        box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
-    }
-    
-    .chat-send-btn:active:not(:disabled) {
-        transform: scale(1.02);
-    }
-    
-    .chat-send-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: scale(1);
+        color: white; border: none; width: 48px; height: 48px;
+        border-radius: 50%; cursor: pointer; display: flex;
+        align-items: center; justify-content: center; font-size: 1.2rem;
+        transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
     }
     
     .chat-typing-indicator {
-        display: flex;
-        gap: 5px;
-        padding: 14px 18px;
-        background: white;
-        border-radius: 20px;
-        border-bottom-left-radius: 6px;
-        max-width: 70px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex; gap: 5px; padding: 14px 18px; background: white;
+        border-radius: 20px; border-bottom-left-radius: 6px; max-width: 70px;
     }
     
     .chat-typing-dot {
-        width: 9px;
-        height: 9px;
-        background: #adb5bd;
-        border-radius: 50%;
+        width: 9px; height: 9px; background: #adb5bd; border-radius: 50%;
         animation: typingBounce 1.4s infinite;
     }
-    
-    .chat-typing-dot:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-    
-    .chat-typing-dot:nth-child(3) {
-        animation-delay: 0.4s;
-    }
-    
-    @keyframes typingBounce {
-        0%, 60%, 100% {
-            transform: translateY(0);
-            opacity: 0.7;
-        }
-        30% {
-            transform: translateY(-12px);
-            opacity: 1;
-        }
-    }
+    .chat-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .chat-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.7; } 30% { transform: translateY(-12px); opacity: 1; } }
     
     .chat-empty-state {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        color: #6c757d;
-        text-align: center;
-        padding: 60px 20px;
+        flex: 1; display: flex; flex-direction: column; align-items: center;
+        justify-content: center; color: #6c757d; text-align: center; padding: 60px 20px;
     }
     
-    .chat-empty-state-icon {
-        font-size: 4rem;
-        margin-bottom: 20px;
-        opacity: 0.4;
-        filter: grayscale(0.3);
-    }
+    .chat-empty-state-icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.4; filter: grayscale(0.3); }
+    .chat-empty-state-text { font-size: 1.05rem; color: #6c757d; font-weight: 500; max-width: 280px; }
     
-    .chat-empty-state-text {
-        font-size: 1.05rem;
-        color: #6c757d;
-        font-weight: 500;
-        max-width: 280px;
-        line-height: 1.6;
-    }
-    
-    @media (max-width: 480px) {
-        .chat-message {
-            max-width: 90%;
-        }
-        
-        .chat-header {
-            padding: 16px 16px;
-        }
-        
-        .chat-messages {
-            padding: 20px 16px;
-        }
-        
-        .chat-input-container {
-            padding: 14px 16px;
-        }
-    }
     /* ----------------------------- */
 
     /* Rodapé começa oculto */
@@ -391,27 +258,22 @@
       box-sizing: border-box;
       padding: 10px; 
     }
-
-    .footer-btn {
-      flex: 1; text-align: center; padding: 10px 5px;
-      font-size: 0.8rem; text-decoration: none; color: #888888; 
-      background: none; border: none;
+    /* Correção para o clique no botão de chat */
+    .chat-fab img {
+        width: 100%; height: 100%; object-fit: cover; display: block;
+        pointer-events: none; /* AQUI ESTÁ O SEGREDO DO CLIQUE */
     }
+
+    .footer-btn { flex: 1; text-align: center; padding: 10px 5px; font-size: 0.8rem; text-decoration: none; color: #888888; background: none; border: none; }
     .footer-btn.active { color: #28a745; font-weight: 600; }
     
     .footer-btn-central {
-      background: #000000; color: white;
-      width: 60px; height: 60px;
-      text-align: center; text-decoration: none;
-      border-radius: 50%;
-      position: relative; top: -20px;
-      box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
-      border: 4px solid white; 
-      padding: 0; box-sizing: border-box; overflow: hidden;
+      background: #000000; color: white; width: 60px; height: 60px;
+      text-align: center; text-decoration: none; border-radius: 50%;
+      position: relative; top: -20px; box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
+      border: 4px solid white; padding: 0; box-sizing: border-box; overflow: hidden;
     }
     .footer-btn-central img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    
-    .chat-fab img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     #agenda-section { margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px; }
     #grafico-placeholder { width: 100%; height: 250px; background: #EEEEEE; border-radius: 12px; }
@@ -440,7 +302,6 @@
     .menu-icon { font-size: 1.2rem; margin-right: 16px; width: 24px; text-align: center; }
     .menu-chevron { margin-left: auto; color: #AAA; font-weight: 600; }
     
-    /* Helper */
     .hide { display: none !important; }
   </style>
 </head>
@@ -581,7 +442,7 @@
     </div>
   </div>
 
-  <div class="app-footer">
+  <div class="app-footer" style="display:none;"> 
     <a onclick="nav('dashboard-screen')" class="footer-btn active">Início</a>
     <a onclick="nav('resultado-screen')" class="footer-btn">Relatórios</a>
     <a onclick="nav('app-screen')" class="footer-btn-central">
@@ -591,7 +452,7 @@
     <a onclick="nav('perfil-screen')" class="footer-btn">Perfil</a>
   </div>
   
-  <button id="btnChat" class="chat-fab" onclick="nav('chat-screen')">
+  <button id="btnChat" class="chat-fab" style="display:none;" onclick="nav('chat-screen')">
     <img src="imagem2.png" alt="Chat">
   </button>
 
@@ -623,16 +484,18 @@
       const btnIconeUva = document.getElementById("btnIconeUva");
       const btnIconePitaya = document.getElementById("btnIconePitaya");
       
-      // Navegação Centralizada
-      function nav(telaId) {
+      // Navegação Centralizada (Exportada para o window para funcionar no onclick)
+      window.nav = function(telaId) {
         // Esconde todas as telas
         const telas = [loginScreen, selecaoCulturaScreen, dashboardScreen, appScreen, resultadoScreen, chatScreen, perfilScreen];
         telas.forEach(s => s.classList.add('hide'));
         
         // Mostra a tela desejada
         const telaAtual = document.getElementById(telaId);
-        telaAtual.classList.remove('hide');
-        telaAtual.style.display = (telaId === 'chat-screen') ? 'flex' : 'block';
+        if (telaAtual) {
+            telaAtual.classList.remove('hide');
+            telaAtual.style.display = (telaId === 'chat-screen') ? 'flex' : 'block';
+        }
         
         // Lógica Rodapé/Chat
         if (telaId === 'login-screen' || telaId === 'selecao-cultura-screen') {
@@ -652,19 +515,31 @@
           btnChat.style.display = 'block';
           btnChat.style.pointerEvents = 'auto';
         }
-      }
+      };
       
+      // Função de Reset UI (Exportada)
+      window.resetUI = function() {
+        selectedFile = null; fileInput.value = ""; areaInput.value = ""; 
+        btnSend.disabled = true; btnClear.disabled = true;
+        fileInfo.textContent = "Nenhum ficheiro selecionado.";
+        previewVideo.src = ""; previewVideo.style.display = "none";
+        previewImage.src = ""; previewImage.style.display = "none";
+        areaInput.style.display = "none"; 
+        out.innerHTML = "—"; pbar.style.width = "0%";
+        statusEl.textContent = "aguardando ficheiro...";
+      };
+
       // Inicialização
-      nav('login-screen');
+      window.nav('login-screen');
 
       // --- Eventos ---
       loginButton.onclick = () => { 
-          if (passwordInput.value === SENHA_SECRETA) nav('selecao-cultura-screen'); 
+          if (passwordInput.value === SENHA_SECRETA) window.nav('selecao-cultura-screen'); 
           else loginError.style.display = "block"; 
       };
       passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") loginButton.click(); });
 
-      btnIconeManga.onclick = () => nav('dashboard-screen');
+      btnIconeManga.onclick = () => window.nav('dashboard-screen');
       btnIconeUva.onclick = () => alert("Em breve!");
       btnIconePitaya.onclick = () => alert("Em breve!");
       
@@ -677,19 +552,19 @@
       const navRanking = document.getElementById("navRanking");
       const navPerfil = document.getElementById("navPerfil");
 
-      btnNovaContagem.onclick = (e) => { e.preventDefault(); nav('app-screen'); };
-      navInicio.onclick = (e) => { e.preventDefault(); nav('dashboard-screen'); };
-      navRelatorios.onclick = (e) => { e.preventDefault(); nav('resultado-screen'); };
-      navPerfil.onclick = (e) => { e.preventDefault(); nav('perfil-screen'); };
+      btnNovaContagem.onclick = (e) => { e.preventDefault(); window.nav('app-screen'); };
+      navInicio.onclick = (e) => { e.preventDefault(); window.nav('dashboard-screen'); };
+      navRelatorios.onclick = (e) => { e.preventDefault(); window.nav('resultado-screen'); };
+      navPerfil.onclick = (e) => { e.preventDefault(); window.nav('perfil-screen'); };
       navRanking.onclick = (e) => { e.preventDefault(); alert("Ranking em breve"); };
       
-      btnVoltarDashboard.onclick = (e) => { e.preventDefault(); nav('dashboard-screen'); resetUI(); };
-      btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); nav('dashboard-screen'); resetUI(); };
-      btnVoltarDashboardChat.onclick = (e) => { e.preventDefault(); nav('dashboard-screen'); };
+      btnVoltarDashboard.onclick = (e) => { e.preventDefault(); window.nav('dashboard-screen'); window.resetUI(); };
+      btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); window.nav('dashboard-screen'); window.resetUI(); };
+      btnVoltarDashboardChat.onclick = (e) => { e.preventDefault(); window.nav('dashboard-screen'); };
       
       document.getElementById("navSair").onclick = (e) => { 
         e.preventDefault(); 
-        if(confirm("Sair?")) { resetUI(); nav('login-screen'); } 
+        if(confirm("Sair?")) { window.resetUI(); window.nav('login-screen'); } 
       };
 
       // --- LÓGICA DO CHATBOT NATIVO ---
@@ -714,7 +589,7 @@
         avatar.className = 'chat-message-avatar';
         
         if (!isUser) {
-           // *** SUBSTITUIÇÃO DO ROBÔ PELA LOGO ***
+           // *** AQUI A MUDANÇA: LOGO NO AVATAR ***
            avatar.innerHTML = '<img src="logo.png?v=9" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">';
            avatar.style.background = 'white';
         } else {
@@ -753,7 +628,7 @@
         
         const avatar = document.createElement('div');
         avatar.className = 'chat-message-avatar';
-        // *** LOGO NA ANIMAÇÃO DE DIGITAR ***
+        // *** AQUI TAMBÉM: LOGO NA ANIMAÇÃO ***
         avatar.innerHTML = '<img src="logo.png?v=9" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">';
         avatar.style.background = 'white';
         
@@ -832,23 +707,12 @@
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
-      const fileInput = document.getElementById("fileInput");
-      const areaInput = document.getElementById("areaInput"); 
-      const btnSend = document.getElementById("btnSend");
-      const btnClear = document.getElementById("btnClear");
-      const out = document.getElementById("out");
-      const statusEl = document.getElementById("status");
-      const pbar = document.getElementById("pbar");
-      const fileInfo = document.getElementById("fileInfo");
-      const previewVideo = document.getElementById("previewVideo");
-      const previewImage = document.getElementById("previewImage");
-      const resultadoDetalhado = document.getElementById("resultado-detalhado");
-      const forecastMessage = document.getElementById("forecast-message");
+      
       const btnAgenda = document.getElementById("btnAgenda");
-      let selectedFile = null;
-      let myChart = null; 
+
       const formatterInt = new Intl.NumberFormat('pt-BR', { style: 'decimal', maximumFractionDigits: 0 });
       const formatterCurrency = new Intl.NumberFormat('pt-BR', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
       function renderChart(labels, dataPrices) {
         const ctx = document.getElementById('myChart').getContext('2d');
         if (myChart) {
@@ -883,83 +747,12 @@
             }
         });
       }
-      function setStatus(s){ statusEl.textContent = s; }
-      function setProgress(p){ pbar.style.width = Math.min(100, Math.max(0, p)) + "%"; }
-      function resetUI(){
-        selectedFile = null; fileInput.value = ""; areaInput.value = ""; 
-        btnSend.disabled = true; btnClear.disabled = true;
-        fileInfo.textContent = "Nenhum ficheiro selecionado.";
-        previewVideo.src = ""; previewVideo.style.display = "none";
-        previewImage.src = ""; previewImage.style.display = "none";
-        areaInput.style.display = "none"; 
-        out.innerHTML = "—"; 
-        setProgress(0);
-        setStatus("aguardando ficheiro (vídeo ou imagem)...");
-      }
-      function checkInputs() {
-        const area = parseFloat(areaInput.value);
-        const isVideo = selectedFile && selectedFile.type.startsWith("video/");
-        const isImage = selectedFile && selectedFile.type.startsWith("image/");
-        if ((isVideo && area > 0) || isImage) {
-          btnSend.disabled = false; setStatus("Pronto para enviar.");
-        } else {
-          btnSend.disabled = true;
-        }
-      }
-      fileInput.addEventListener("change", (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (!file) return;
-        const isVideo = file.type.startsWith("video/");
-        const isImage = file.type.startsWith("image/");
-        if (!isVideo && !isImage) {
-            setStatus("Erro: Apenas arquivos de VÍDEO ou IMAGEM são permitidos.");
-            fileInfo.textContent = "Erro: Apenas arquivos de VÍDEO ou IMAGEM.";
-            btnSend.disabled = true; btnClear.disabled = true; selectedFile = null;
-            previewVideo.style.display = "none"; previewImage.style.display = "none";
-            return;
-        }
-        selectedFile = file;
-        const mb = (file.size/1024/1024).toFixed(2);
-        fileInfo.textContent = `${file.name} • ${mb} MB`;
-        btnClear.disabled = false;
-        if (file.size > MAX_MB*1024*1024) {
-          setStatus(`arquivo muito grande (> ${MAX_MB} MB)`); btnSend.disabled = true;
-        } else {
-          checkInputs();
-        }
-        const previewURL = URL.createObjectURL(file);
-        if (isVideo) {
-          previewVideo.src = previewURL; previewVideo.style.display = "block";
-          previewImage.style.display = "none"; areaInput.style.display = "block"; 
-          previewVideo.play().catch(()=>{});
-        } else {
-          previewImage.src = previewURL; previewImage.style.display = "block";
-          previewVideo.style.display = "none"; areaInput.style.display = "none"; 
-          areaInput.value = ""; checkInputs(); 
-        }
-      });
-      areaInput.addEventListener("input", checkInputs); 
-      btnClear.addEventListener("click", resetUI);
-      function gerarLinkAgenda(contagem, estimativa_kg, preco_hoje, preco_futuro) {
-          const dataIA = "20251215"; 
-          const titulo = "Melhor Dia Venda Manga (CyberAgro)";
-          const detalhes = `Contagem: ${contagem}.\nEstimativa: ${estimativa_kg} KG/HA.\n` +
-                           `Preço hoje: R$ ${preco_hoje.toFixed(2)}\n` +
-                           `Previsão (Dia 15): R$ ${preco_futuro.toFixed(2)}\n` +
-                           `Agendado via App CyberAgro.`;
-          const url = new URL("https://calendar.google.com/calendar/render");
-          url.searchParams.append('action', 'TEMPLATE');
-          url.searchParams.append('text', titulo);
-          url.searchParams.append('dates', `${dataIA}/${dataIA}`);
-          url.searchParams.append('details', detalhes);
-          window.open(url.href, '_blank'); 
-      }
-      btnSend.addEventListener("click", iniciarContagem);
-      async function iniciarContagem() {
+      
+      btnSend.addEventListener("click", async () => {
         if (!selectedFile) return;
         btnSend.disabled = true;
-        setStatus("Passo 1/3: A obter cotação do dia...");
-        setProgress(10);
+        statusEl.textContent = "Obtendo cotação...";
+        pbar.style.width = "10%";
         let dados_preco;
         try {
           const respPreco = await fetch(`mango_prices.json?v=${Date.now()}`); 
@@ -1029,7 +822,7 @@
               out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Ver Resultado</button>`;
               document.getElementById("btnVerResultado").onclick = () => {
                 renderChart(['3/10','10/10','17/10','24/10','31/10','7/11'], [2.51, 1.26, 1.95, 1.88, 2.06, 1.86]);
-                navigateTo(resultadoScreen); 
+                window.nav('resultado-screen'); 
               };
             } catch (e) {
               out.textContent = "Erro ao ler o JSON: " + text;
@@ -1045,11 +838,8 @@
           btnSend.disabled = false;
         }
       } 
-      
-      // Funções Globais para os botões onclick do HTML
-      window.nav = nav;
-      window.resetUI = resetUI;
-    });
+      ); // Fechamento do listener do btnSend
+    }); // Fechamento do DOMContentLoaded
   </script>
 </body>
 </html>
