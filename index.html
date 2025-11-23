@@ -9,273 +9,491 @@
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/app-mvp1/sw.js')
-        .then(reg => { reg.update(); console.log('Service Worker v9'); })
-        .catch(console.log);
+        .then(reg => {
+            reg.update();
+            console.log('Service Worker Registrado v10');
+        })
+        .catch(err => console.log('Service Worker falhou:', err));
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
-    /* ESTILOS BASE */
-    :root { font-family: system-ui, -apple-system, sans-serif; }
-    body { margin: 0 0 80px 0; background: #FFF; color: #333; height: 100vh; overflow-x: hidden; }
+    /* --- ESTILOS GERAIS --- */
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
+    body { margin: 0 0 80px 0; background: #FFFFFF; color: #333333; height: 100vh; overflow-x: hidden; }
     .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
-    .card { background: #F8F8F8; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    
-    /* BOTÕES & INPUTS */
-    button { background: #2a7bf6; color: white; border: 0; border-radius: 12px; padding: 12px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 10px; }
-    button:disabled { opacity: 0.6; }
-    input { width: 100%; padding: 12px; border: 1px solid #DDD; border-radius: 12px; box-sizing: border-box; margin-bottom: 10px; }
-    .btn-upload { display: block; background: #E6EEFA; color: #2a7bf6; border: 1px dashed #2a7bf6; text-align: center; padding: 20px; border-radius: 12px; margin-bottom: 10px; }
-
-    /* SELEÇÃO DE CULTURA */
-    .cultura-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 20px; }
-    .cultura-item { background: #FFF; border: 1px solid #EEE; border-radius: 12px; padding: 15px 5px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
-    .cultura-item img { width: 50px; height: 50px; object-fit: contain; margin-bottom: 5px; }
-    .cultura-item span { font-size: 0.85rem; font-weight: 600; }
-
-    /* FOOTER & CHAT FAB */
-    .app-footer { position: fixed; bottom: 0; left: 0; right: 0; background: #FFF; border-top: 1px solid #EEE; display: none; justify-content: space-around; align-items: center; height: 60px; z-index: 999; }
-    .footer-btn { flex: 1; text-align: center; font-size: 0.8rem; color: #888; text-decoration: none; background: none; border: none; padding: 5px; }
-    .footer-btn.active { color: #28a745; font-weight: bold; }
-    
-    .footer-btn-central { width: 60px; height: 60px; border-radius: 50%; background: #000; position: relative; top: -20px; border: 4px solid #FFF; overflow: hidden; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); padding: 0; }
-    .footer-btn-central img { width: 100%; height: 100%; object-fit: cover; }
-
-    .chat-fab { position: fixed; bottom: 80px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: #28a745; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; display: none; padding: 0; overflow: hidden; }
-    .chat-fab img { width: 100%; height: 100%; object-fit: cover; }
-
-    /* IFRAME DO CHAT (ESTILO NOVO) */
-    .chat-iframe-container {
-        position: fixed; top: 0; left: 0; right: 0; bottom: 60px; /* Deixa espaço pro footer */
-        background: #FFF; z-index: 900;
+    .card { background: #F8F8F8; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    button { background: #2a7bf6; color: white; border: 0; border-radius: 12px; padding: 12px 16px; font-weight: 600; cursor: pointer; }
+    button[disabled] { opacity: .6; cursor: not-allowed; }
+    .muted { color: #555555; font-size: .9rem; text-align: center; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; word-break: break-word; color: #333333; }
+    h3 { margin-top: 20px; margin-bottom: 10px; }
+    .btn-upload { position: relative; display: inline-block; background: #E6EEFA; color: #2a7bf6; border: 1px dashed #2a7bf6; }
+    .file-proxy { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .area-input { font-family: inherit; font-size: 1rem; padding: 10px 14px; border: 1px solid #E0E0E0; border-radius: 12px; background: #FFFFFF; flex-grow: 1; min-width: 150px; }
+    .progress { height: 6px; background: #E0E0E0; border-radius: 999px; overflow: hidden; }
+    .bar { height: 100%; width: 0%; background: #2a7bf6; transition: width .2s; }
+    #previewVideo, #previewImage { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
+    .login-error { color: #D32F2F; font-size: 0.9rem; text-align: center; margin-top: 10px; display: none; }
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .summary-card { background: #EEEEEE; border: 1px solid #E0E0E0; border-radius: 16px; padding: 16px; }
+    .summary-card label { display: block; font-size: 0.8rem; color: #555555; margin-bottom: 4px; text-transform: uppercase; }
+    .summary-card .value { font-size: 1.25rem; font-weight: 600; color: #333; }
+    .data-list { list-style: none; padding: 0; margin: 0; }
+    .data-row { display: flex; justify-content: space-between; padding: 14px 8px; border-bottom: 1px solid #EEE; font-size: 0.9rem; }
+    .data-row span:first-child { color: #333; }
+    .data-row span:last-child { color: #555; font-weight: 500; }
+    .btn-nova-contagem {
+      background: #28a745; /* Verde */
+      color: white;
+      border: 0;
+      border-radius: 12px;
+      padding: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1.1rem;
+      margin-top: 20px;
     }
-    iframe { border: none; width: 100%; height: 100%; }
+    
+    /* --- IFRAME DO CHAT (NOVO) --- */
+    .chat-frame-container {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 60px; /* Espaço pro rodapé */
+        background: #FFF;
+        z-index: 900;
+        display: flex;
+        flex-direction: column;
+    }
+    .chat-iframe {
+        flex-grow: 1;
+        border: none;
+        width: 100%;
+        height: 100%;
+    }
+    .chat-header-btn {
+        position: absolute; top: 10px; left: 10px; 
+        background: rgba(0,0,0,0.5); color: white; 
+        padding: 8px 12px; border-radius: 8px; 
+        font-size: 0.8rem; text-decoration: none;
+        z-index: 910; cursor: pointer;
+    }
+    /* ----------------------------- */
 
-    /* Helpers */
+    /* Rodapé começa oculto */
+    .app-footer {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #FFFFFF; border-top: 1px solid #E0E0E0;
+      display: none;
+      justify-content: space-around; align-items: center;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 999;
+      padding: 0 10px; height: 60px;
+    }
+
+    /* Chat começa oculto */
+    .chat-fab {
+      position: fixed; bottom: 90px; right: 20px; background: #28a745;
+      color: white; width: 50px; height: 50px; border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; 
+      display: none;
+      box-sizing: border-box;
+      padding: 10px; 
+    }
+
+    .footer-btn {
+      flex: 1; text-align: center; padding: 10px 5px;
+      font-size: 0.8rem; text-decoration: none; color: #888888; 
+      background: none; border: none;
+    }
+    .footer-btn.active { color: #28a745; font-weight: 600; }
+    
+    .footer-btn-central {
+      background: #000000; color: white;
+      width: 60px; height: 60px;
+      text-align: center; text-decoration: none;
+      border-radius: 50%;
+      position: relative; top: -20px;
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
+      border: 4px solid white; 
+      padding: 0; box-sizing: border-box; overflow: hidden;
+    }
+    .footer-btn-central img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    
+    .chat-fab img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    #agenda-section { margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px; }
+    #grafico-placeholder { width: 100%; height: 250px; background: #EEEEEE; border-radius: 12px; }
+    
+    /* CSS da Seleção de Cultura */
+    .cultura-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 20px; }
+    .cultura-btn {
+      background: #F8F8F8; border: 1px solid #E0E0E0; border-radius: 12px;
+      padding: 15px 5px; text-decoration: none; color: #333;
+      font-size: 0.8rem; font-weight: 600; text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .cultura-btn:hover { transform: translateY(-4px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+    .cultura-btn img { width: 50px; height: 50px; object-fit: contain; margin-bottom: 8px; }
+    
+    /* Estilos Perfil */
+    .profile-header { display: flex; align-items: center; gap: 16px; }
+    .profile-pic { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #DDD; }
+    .profile-name { font-size: 1.2rem; font-weight: 600; color: #333; }
+    .profile-subtitle { font-size: 0.9rem; color: #555; }
+    .menu-list { margin-top: 20px; padding: 0; }
+    .menu-item { display: flex; align-items: center; padding: 16px; text-decoration: none; color: #333; font-size: 1rem; border-bottom: 1px solid #EEE; }
+    .menu-item:last-child { border-bottom: none; }
+    .menu-item.danger { color: #D32F2F; } 
+    .menu-icon { font-size: 1.2rem; margin-right: 16px; width: 24px; text-align: center; }
+    .menu-chevron { margin-left: auto; color: #AAA; font-weight: 600; }
+    
+    /* Helper */
     .hide { display: none !important; }
-    #previewVideo, #previewImage { width: 100%; border-radius: 12px; display: none; margin-top: 10px; }
   </style>
 </head>
 <body>
 
-  <div id="screen-login" class="wrap">
-    <div style="text-align:center; margin-bottom:20px;"><img src="logo.png?v=9" height="200"></div>
+  <div id="login-screen" class="wrap">
+    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=7" alt="CyberAgro Logo" height="250"></h1>
     <div class="card">
-      <h3 style="text-align:center">Acesso Restrito</h3>
-      <input type="password" id="inputSenha" placeholder="Senha de acesso">
-      <button id="btnLogin">Entrar</button>
-      <p id="msgErro" style="color:red; text-align:center; display:none; margin-top:10px;">Senha incorreta.</p>
+      <h3 style="text-align: center;">Acesso Restrito</h3>
+      <p class="muted" style="text-align: left;">Insira a senha de acesso para continuar.</p>
+      <input type="password" id="passwordInput" placeholder="Senha" class="area-input" style="width:100%; box-sizing: border-box;">
+      <p id="loginError" class="login-error">Senha incorreta. Tente novamente.</p>
+      <button id="loginButton" style="width:100%; margin-top: 12px;">Entrar</button>
     </div>
   </div>
 
-  <div id="screen-cultura" class="wrap hide">
-    <div style="text-align:center; margin-bottom:20px;"><img src="logo.png?v=9" height="150"></div>
+  <div id="selecao-cultura-screen" class="wrap hide">
+    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=7" alt="CyberAgro Logo" height="250"></h1>
     <div class="card">
-      <h3 style="text-align:center">Selecione a Cultura</h3>
+      <h3 style="text-align: center;">Selecione a Cultura</h3>
       <div class="cultura-grid">
-        <div class="cultura-item" id="btnManga"><img src="manga.png"><span>Manga</span></div>
-        <div class="cultura-item" onclick="alert('Em breve')"><img src="uva.png"><span>Uva</span></div>
-        <div class="cultura-item" onclick="alert('Em breve')"><img src="pitaya.png"><span>Pitaya</span></div>
+        <div id="btnIconeManga" class="cultura-btn">
+          <img src="manga.png" alt="Manga"><span>Manga</span>
+        </div>
+        <div id="btnIconeUva" class="cultura-btn">
+          <img src="uva.png" alt="Uva"><span>Uva</span>
+        </div>
+        <div id="btnIconePitaya" class="cultura-btn">
+          <img src="pitaya.png" alt="Pitaya"><span>Pitaya</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <div id="screen-dashboard" class="wrap hide">
+  <div id="dashboard-screen" class="wrap hide">
     <h3>Visão Geral</h3>
-    <div class="card" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; text-align:center;">
-      <div><small>Contagens</small><br><b>312</b></div>
-      <div><small>Faturamento</small><br><b>R$ 13.4M</b></div>
+    <div class="summary-grid">
+      <div class="summary-card"><label>Contagens no Ano</label><div class="value">312</div></div>
+      <div class="summary-card"><label>Est. Faturamento Anual</label><div class="value">R$ 13.491.152</div></div>
     </div>
-    <h3>Histórico</h3>
-    <ul class="data-list card" style="padding:10px; list-style:none;">
-      <li style="border-bottom:1px solid #eee; padding:10px 0; display:flex; justify-content:space-between;"><span>Dezembro</span> <span>R$ 0,00</span></li>
+    <h3>Produtividade Mensal</h3>
+    <ul class="data-list card">
+      <li class="data-row"><span>Dezembro</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Novembro</span> <span>R$ 0,00</span></li>
+      <li class="data-row"><span>Janeiro</span> <span>R$ 0,00</span></li>
     </ul>
   </div>
 
-  <div id="screen-app" class="wrap hide">
-    <button onclick="nav('screen-dashboard')" style="background:#555; margin-bottom:15px;">VOLTAR</button>
-    <div class="card">
-      <div class="btn-upload" onclick="document.getElementById('fileInput').click()">
-        📷 Escolher Arquivo
-        <input type="file" id="fileInput" hidden accept="image/*,video/*">
+  <div id="app-screen" class="wrap hide">
+    <button onclick="nav('dashboard-screen')" style="background:#555; margin-bottom:15px;">VOLTAR AO INICIO</button>
+    <p class="muted">Anexe um vídeo ou imagem para a contagem da IA.</p>
+    <div class="card" id="app">
+      <div class="row">
+        <button id="btnSelect" class="btn-upload">1. Escolher Vídeo/Imagem…
+          <input id="fileInput" class="file-proxy" type="file" accept="video/*,image/*">
+        </button>
+        <input type="number" id="areaInput" placeholder="Área (m²) (só p/ vídeo)" class="area-input" style="display:none;">
       </div>
-      <video id="previewVideo" controls></video>
-      <img id="previewImage">
-      <input type="number" id="areaInput" placeholder="Área (m²) se for vídeo" style="margin-top:10px;">
-      <button id="btnEnviar" disabled>Enviar para IA</button>
-      <p id="statusApp" style="text-align:center; margin-top:10px; font-family:monospace;"></p>
-    </div>
-  </div>
-
-  <div id="screen-resultado" class="wrap hide">
-    <button onclick="nav('screen-dashboard')" style="background:#555; margin-bottom:15px;">VOLTAR</button>
-    <div class="card">
-      <h3>Resultado</h3>
-      <pre id="txtResultado" style="background:#eee; padding:10px; border-radius:8px; overflow-x:auto;"></pre>
-      <h3>Gráfico Anual</h3>
-      <canvas id="myChart"></canvas>
-      <div style="margin-top:20px; border-top:1px solid #eee; padding-top:10px;">
-        <p id="txtPrevisao" style="font-size:0.9rem;"></p>
-        <button id="btnAgenda" style="background:#f0ad4e;">Criar Lembrete</button>
+      <div class="row" style="margin-top: 12px;">
+         <button id="btnSend" disabled>2. Enviar para IA</button>
+         <button id="btnClear" disabled style="background:#eee;color:#333;">Limpar</button>
+      </div>
+      <div style="margin:12px 0;text-align:left;">
+        <div class="progress"><div id="pbar" class="bar"></div></div>
+        <div style="margin-top:8px">Status: <span id="status" class="mono">aguardando ficheiro...</span></div>
+        <div id="fileInfo" class="muted" style="text-align:left;margin-top:8px;">Nenhum ficheiro selecionado.</div>
+        <video id="previewVideo" controls playsinline style="display:none;"></video>
+        <img id="previewImage" src="" alt="Preview da Imagem" style="display:none;">
+      </div>
+      <div>
+        <h3>Resultado</h3>
+        <pre id="out" class="mono">—</pre>
       </div>
     </div>
   </div>
 
-  <div id="screen-chat" class="chat-iframe-container hide">
-    <button onclick="nav('screen-dashboard')" style="position:absolute; top:10px; left:10px; z-index:999; background:#555; width:auto; padding:8px 12px;">VOLTAR</button>
-    <iframe id="n8nFrame" src=""></iframe>
-  </div>
-
-  <div id="screen-perfil" class="wrap hide">
-    <div class="card" style="text-align:center;">
-      <img src="logo.png?v=9" width="80" style="border-radius:50%; background:#eee;">
-      <h3>Wendell Nascoli</h3>
-      <p>uendeu.agro@gmail.com</p>
-      <hr>
-      <button onclick="if(confirm('Sair?')) location.reload()" style="background:none; color:red; text-align:left;">🚪 Sair</button>
+  <div id="resultado-screen" class="wrap hide">
+    <button onclick="nav('dashboard-screen')" style="background:#555; margin-bottom:15px;">VOLTAR AO INICIO</button>
+    <div class="card">
+      <h3>Resultado Detalhado</h3>
+      <pre id="resultado-detalhado" class="mono"></pre>
+      <h3 style="margin-top: 20px;">Gráfico Anual</h3>
+      <canvas id="myChart" height="200"></canvas> 
+      <div id="agenda-section" style="margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px;">
+        <h3 style="margin-top: 0;">Previsão de Venda</h3>
+        <p id="forecast-message" class="mono" style="font-size: 0.9rem;"></p>
+        <button id="btnAgenda" class="btn-nova-contagem" style="background-color: #f0ad4e; margin-top: 10px;">
+          Deseja adicionar um lembrete na sua agenda?
+        </button>
+      </div>
     </div>
-  </div>
-
-  <div id="appFooter" class="app-footer">
-    <a onclick="nav('screen-dashboard')" class="footer-btn active">Início</a>
-    <a onclick="nav('screen-resultado')" class="footer-btn">Relatórios</a>
-    <a onclick="nav('screen-app')" class="footer-btn-central"><img src="imagem1.jpeg"></a>
-    <a onclick="alert('Em breve')" class="footer-btn">Ranking</a>
-    <a onclick="nav('screen-perfil')" class="footer-btn">Perfil</a>
   </div>
   
-  <button id="btnChatFab" class="chat-fab" onclick="nav('screen-chat')">
-    <img src="imagem2.png">
+  <div id="chat-screen" class="chat-frame-container hide">
+    <div onclick="nav('dashboard-screen')" class="chat-header-btn">⬅ VOLTAR</div>
+    <iframe id="n8nFrame" class="chat-iframe" src="about:blank"></iframe>
+  </div>
+  
+  <div id="perfil-screen" class="wrap hide">
+    <div class="profile-header card">
+      <img src="logo.png?v=7" alt="Foto de Perfil" class="profile-pic">
+      <div class="profile-info">
+        <div class="profile-name">Wendell Nascoli</div>
+        <div class="profile-subtitle">uendeu.agro@gmail.com</div>
+      </div>
+    </div>
+    <div class="menu-list card">
+      <a href="#" class="menu-item" id="navMeusDados"><span class="menu-icon">👤</span> <span>Meus Dados</span> <span class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item" id="navConfig"><span class="menu-icon">⚙️</span> <span>Configurações</span> <span class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item danger" id="navSair"><span class="menu-icon">🚪</span> <span>Sair</span> <span class="menu-chevron">&gt;</span></a>
+    </div>
+  </div>
+
+  <div class="app-footer">
+    <a onclick="nav('dashboard-screen')" class="footer-btn active">Início</a>
+    <a onclick="nav('resultado-screen')" class="footer-btn">Relatórios</a>
+    <a onclick="nav('app-screen')" class="footer-btn-central"><img src="imagem1.jpeg" alt="Nova"></a>
+    <a onclick="alert('Em breve')" class="footer-btn">Ranking</a> 
+    <a onclick="nav('perfil-screen')" class="footer-btn">Perfil</a>
+  </div>
+  
+  <button id="btnChat" class="chat-fab" onclick="nav('chat-screen')">
+    <img src="imagem2.png" alt="Chat">
   </button>
 
   <script>
-    // --- CONFIGURAÇÕES ---
-    const SENHA_MASTER = "cyberagro2025";
-    // COLE AQUI A URL DO "CHAT TRIGGER" DO N8N (Modo Produção):
-    const N8N_CHAT_URL = "COLE_SUA_URL_DO_CHAT_TRIGGER_AQUI"; 
-    // Ex: https://n8n-agent-xyz.run.app/chat/agente-ia
-
-    // --- NAVEGAÇÃO CENTRAL ---
-    function nav(telaId) {
-      // Esconde todas as telas
-      document.querySelectorAll('.wrap, .chat-iframe-container').forEach(el => el.classList.add('hide'));
-      // Mostra a desejada
-      document.getElementById(telaId).classList.remove('hide');
+    document.addEventListener("DOMContentLoaded", () => {
+      const SENHA_SECRETA = "cyberagro2025"; 
       
-      // Controle do Footer/Fab
-      const footer = document.getElementById('appFooter');
-      const fab = document.getElementById('btnChatFab');
+      // *** URL DO CHAT TRIGGER (PRODUÇÃO) - ALTERE AQUI ***
+      const N8N_CHAT_URL = "https://n8n-agent-476522137012.us-central1.run.app/chat/agente-ia"; 
       
-      if (['screen-login', 'screen-cultura'].includes(telaId)) {
-        footer.style.display = 'none';
-        fab.style.display = 'none';
-      } else if (telaId === 'screen-chat') {
-        // No chat, mostramos o iframe e escondemos o FAB, mas mantemos footer opcional
-        footer.style.display = 'none'; 
-        fab.style.display = 'none';
-        // Carrega o chat se ainda não carregou
-        const iframe = document.getElementById('n8nFrame');
-        if (!iframe.src) iframe.src = N8N_CHAT_URL;
-      } else {
-        footer.style.display = 'flex';
-        fab.style.display = 'block';
-      }
-    }
-
-    // --- LOGIN & FLUXO ---
-    document.getElementById('btnLogin').onclick = () => {
-      if (document.getElementById('inputSenha').value === SENHA_MASTER) nav('screen-cultura');
-      else document.getElementById('msgErro').style.display = 'block';
-    };
-    document.getElementById('btnManga').onclick = () => nav('screen-dashboard');
-
-    // --- APP CONTAGEM ---
-    const fileInput = document.getElementById('fileInput');
-    let selectedFile = null;
-
-    fileInput.onchange = (e) => {
-      selectedFile = e.target.files[0];
-      if (!selectedFile) return;
+      // Telas
+      const loginScreen = document.getElementById("login-screen");
+      const selecaoCulturaScreen = document.getElementById("selecao-cultura-screen");
+      const dashboardScreen = document.getElementById("dashboard-screen"); 
+      const appScreen = document.getElementById("app-screen");
+      const resultadoScreen = document.getElementById("resultado-screen");
+      const chatScreen = document.getElementById("chat-screen");
+      const perfilScreen = document.getElementById("perfil-screen");
       
-      const isVideo = selectedFile.type.startsWith('video/');
-      const vid = document.getElementById('previewVideo');
-      const img = document.getElementById('previewImage');
-      const url = URL.createObjectURL(selectedFile);
+      // Elementos UI
+      const appFooter = document.querySelector(".app-footer");
+      const btnChat = document.getElementById("btnChat");
+      const loginButton = document.getElementById("loginButton");
+      const passwordInput = document.getElementById("passwordInput");
+      const loginError = document.getElementById("loginError");
       
-      if (isVideo) { vid.src = url; vid.style.display='block'; img.style.display='none'; }
-      else { img.src = url; img.style.display='block'; vid.style.display='none'; }
+      // Botões Seleção
+      const btnIconeManga = document.getElementById("btnIconeManga");
+      const btnIconeUva = document.getElementById("btnIconeUva");
+      const btnIconePitaya = document.getElementById("btnIconePitaya");
       
-      document.getElementById('btnEnviar').disabled = false;
-    };
-
-    document.getElementById('btnEnviar').onclick = async () => {
-      const status = document.getElementById('statusApp');
-      status.innerText = "Processando...";
-      
-      const form = new FormData();
-      form.append('video', selectedFile);
-      
-      const isVideo = selectedFile.type.startsWith('video/');
-      const apiUrl = isVideo 
-        ? "https://contador-manga-476522137012.us-central1.run.app/contar"
-        : "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
-
-      try {
-        // Pega preço
-        let preco = 1.86;
-        try {
-           const r = await fetch(`mango_prices.json?v=${Date.now()}`);
-           const j = await r.json();
-           preco = j.preco_kg;
-        } catch(e){}
-
-        const res = await fetch(apiUrl, { method: 'POST', body: form });
-        const data = await res.json();
+      // Navegação Centralizada
+      function nav(telaId) {
+        // Esconde todas as telas
+        const telas = [loginScreen, selecaoCulturaScreen, dashboardScreen, appScreen, resultadoScreen, chatScreen, perfilScreen];
+        telas.forEach(s => s.classList.add('hide'));
         
-        let txt = `CONTAGEM: ${data.contagem_final}\n`;
-        let kg_ha = 0;
-
-        if (isVideo) {
-           const area = parseFloat(document.getElementById('areaInput').value) || 1;
-           kg_ha = Math.round(((data.contagem_final * 0.5) / area) * 10000);
-           const qtd_ha = Math.round((data.contagem_final / area) * 10000);
-           txt += `QNTD/HA: ${qtd_ha.toLocaleString('pt-BR')}\n`;
-           txt += `KG/HA: ${kg_ha.toLocaleString('pt-BR')}\n`;
-           txt += `FATURAMENTO: R$ ${(kg_ha * preco).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        // Mostra a tela desejada
+        const telaAtual = document.getElementById(telaId);
+        telaAtual.classList.remove('hide');
+        telaAtual.style.display = (telaId === 'chat-screen') ? 'flex' : 'block';
+        
+        // Lógica Rodapé/Chat
+        if (telaId === 'login-screen' || telaId === 'selecao-cultura-screen') {
+          appFooter.style.display = 'none';
+          btnChat.style.display = 'none';
+        } else if (telaId === 'chat-screen') {
+           appFooter.style.display = 'none';
+           btnChat.style.display = 'none';
+           // Carrega o chat apenas quando necessário (Lazy Load)
+           const iframe = document.getElementById('n8nFrame');
+           if (iframe.src === "about:blank") iframe.src = N8N_CHAT_URL;
         } else {
-           txt += "Estimativa requer vídeo.";
+          appFooter.style.display = 'flex';
+          appFooter.style.pointerEvents = 'auto';
+          btnChat.style.display = 'block';
+          btnChat.style.pointerEvents = 'auto';
         }
-        
-        document.getElementById('txtResultado').innerText = txt;
-        document.getElementById('txtPrevisao').innerText = `Preço Hoje: R$ ${preco}. Previsão: R$ 2,50.`;
-        
-        // Gráfico
-        new Chart(document.getElementById('myChart'), {
-            type: 'line',
-            data: {
-                labels: ['3/10', '10/10', '17/10', '24/10', '31/10', '7/11'],
-                datasets: [{ label: 'Preço (R$)', data: [2.51, 1.26, 1.95, 1.88, 2.06, 1.86], borderColor: 'green' }]
-            }
-        });
-        
-        // Botão Agenda
-        document.getElementById('btnAgenda').onclick = () => {
-            const url = new URL("https://calendar.google.com/calendar/render?action=TEMPLATE");
-            url.searchParams.append('text', "Venda Manga");
-            url.searchParams.append('details', txt);
-            window.open(url.href, '_blank');
-        };
-
-        nav('screen-resultado');
-        
-      } catch (err) {
-        status.innerText = "Erro: " + err.message;
       }
-    };
+      
+      // Inicialização
+      nav('login-screen');
 
-    // Inicializa
-    nav('screen-login');
+      // --- Eventos ---
+      loginButton.onclick = () => { 
+          if (passwordInput.value === SENHA_SECRETA) nav('selecao-cultura-screen'); 
+          else loginError.style.display = "block"; 
+      };
+      passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") loginButton.click(); });
+
+      btnIconeManga.onclick = () => nav('dashboard-screen');
+      btnIconeUva.onclick = () => alert("Em breve!");
+      btnIconePitaya.onclick = () => alert("Em breve!");
+      
+      document.getElementById("navSair").onclick = (e) => { 
+        e.preventDefault(); 
+        if(confirm("Sair?")) window.location.reload(); 
+      };
+
+      // --- LÓGICA DO APP DE CONTAGEM ---
+      const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
+      const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
+      const M2_POR_HECTARE = 10000;
+      
+      const fileInput = document.getElementById("fileInput");
+      const areaInput = document.getElementById("areaInput"); 
+      const btnSend = document.getElementById("btnSend");
+      const btnClear = document.getElementById("btnClear");
+      const out = document.getElementById("out");
+      const statusEl = document.getElementById("status");
+      const pbar = document.getElementById("pbar");
+      const fileInfo = document.getElementById("fileInfo");
+      const previewVideo = document.getElementById("previewVideo");
+      const previewImage = document.getElementById("previewImage");
+      const resultadoDetalhado = document.getElementById("resultado-detalhado");
+      const forecastMessage = document.getElementById("forecast-message");
+      const btnAgenda = document.getElementById("btnAgenda");
+      let selectedFile = null;
+      let myChart = null; 
+
+      const formatterInt = new Intl.NumberFormat('pt-BR', { style: 'decimal', maximumFractionDigits: 0 });
+      const formatterCurrency = new Intl.NumberFormat('pt-BR', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      function renderChart(labels, dataPrices) {
+        const ctx = document.getElementById('myChart').getContext('2d');
+        if (myChart) myChart.destroy();
+        myChart = new Chart(ctx, {
+            type: 'line', 
+            data: { labels: labels, datasets: [{ label: 'Preço R$/KG (Tommy)', data: dataPrices, fill: true, borderColor: '#28a745', backgroundColor: 'rgba(40, 167, 69, 0.1)', tension: 0.1 }] },
+            options: { responsive: true, maintainAspectRatio: true, scales: { y: { ticks: { callback: function(value) { return 'R$ ' + value.toFixed(2); } } } } }
+        });
+      }
+
+      function resetUI(){
+        selectedFile = null; fileInput.value = ""; areaInput.value = ""; 
+        btnSend.disabled = true; btnClear.disabled = true;
+        fileInfo.textContent = "Nenhum ficheiro selecionado.";
+        previewVideo.src = ""; previewVideo.style.display = "none";
+        previewImage.src = ""; previewImage.style.display = "none";
+        areaInput.style.display = "none"; 
+        out.innerHTML = "—"; pbar.style.width = "0%";
+        statusEl.textContent = "aguardando ficheiro...";
+      }
+
+      function checkInputs() {
+        const area = parseFloat(areaInput.value);
+        const isVideo = selectedFile && selectedFile.type.startsWith("video/");
+        const isImage = selectedFile && selectedFile.type.startsWith("image/");
+        if ((isVideo && area > 0) || isImage) {
+          btnSend.disabled = false; statusEl.textContent = "Pronto para enviar.";
+        } else {
+          btnSend.disabled = true;
+        }
+      }
+
+      fileInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const isVideo = file.type.startsWith("video/");
+        const isImage = file.type.startsWith("image/");
+        if (!isVideo && !isImage) { alert("Erro: Apenas arquivos de VÍDEO ou IMAGEM são permitidos."); resetUI(); return; }
+        selectedFile = file;
+        fileInfo.textContent = `${file.name} • ${(file.size/1024/1024).toFixed(2)} MB`;
+        btnClear.disabled = false;
+        const previewURL = URL.createObjectURL(file);
+        if (isVideo) {
+          previewVideo.src = previewURL; previewVideo.style.display = "block";
+          previewImage.style.display = "none"; areaInput.style.display = "block"; 
+          previewVideo.play().catch(()=>{});
+        } else {
+          previewImage.src = previewURL; previewImage.style.display = "block";
+          previewVideo.style.display = "none"; areaInput.style.display = "none"; 
+          areaInput.value = ""; checkInputs(); 
+        }
+      });
+      areaInput.addEventListener("input", checkInputs); 
+      btnClear.addEventListener("click", resetUI);
+
+      btnSend.addEventListener("click", async () => {
+        if (!selectedFile) return;
+        btnSend.disabled = true;
+        statusEl.textContent = "Obtendo cotação...";
+        pbar.style.width = "10%";
+        let dados_preco;
+        try {
+          const respPreco = await fetch(`mango_prices.json?v=${Date.now()}`);
+          if (!respPreco.ok) throw new Error();
+          dados_preco = await respPreco.json();
+        } catch { dados_preco = { preco_kg: 1.86, peso_medio_g: 500 }; }
+
+        const isVideoRequest = selectedFile.type.startsWith("video/");
+        let target_url = isVideoRequest ? API_URL_VIDEO : API_URL_IMAGEM;
+        statusEl.textContent = "Enviando para IA...";
+        pbar.style.width = "30%";
+        const form = new FormData();
+        form.append("video", selectedFile, selectedFile.name || "mediafile");
+
+        try {
+          const resp = await fetch(target_url, { method: "POST", body: form });
+          const text = await resp.text();
+          pbar.style.width = "100%";
+          if (resp.ok) {
+            statusEl.textContent = "Concluído!";
+            const data = JSON.parse(text);
+            const contagem = data.contagem_final;
+            const area = parseFloat(areaInput.value);
+            const preco = dados_preco.preco_kg;
+            const peso = dados_preco.peso_medio_g / 1000;
+            let html = `TIPO: ${isVideoRequest ? "VÍDEO" : "IMAGEM"}\n`;
+            html += `CONTAGEM: ${contagem}\n\n`;
+            let kg_ha = 0;
+            if (isVideoRequest) {
+               const kg_m2 = (contagem * peso) / area;
+               kg_ha = Math.round(kg_m2 * M2_POR_HECTARE);
+               const qntd_ha = Math.round((contagem / area) * M2_POR_HECTARE);
+               html += `ESTIMATIVA (QNTD): ${formatterInt.format(qntd_ha)} MANGAS/HA\n`;
+               html += `ESTIMATIVA (KG/HA): ${formatterInt.format(kg_ha)} KG/HA\n`;
+               html += `FATURAMENTO: R$ ${formatterCurrency.format(kg_ha * preco)}`;
+            } else { html += "ESTIMATIVA: N/A (Requer vídeo)"; }
+            resultadoDetalhado.textContent = html;
+            const futuro = 2.50;
+            forecastMessage.textContent = `Hoje: R$ ${formatterCurrency.format(preco)}. Dia 15/12: R$ ${formatterCurrency.format(futuro)}. Venda recomendada!`;
+            btnAgenda.onclick = () => {
+               const url = new URL("https://calendar.google.com/calendar/render?action=TEMPLATE");
+               url.searchParams.append('text', "Venda Manga (CyberAgro)");
+               url.searchParams.append('details', html);
+               window.open(url.href, '_blank');
+            };
+            out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Ver Resultado</button>`;
+            document.getElementById("btnVerResultado").onclick = () => {
+               renderChart(['3/10','10/10','17/10','24/10','31/10','7/11'], [2.51, 1.26, 1.95, 1.88, 2.06, 1.86]);
+               nav('resultado-screen');
+            };
+          } else { statusEl.textContent = "Erro no processamento."; out.textContent = text; }
+        } catch (e) { statusEl.textContent = "Erro de rede."; } finally { btnSend.disabled = false; }
+      });
+      
+      // Funções Globais para os botões onclick do HTML
+      window.nav = nav;
+      window.resetUI = resetUI;
+    });
   </script>
 </body>
 </html>
