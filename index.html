@@ -11,7 +11,7 @@
       navigator.serviceWorker.register('/app-mvp1/sw.js')
         .then(reg => {
             reg.update();
-            console.log('Service Worker Registrado v12');
+            console.log('Service Worker Registrado v10');
         })
         .catch(err => console.log('Service Worker falhou:', err));
     }
@@ -190,7 +190,6 @@
         font-size: 0.85rem;
         box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
         border: 2px solid white;
-        overflow: hidden; /* Garante que a imagem não saia da borda */
     }
     
     .chat-message.user .chat-message-avatar {
@@ -463,16 +462,13 @@
       <h3 style="text-align: center;">Selecione a Cultura</h3>
       <div class="cultura-grid">
         <div id="btnIconeManga" class="cultura-btn">
-          <img src="manga.png" alt="Manga">
-          <span>Manga</span>
+          <img src="manga.png" alt="Manga"><span>Manga</span>
         </div>
         <div id="btnIconeUva" class="cultura-btn">
-          <img src="uva.png" alt="Uva">
-          <span>Uva</span>
+          <img src="uva.png" alt="Uva"><span>Uva</span>
         </div>
         <div id="btnIconePitaya" class="cultura-btn">
-          <img src="pitaya.png" alt="Pitaya">
-          <span>Pitaya</span>
+          <img src="pitaya.png" alt="Pitaya"><span>Pitaya</span>
         </div>
       </div>
     </div>
@@ -488,15 +484,6 @@
     <ul class="data-list card">
       <li class="data-row"><span>Dezembro</span> <span>R$ 0,00</span></li>
       <li class="data-row"><span>Novembro</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Outubro</span> <span>R$ 12.029.994,00</span></li>
-      <li class="data-row"><span>Setembro</span> <span>R$ 1.104.513,91</span></li>
-      <li class="data-row"><span>Agosto</span> <span>R$ 356.644,48</span></li>
-      <li class="data-row"><span>Julho</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Junho</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Maio</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Abril</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Março</span> <span>R$ 0,00</span></li>
-      <li class="data-row"><span>Fevereiro</span> <span>R$ 0,00</span></li>
       <li class="data-row"><span>Janeiro</span> <span>R$ 0,00</span></li>
     </ul>
   </div>
@@ -549,9 +536,6 @@
   <div id="chat-screen" class="chat-frame-container hide">
     <div class="chat-header">
       <button onclick="nav('dashboard-screen')" class="chat-header-btn">← Voltar</button>
-      
-      <img src="logo.png?v=9" style="width:35px; height:35px; border-radius:50%; background:white; padding:2px; margin-right:10px; object-fit:cover;">
-      
       <div style="flex: 1;">
         <div class="chat-header-title">CyberAgro Assistente</div>
         <div class="chat-header-status">Online</div>
@@ -584,7 +568,7 @@
     </div>
   </div>
 
-  <div class="app-footer" style="display:none;"> 
+  <div class="app-footer">
     <a onclick="nav('dashboard-screen')" class="footer-btn active">Início</a>
     <a onclick="nav('resultado-screen')" class="footer-btn">Relatórios</a>
     <a onclick="nav('app-screen')" class="footer-btn-central"><img src="imagem1.jpeg" alt="Nova"></a>
@@ -592,7 +576,7 @@
     <a onclick="nav('perfil-screen')" class="footer-btn">Perfil</a>
   </div>
   
-  <button id="btnChat" class="chat-fab" style="display:none;" onclick="nav('chat-screen')">
+  <button id="btnChat" class="chat-fab" onclick="nav('chat-screen')">
     <img src="imagem2.png" alt="Chat">
   </button>
 
@@ -600,8 +584,8 @@
     document.addEventListener("DOMContentLoaded", () => {
       const SENHA_SECRETA = "cyberagro2025"; 
       
-      // *** URL DO WEBHOOK (MANTENHA A SUA) ***
-      const N8N_WEBHOOK_URL = "https://n8n-agent-476522137012.us-central1.run.app/webhook-test/agente-ia"; 
+      // *** URL DO WEBHOOK DO N8N (PRODUÇÃO) ***
+      const N8N_CHAT_URL = "https://n8n-agent-476522137012.us-central1.run.app/webhook/chat"; 
       
       // Telas
       const loginScreen = document.getElementById("login-screen");
@@ -669,167 +653,12 @@
       btnIconeUva.onclick = () => alert("Em breve!");
       btnIconePitaya.onclick = () => alert("Em breve!");
       
-      const btnNovaContagem = document.getElementById("btnNovaContagem");
-      const btnVoltarDashboard = document.getElementById("btnVoltarDashboard");
-      const btnVoltarDashboardResultado = document.getElementById("btnVoltarDashboardResultado");
-      const btnVoltarDashboardChat = document.getElementById("btnVoltarDashboardChat");
-      const navInicio = document.getElementById("navInicio");
-      const navRelatorios = document.getElementById("navRelatorios");
-      const navRanking = document.getElementById("navRanking");
-      const navPerfil = document.getElementById("navPerfil");
-
-      btnNovaContagem.onclick = (e) => { e.preventDefault(); nav('app-screen'); };
-      navInicio.onclick = (e) => { e.preventDefault(); nav('dashboard-screen'); };
-      navRelatorios.onclick = (e) => { e.preventDefault(); nav('resultado-screen'); };
-      navPerfil.onclick = (e) => { e.preventDefault(); nav('perfil-screen'); };
-      navRanking.onclick = (e) => { e.preventDefault(); alert("Ranking em breve"); };
-      
-      btnVoltarDashboard.onclick = (e) => { e.preventDefault(); nav('dashboard-screen'); resetUI(); };
-      btnVoltarDashboardResultado.onclick = (e) => { e.preventDefault(); nav('dashboard-screen'); resetUI(); };
-      btnVoltarDashboardChat.onclick = (e) => { e.preventDefault(); nav('dashboard-screen'); };
-      
       document.getElementById("navSair").onclick = (e) => { 
         e.preventDefault(); 
-        if(confirm("Sair?")) { resetUI(); nav('login-screen'); } 
+        if(confirm("Sair?")) window.location.reload(); 
       };
 
-      // --- LÓGICA DO CHATBOT NATIVO ---
-      const chatMessages = document.getElementById('chatMessages');
-      const chatInput = document.getElementById('chatInput');
-      const chatSendBtn = document.getElementById('chatSendBtn');
-      let isTyping = false;
-      
-      function formatTime() {
-        const now = new Date();
-        return now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      }
-      
-      function addMessage(text, isUser = false) {
-        const emptyState = chatMessages.querySelector('.chat-empty-state');
-        if (emptyState) emptyState.remove();
-        
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
-        
-        const avatar = document.createElement('div');
-        avatar.className = 'chat-message-avatar';
-        
-        if (!isUser) {
-           // *** AQUI A MUDANÇA DO AVATAR DO CHAT ***
-           avatar.innerHTML = '<img src="logo.png?v=9" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">';
-           avatar.style.background = 'white';
-        } else {
-           avatar.textContent = 'Você';
-        }
-
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'chat-message-content';
-        contentDiv.innerHTML = text.replace(/\n/g, '<br>');
-        
-        const time = document.createElement('div');
-        time.className = 'chat-message-time';
-        time.textContent = formatTime();
-        
-        const wrapper = document.createElement('div');
-        wrapper.style.display = 'flex';
-        wrapper.style.flexDirection = 'column';
-        
-        wrapper.appendChild(contentDiv);
-        wrapper.appendChild(time);
-        
-        messageDiv.appendChild(avatar);
-        messageDiv.appendChild(wrapper);
-        
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-
-      function showTypingIndicator() {
-        if (isTyping) return;
-        isTyping = true;
-        
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'chat-message bot';
-        typingDiv.id = 'typingIndicator';
-        
-        const avatar = document.createElement('div');
-        avatar.className = 'chat-message-avatar';
-        // *** AQUI A MUDANÇA DA ANIMAÇÃO ***
-        avatar.innerHTML = '<img src="logo.png?v=9" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">';
-        avatar.style.background = 'white';
-        
-        const indicator = document.createElement('div');
-        indicator.className = 'chat-typing-indicator';
-        indicator.innerHTML = '<div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div>';
-        
-        typingDiv.appendChild(avatar);
-        typingDiv.appendChild(indicator);
-        chatMessages.appendChild(typingDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-      
-      function hideTypingIndicator() {
-        const indicator = document.getElementById('typingIndicator');
-        if (indicator) {
-          indicator.remove();
-          isTyping = false;
-        }
-      }
-      
-      async function sendMessage() {
-        const message = chatInput.value.trim();
-        if (!message || isTyping) return;
-        
-        addMessage(message, true);
-        chatInput.value = '';
-        chatSendBtn.disabled = true;
-        
-        showTypingIndicator();
-        
-        try {
-          let chatId = localStorage.getItem('chatSessionId');
-          if (!chatId) {
-            chatId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            localStorage.setItem('chatSessionId', chatId);
-          }
-          
-          const payload = { message: message, text: message, chatId: chatId, sessionId: chatId };
-          
-          const response = await fetch(N8N_WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          
-          hideTypingIndicator();
-          
-          if (response.ok) {
-            const data = await response.json();
-            const botMessage = data.output || data.response || data.text || "Desculpe, não entendi.";
-            addMessage(botMessage, false);
-          } else {
-            addMessage("Erro no servidor da IA. Tente novamente.", false);
-          }
-        } catch (error) {
-          hideTypingIndicator();
-          addMessage("Erro de conexão com a IA.", false);
-        } finally {
-          chatSendBtn.disabled = false;
-          chatInput.focus();
-        }
-      }
-      
-      if (chatSendBtn && chatInput) {
-        chatSendBtn.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', (e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-          }
-        });
-      }
-
-      // --- LÓGICA DO APP DE CONTAGEM (MANTIDA IGUAL) ---
+      // --- LÓGICA DO APP DE CONTAGEM ---
       const API_URL_VIDEO = "https://contador-manga-476522137012.us-central1.run.app/contar";
       const API_URL_IMAGEM = "https://contador-manga-476522137012.us-central1.run.app/contar-imagem";
       const M2_POR_HECTARE = 10000;
@@ -967,6 +796,239 @@
         } catch (e) { statusEl.textContent = "Erro de rede."; } finally { btnSend.disabled = false; }
       });
       
+      // --- LÓGICA DO CHAT NATIVO COM WEBHOOK ---
+      const chatMessages = document.getElementById('chatMessages');
+      const chatInput = document.getElementById('chatInput');
+      const chatSendBtn = document.getElementById('chatSendBtn');
+      let isTyping = false;
+      
+      function formatTime() {
+        const now = new Date();
+        return now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      }
+      
+      function addMessage(text, isUser = false) {
+        // Remove empty state se existir
+        const emptyState = chatMessages.querySelector('.chat-empty-state');
+        if (emptyState) emptyState.remove();
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'chat-message-avatar';
+        avatar.textContent = isUser ? 'Você' : '🤖';
+        
+        const contentWrapper = document.createElement('div');
+        contentWrapper.style.display = 'flex';
+        contentWrapper.style.flexDirection = 'column';
+        contentWrapper.style.maxWidth = '100%';
+        
+        const content = document.createElement('div');
+        content.className = 'chat-message-content';
+        // Suporta quebras de linha e formatação básica
+        content.innerHTML = text.replace(/\n/g, '<br>');
+        
+        const time = document.createElement('div');
+        time.className = 'chat-message-time';
+        time.textContent = formatTime();
+        
+        contentWrapper.appendChild(content);
+        contentWrapper.appendChild(time);
+        
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(contentWrapper);
+        chatMessages.appendChild(messageDiv);
+        
+        // Scroll suave para o final
+        setTimeout(() => {
+          chatMessages.scrollTo({
+            top: chatMessages.scrollHeight,
+            behavior: 'smooth'
+          });
+        }, 100);
+      }
+      
+      function showTypingIndicator() {
+        if (isTyping) return;
+        isTyping = true;
+        
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-message bot';
+        typingDiv.id = 'typingIndicator';
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'chat-message-avatar';
+        avatar.textContent = '🤖';
+        
+        const indicator = document.createElement('div');
+        indicator.className = 'chat-typing-indicator';
+        indicator.innerHTML = '<div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div>';
+        
+        typingDiv.appendChild(avatar);
+        typingDiv.appendChild(indicator);
+        chatMessages.appendChild(typingDiv);
+        
+        setTimeout(() => {
+          chatMessages.scrollTo({
+            top: chatMessages.scrollHeight,
+            behavior: 'smooth'
+          });
+        }, 100);
+      }
+      
+      function hideTypingIndicator() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) {
+          indicator.remove();
+          isTyping = false;
+        }
+      }
+      
+      async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message || isTyping) return;
+        
+        // Adiciona mensagem do usuário
+        addMessage(message, true);
+        chatInput.value = '';
+        chatSendBtn.disabled = true;
+        
+        // Mostra indicador de digitação
+        showTypingIndicator();
+        
+        try {
+          // Obtém ou cria um chatId para manter a sessão
+          let chatId = localStorage.getItem('chatSessionId');
+          if (!chatId) {
+            chatId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            localStorage.setItem('chatSessionId', chatId);
+          }
+          
+          // Prepara o payload para o webhook do n8n
+          const payload = {
+            message: message,
+            text: message,
+            chatId: chatId,
+            sessionId: chatId
+          };
+          
+          console.log('Enviando para webhook:', N8N_CHAT_URL);
+          console.log('Payload:', payload);
+          
+          // Envia para o Webhook do n8n via HTTP POST
+          // O n8n webhook espera os dados no body da requisição
+          const response = await fetch(N8N_CHAT_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            mode: 'cors', // Permite CORS
+            credentials: 'omit', // Não envia cookies
+            body: JSON.stringify(payload)
+          });
+          
+          // Verifica se a requisição foi feita
+          if (!response) {
+            throw new Error('Nenhuma resposta recebida do servidor');
+          }
+          
+          console.log('Response status:', response.status);
+          console.log('Response headers:', response.headers);
+          
+          hideTypingIndicator();
+          
+          if (response.ok) {
+            let data;
+            const contentType = response.headers.get('content-type');
+            const responseText = await response.text();
+            
+            console.log('Response text:', responseText);
+            console.log('Content-Type:', contentType);
+            
+            if (contentType && contentType.includes('application/json')) {
+              try {
+                data = JSON.parse(responseText);
+                console.log('Response data:', data);
+              } catch (e) {
+                console.error('Erro ao parsear JSON:', e);
+                data = { output: responseText, response: responseText };
+              }
+            } else {
+              try {
+                data = JSON.parse(responseText);
+              } catch {
+                data = { output: responseText, response: responseText };
+              }
+            }
+            
+            // Webhook do n8n retorna em diferentes formatos
+            const botMessage = data.output || 
+                              data.response || 
+                              data.message || 
+                              data.text || 
+                              data.answer || 
+                              (typeof data === 'string' ? data : 'Desculpe, não consegui processar sua mensagem.');
+            
+            console.log('Mensagem extraída:', botMessage);
+            addMessage(botMessage, false);
+            
+            // Atualiza chatId se fornecido na resposta
+            if (data.chatId) {
+              localStorage.setItem('chatSessionId', data.chatId);
+            }
+          } else {
+            const errorText = await response.text();
+            console.error('Erro HTTP:', response.status, errorText);
+            
+            let errorMessage = 'Desculpe, ocorreu um erro ao processar sua mensagem.';
+            
+            try {
+              const errorData = JSON.parse(errorText);
+              errorMessage = errorData.message || errorData.error || errorMessage;
+              console.error('Erro parseado:', errorData);
+            } catch {
+              if (errorText) {
+                console.error('Erro detalhado (texto):', errorText);
+              }
+            }
+            
+            addMessage(`Erro ${response.status}: ${errorMessage}. Tente novamente.`, false);
+          }
+        } catch (error) {
+          hideTypingIndicator();
+          console.error('Erro completo no chat:', error);
+          console.error('Stack trace:', error.stack);
+          
+          let errorMsg = 'Erro de conexão. ';
+          if (error.message) {
+            errorMsg += error.message;
+          } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            errorMsg += 'Não foi possível conectar ao servidor. Verifique se o webhook está ativo no n8n.';
+          } else {
+            errorMsg += 'Verifique sua internet e tente novamente.';
+          }
+          
+          addMessage(errorMsg, false);
+        } finally {
+          chatSendBtn.disabled = false;
+          chatInput.focus();
+        }
+      }
+      
+      // Event listeners do chat
+      if (chatSendBtn && chatInput) {
+        chatSendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
+        });
+      }
+      
+      // Funções Globais para os botões onclick do HTML
       window.nav = nav;
       window.resetUI = resetUI;
     });
