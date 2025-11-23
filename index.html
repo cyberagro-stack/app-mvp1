@@ -585,7 +585,7 @@
       const SENHA_SECRETA = "cyberagro2025"; 
       
       // *** URL DO WEBHOOK DO N8N (PRODUÇÃO) ***
-      const N8N_CHAT_URL = "https://n8n-agent-476522137012.us-central1.run.app/webhook/chat"; 
+      const N8N_CHAT_URL = "https://n8n-agent-476522137012.us-central1.run.app/webhook/8b54aa60-7be4-4882-908a-0fc8c27b7c7c/chat"; 
       
       // Telas
       const loginScreen = document.getElementById("login-screen");
@@ -905,33 +905,61 @@
             localStorage.setItem('chatSessionId', chatId);
           }
           
+          // Prepara o payload para o webhook do n8n
+          const payload = {
+            message: message,
+            text: message,
+            chatId: chatId,
+            sessionId: chatId
+          };
+          
+          console.log('Enviando para webhook:', N8N_CHAT_URL);
+          console.log('Payload:', payload);
+          
           // Envia para o Webhook do n8n via HTTP POST
+          // O n8n webhook espera os dados no body da requisição
           const response = await fetch(N8N_CHAT_URL, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'Accept': 'application/json'
             },
-            body: JSON.stringify({
-              message: message,
-              text: message,
-              chatId: chatId
-            })
+            mode: 'cors', // Permite CORS
+            credentials: 'omit', // Não envia cookies
+            body: JSON.stringify(payload)
           });
+          
+          // Verifica se a requisição foi feita
+          if (!response) {
+            throw new Error('Nenhuma resposta recebida do servidor');
+          }
+          
+          console.log('Response status:', response.status);
+          console.log('Response headers:', response.headers);
           
           hideTypingIndicator();
           
           if (response.ok) {
             let data;
             const contentType = response.headers.get('content-type');
+            const responseText = await response.text();
+            
+            console.log('Response text:', responseText);
+            console.log('Content-Type:', contentType);
             
             if (contentType && contentType.includes('application/json')) {
-              data = await response.json();
-            } else {
-              const text = await response.text();
               try {
-                data = JSON.parse(text);
+                data = JSON.parse(responseText);
+                console.log('Response data:', data);
+              } catch (e) {
+                console.error('Erro ao parsear JSON:', e);
+                data = { output: responseText, response: responseText };
+              }
+            } else {
+              try {
+                data = JSON.parse(responseText);
               } catch {
-                data = { output: text, response: text };
+                data = { output: responseText, response: responseText };
               }
             }
             
@@ -943,6 +971,7 @@
                               data.answer || 
                               (typeof data === 'string' ? data : 'Desculpe, não consegui processar sua mensagem.');
             
+            console.log('Mensagem extraída:', botMessage);
             addMessage(botMessage, false);
             
             // Atualiza chatId se fornecido na resposta
@@ -951,24 +980,37 @@
             }
           } else {
             const errorText = await response.text();
+            console.error('Erro HTTP:', response.status, errorText);
+            
             let errorMessage = 'Desculpe, ocorreu um erro ao processar sua mensagem.';
             
             try {
               const errorData = JSON.parse(errorText);
               errorMessage = errorData.message || errorData.error || errorMessage;
+              console.error('Erro parseado:', errorData);
             } catch {
               if (errorText) {
-                console.error('Erro detalhado:', errorText);
+                console.error('Erro detalhado (texto):', errorText);
               }
             }
             
-            addMessage(errorMessage + ' Tente novamente.', false);
-            console.error('Erro no chat - Status:', response.status);
+            addMessage(`Erro ${response.status}: ${errorMessage}. Tente novamente.`, false);
           }
         } catch (error) {
           hideTypingIndicator();
-          addMessage('Erro de conexão. Verifique sua internet e tente novamente.', false);
-          console.error('Erro no chat:', error);
+          console.error('Erro completo no chat:', error);
+          console.error('Stack trace:', error.stack);
+          
+          let errorMsg = 'Erro de conexão. ';
+          if (error.message) {
+            errorMsg += error.message;
+          } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            errorMsg += 'Não foi possível conectar ao servidor. Verifique se o webhook está ativo no n8n.';
+          } else {
+            errorMsg += 'Verifique sua internet e tente novamente.';
+          }
+          
+          addMessage(errorMsg, false);
         } finally {
           chatSendBtn.disabled = false;
           chatInput.focus();
@@ -993,5 +1035,4 @@
   </script>
 </body>
 </html>
-
 
