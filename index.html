@@ -194,6 +194,11 @@
         border: 2px solid white;
         overflow: hidden;
     }
+
+    /* ÚNICA ALTERAÇÃO: fundo branco apenas para o avatar do bot */
+    .chat-message.bot .chat-message-avatar {
+        background: #ffffff;
+    }
     
     .chat-message.user .chat-message-avatar {
         background: linear-gradient(135deg, #2a7bf6 0%, #1e5fd4 100%);
@@ -709,7 +714,7 @@
       function checkInputs() {
         const area = parseFloat(areaInput.value);
         const isVideo = selectedFile && selectedFile.type.startsWith("video/");
-        const isImage = selectedFile && selectedFile.type.startsWith("image/");
+               const isImage = selectedFile && selectedFile.type.startsWith("image/");
         if ((isVideo && area > 0) || isImage) {
           btnSend.disabled = false; statusEl.textContent = "Pronto para enviar.";
         } else {
@@ -1068,4 +1073,3 @@
   </script>
 </body>
 </html>
-```
