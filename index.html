@@ -784,7 +784,15 @@
         showTypingIndicator();
         
         try {
-          // Envia para o webhook do n8n
+          // Obtém ou cria um chatId para manter a sessão
+          let chatId = localStorage.getItem('chatSessionId');
+          if (!chatId) {
+            chatId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            localStorage.setItem('chatSessionId', chatId);
+          }
+          
+          // Envia para o Chat Trigger do n8n
+          // O Chat Trigger do n8n espera: message/text e chatId
           const response = await fetch(N8N_CHAT_URL, {
             method: 'POST',
             headers: {
@@ -792,7 +800,8 @@
             },
             body: JSON.stringify({
               message: message,
-              sessionId: localStorage.getItem('chatSessionId') || `session_${Date.now()}`
+              text: message, // Alguns Chat Triggers usam 'text' ao invés de 'message'
+              chatId: chatId
             })
           });
           
@@ -809,22 +818,43 @@
               try {
                 data = JSON.parse(text);
               } catch {
-                data = { response: text };
+                // Se não for JSON, trata como texto simples
+                data = { output: text, response: text };
               }
             }
             
-            // A resposta pode vir em diferentes formatos, ajuste conforme necessário
-            const botMessage = data.response || data.message || data.text || data.output || data.answer || 'Desculpe, não consegui processar sua mensagem.';
+            // Chat Trigger do n8n pode retornar em diferentes formatos
+            // Tenta vários campos comuns
+            const botMessage = data.output || 
+                              data.response || 
+                              data.message || 
+                              data.text || 
+                              data.answer || 
+                              (typeof data === 'string' ? data : 'Desculpe, não consegui processar sua mensagem.');
+            
             addMessage(botMessage, false);
             
-            // Salva sessionId se fornecido
-            if (data.sessionId) {
-              localStorage.setItem('chatSessionId', data.sessionId);
+            // Atualiza chatId se fornecido na resposta
+            if (data.chatId) {
+              localStorage.setItem('chatSessionId', data.chatId);
             }
           } else {
             const errorText = await response.text();
-            addMessage('Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.', false);
-            console.error('Erro no chat:', errorText);
+            let errorMessage = 'Desculpe, ocorreu um erro ao processar sua mensagem.';
+            
+            // Tenta extrair mensagem de erro se for JSON
+            try {
+              const errorData = JSON.parse(errorText);
+              errorMessage = errorData.message || errorData.error || errorMessage;
+            } catch {
+              // Se não for JSON, usa o texto como está
+              if (errorText) {
+                console.error('Erro detalhado:', errorText);
+              }
+            }
+            
+            addMessage(errorMessage + ' Tente novamente.', false);
+            console.error('Erro no chat - Status:', response.status, 'Response:', errorText);
           }
         } catch (error) {
           hideTypingIndicator();
