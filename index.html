@@ -453,6 +453,7 @@
 </head>
 <body>
 
+  <!-- PASSO 1: LOGIN NOVO -->
   <div id="login-screen" class="wrap" style="text-align: center; padding-top: 40px;">
     <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=7" alt="CyberAgro Logo" height="250"></h1>
     <div class="card">
@@ -534,9 +535,12 @@
     <div class="card">
       <h3>Resultado Detalhado</h3>
       <pre id="resultado-detalhado" class="mono"></pre>
+
+      <!-- PASSO 2: BOTÃO SALVAR NO BANCO -->
       <button id="btnSalvarBanco" class="btn-nova-contagem" style="background:#2a7bf6; margin-top:10px;">
         💾 Salvar no Histórico Pessoal
       </button>
+
       <h3 style="margin-top: 20px;">Gráfico Anual</h3>
       <canvas id="myChart" height="200"></canvas> 
       <div id="agenda-section" style="margin-top: 20px; border-top: 1px solid #E0E0E0; padding-top: 15px;">
@@ -596,6 +600,7 @@
     <img src="imagem2.png" alt="Chat">
   </button>
 
+  <!-- PASSO 3: SUBSTITUIR TODO JS FINAL -->
   <script type="module">
     // 1. IMPORTAR FIREBASE
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -872,5 +877,6 @@
         } catch(e) { console.log(e); }
     };
   </script>
+
 </body>
 </html>
