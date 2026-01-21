@@ -701,6 +701,8 @@
       const resultadoScreen = document.getElementById("resultado-screen");
       const chatScreen = document.getElementById("chat-screen");
       const perfilScreen = document.getElementById("perfil-screen");
+      const irrigacaoScreen = document.getElementById("irrigacao-screen");
+
       
       // Elementos UI
       const appFooter = document.querySelector(".app-footer");
@@ -717,7 +719,7 @@
       // Navegação Centralizada
       function nav(telaId) {
         // Esconde todas as telas
-        const telas = [loginScreen, selecaoCulturaScreen, dashboardScreen, appScreen, resultadoScreen, chatScreen, perfilScreen];
+        const telas = [loginScreen, selecaoCulturaScreen, dashboardScreen, appScreen, resultadoScreen, chatScreen, perfilScreen, irrigacaoScreen];
         telas.forEach(s => s.classList.add('hide'));
         
         // Mostra a tela desejada
@@ -1243,6 +1245,7 @@ if (btnCalc) btnCalc.addEventListener('click', calcularIrrigacao);
   </script>
 </body>
 </html>
+
 
 
 
