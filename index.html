@@ -589,9 +589,18 @@
 
     <h3 style="margin-bottom:8px;">1. Dados Meteorológicos (INMET)</h3>
     <div class="row">
-      <input type="number" id="eto" step="0.1" placeholder="ETo (mm/dia) — ex: 6.0" class="area-input" style="flex:1;">
-      <input type="number" id="precipitacao" step="0.1" value="0" placeholder="Precipitação (mm) — ex: 0" class="area-input" style="flex:1;">
-    </div>
+  <div style="flex:1;">
+    <div class="muted" style="text-align:left; font-size:.8rem; margin:0 0 6px 2px;">ETo (mm/dia)</div>
+    <input type="number" id="eto" step="0.1" placeholder="Ex: 6.0" class="area-input" style="width:100%; box-sizing:border-box;">
+  </div>
+
+  <div style="flex:1;">
+    <div class="muted" style="text-align:left; font-size:.8rem; margin:0 0 6px 2px;">Precipitação (mm)</div>
+    <input type="number" id="precipitacao" step="0.1" value="0" placeholder="Ex: 0.0"
+           class="area-input" style="width:100%; box-sizing:border-box;">
+  </div>
+</div>
+
 
     <h3 style="margin-bottom:8px;">2. Dados da Cultura (Mangueira)</h3>
     <div class="row">
@@ -608,13 +617,33 @@
       <input type="number" id="el" step="0.1" placeholder="Espaçamento entre linhas (m) — ex: 8.0" class="area-input" style="flex:1;">
     </div>
     <div class="row" style="margin-top:10px;">
-      <input type="number" id="q" step="0.1" placeholder="Vazão do emissor (L/h) — ex: 50" class="area-input" style="flex:1;">
-      <input type="number" id="n" step="1" value="1" placeholder="Nº emissores por planta" class="area-input" style="flex:1;">
-    </div>
+  <div style="flex:1;">
+    <div class="muted" style="text-align:left; font-size:.8rem; margin:0 0 6px 2px;">Vazão do emissor (L/h)</div>
+    <input type="number" id="q" step="0.1" placeholder="Ex: 50"
+           class="area-input" style="width:100%; box-sizing:border-box;">
+  </div>
+
+  <div style="flex:1;">
+    <div class="muted" style="text-align:left; font-size:.8rem; margin:0 0 6px 2px;">Nº emissores por planta</div>
+    <input type="number" id="n" step="1" value="1" placeholder="Ex: 1"
+           class="area-input" style="width:100%; box-sizing:border-box;">
+  </div>
+</div>
+
     <div class="row" style="margin-top:10px;">
-      <input type="number" id="ef" step="1" value="90" placeholder="Eficiência do sistema (%) — ex: 90" class="area-input" style="flex:1;">
-      <input type="number" id="nl" step="0.01" value="1.0" placeholder="Fator lixiviação (NL) — ex: 1.0" class="area-input" style="flex:1;">
-    </div>
+  <div style="flex:1;">
+    <div class="muted" style="text-align:left; font-size:.8rem; margin:0 0 6px 2px;">Eficiência do sistema (%)</div>
+    <input type="number" id="ef" step="1" value="90" placeholder="Ex: 90"
+           class="area-input" style="width:100%; box-sizing:border-box;">
+  </div>
+
+  <div style="flex:1;">
+    <div class="muted" style="text-align:left; font-size:.8rem; margin:0 0 6px 2px;">Fator de lixiviação (NL)</div>
+    <input type="number" id="nl" step="0.01" value="1.0" placeholder="Ex: 1.0"
+           class="area-input" style="width:100%; box-sizing:border-box;">
+  </div>
+</div>
+
     <p class="muted" style="text-align:left; margin-top:6px;">
       Eficiência típica: Gotejo ~90% | Microaspersão ~85%. NL=1.0 sem restrição de salinidade.
     </p>
@@ -1214,6 +1243,7 @@ if (btnCalc) btnCalc.addEventListener('click', calcularIrrigacao);
   </script>
 </body>
 </html>
+
 
 
 
