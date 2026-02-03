@@ -576,109 +576,11 @@
     </div>
   </div>
 
-  <div id="irrigacao-screen" class="wrap hide">
-  <button onclick="nav('dashboard-screen')" style="background:#555; margin-bottom:15px;">
-    VOLTAR AO INICIO
-  </button>
-
-  <div class="card">
-    <h3 style="text-align:center; margin-top:0;">Irrigação (ADIM)</h3>
-    <p class="muted" style="text-align:left;">
-      Calculadora baseada na metodologia do Prof. Dr. José Sebastião Costa de Sousa do IF Sertão PE - Campus Petrolina Zona Rural. Preencha os dados e calcule o tempo de rega.
-    </p>
-
-    <h3 style="margin-bottom:8px;">1. Dados Meteorológicos (INMET)</h3>
-    <div class="row">
-  <div style="flex:1;">
-    <div class="muted" style="text-align:left; font-size:.8rem; margin:0 0 6px 2px;">ETo (mm/dia)</div>
-    <input type="number" id="eto" step="0.1" placeholder="Ex: 6.0" class="area-input" style="width:100%; box-sizing:border-box;">
-  </div>
-
-  <div style="flex:1;">
-    <div class="muted" style="text-align:left; font-size:.8rem; margin:0 0 6px 2px;">Precipitação (mm)</div>
-    <input type="number" id="precipitacao" step="0.1" value="0" placeholder="Ex: 0.0"
-           class="area-input" style="width:100%; box-sizing:border-box;">
-  </div>
-</div>
-
-
-    <h3 style="margin-bottom:8px;">2. Dados da Cultura (Mangueira)</h3>
-    <div class="row">
-      <input type="number" id="kc" step="0.01" placeholder="Kc — ex: 0.90" class="area-input" style="flex:1;">
-      <input type="number" id="pm" step="1" placeholder="Área molhada/sombreada (%) — ex: 85" class="area-input" style="flex:1;">
-    </div>
-    <p class="muted" style="text-align:left; margin-top:6px;">
-      Referência: Veg ~0.5 | Flor ~0.8 | Fruto ~0.9–1.0
-    </p>
-
-    <h3 style="margin-bottom:8px;">3. Sistema de Irrigação</h3>
-    <div class="row">
-      <input type="number" id="ep" step="0.1" placeholder="Espaçamento entre plantas (m) — ex: 5.0" class="area-input" style="flex:1;">
-      <input type="number" id="el" step="0.1" placeholder="Espaçamento entre linhas (m) — ex: 8.0" class="area-input" style="flex:1;">
-    </div>
-    <div class="row" style="margin-top:10px;">
-  <div style="flex:1;">
-    <div class="muted" style="text-align:left; font-size:.8rem; margin:0 0 6px 2px;">Vazão do emissor (L/h)</div>
-    <input type="number" id="q" step="0.1" placeholder="Ex: 50"
-           class="area-input" style="width:100%; box-sizing:border-box;">
-  </div>
-
-  <div style="flex:1;">
-    <div class="muted" style="text-align:left; font-size:.8rem; margin:0 0 6px 2px;">Nº emissores por planta</div>
-    <input type="number" id="n" step="1" value="1" placeholder="Ex: 1"
-           class="area-input" style="width:100%; box-sizing:border-box;">
-  </div>
-</div>
-
-    <div class="row" style="margin-top:10px;">
-  <div style="flex:1;">
-    <div class="muted" style="text-align:left; font-size:.8rem; margin:0 0 6px 2px;">Eficiência do sistema (%)</div>
-    <input type="number" id="ef" step="1" value="90" placeholder="Ex: 90"
-           class="area-input" style="width:100%; box-sizing:border-box;">
-  </div>
-
-  <div style="flex:1;">
-    <div class="muted" style="text-align:left; font-size:.8rem; margin:0 0 6px 2px;">Fator de lixiviação (NL)</div>
-    <input type="number" id="nl" step="0.01" value="1.0" placeholder="Ex: 1.0"
-           class="area-input" style="width:100%; box-sizing:border-box;">
-  </div>
-</div>
-
-    <p class="muted" style="text-align:left; margin-top:6px;">
-      Eficiência típica: Gotejo ~90% | Microaspersão ~85%. NL=1.0 sem restrição de salinidade.
-    </p>
-
-    <button id="btnCalcIrrigacao" class="btn-nova-contagem" style="margin-top:12px; background:#28a745;">
-      CALCULAR TEMPO DE REGA
-    </button>
-
-    <div id="results" class="card" style="display:none; margin-top:14px; background:#fff;">
-      <h3 style="margin-top:0;">Resultados</h3>
-
-      <div class="data-row"><span>Coeficiente de Localização (KL)</span><span id="res-kl">—</span></div>
-      <div class="data-row"><span>Evapotranspiração Real (ETR)</span><span id="res-etr">—</span></div>
-      <div class="data-row"><span>Lâmina Líquida (LLI)</span><span id="res-lli">—</span></div>
-      <div class="data-row"><span>Lâmina Bruta (LBI)</span><span id="res-lbi">—</span></div>
-      <div class="data-row"><span>Volume por Planta</span><span id="res-vol">—</span></div>
-
-      <div class="btn-nova-contagem" style="background:#2a7bf6; margin-top:12px; text-align:center;">
-        Tempo de Irrigação:
-        <div style="font-size:1.8rem; font-weight:800; margin-top:6px;" id="res-tempo">0h 00min</div>
-      </div>
-    </div>
-
-    <p class="muted" style="margin-top:14px;">
-      Desenvolvido para apoio técnico, mas não substitui o Engenheiro Agrônomo. 
-    </p>
-  </div>
-</div>
-
-  
   <div class="app-footer">
     <a onclick="nav('dashboard-screen')" class="footer-btn active">Início</a>
     <a onclick="nav('resultado-screen')" class="footer-btn">Relatórios</a>
     <a onclick="nav('app-screen')" class="footer-btn-central"><img src="imagem1.jpeg" alt="Nova"></a>
-    <a onclick="nav('irrigacao-screen')" class="footer-btn">Irrigação</a>
+    <a onclick="alert('Em breve')" class="footer-btn">Irrigação</a> 
     <a onclick="nav('perfil-screen')" class="footer-btn">Perfil</a>
   </div>
   
@@ -701,8 +603,6 @@
       const resultadoScreen = document.getElementById("resultado-screen");
       const chatScreen = document.getElementById("chat-screen");
       const perfilScreen = document.getElementById("perfil-screen");
-      const irrigacaoScreen = document.getElementById("irrigacao-screen");
-
       
       // Elementos UI
       const appFooter = document.querySelector(".app-footer");
@@ -719,7 +619,7 @@
       // Navegação Centralizada
       function nav(telaId) {
         // Esconde todas as telas
-        const telas = [loginScreen, selecaoCulturaScreen, dashboardScreen, appScreen, resultadoScreen, chatScreen, perfilScreen, irrigacaoScreen];
+        const telas = [loginScreen, selecaoCulturaScreen, dashboardScreen, appScreen, resultadoScreen, chatScreen, perfilScreen];
         telas.forEach(s => s.classList.add('hide'));
         
         // Mostra a tela desejada
@@ -888,7 +788,7 @@
             } else { html += "ESTIMATIVA: N/A (Requer vídeo)"; }
             resultadoDetalhado.textContent = html;
             const futuro = 2.50;
-            forecastMessage.textContent = `Hoje: R$ ${formatterCurrency.format(preco)}. Dia 15/02: R$ ${formatterCurrency.format(futuro)}. Venda recomendada!`;
+            forecastMessage.textContent = `Hoje: R$ ${formatterCurrency.format(preco)}. Dia 15/12: R$ ${formatterCurrency.format(futuro)}. Venda recomendada!`;
             btnAgenda.onclick = () => {
                const url = new URL("https://calendar.google.com/calendar/render?action=TEMPLATE");
                url.searchParams.append('text', "Venda Manga (CyberAgro)");
@@ -1165,78 +1065,6 @@
           }
         });
       }
-
-// --- ABA IRRIGAÇÃO (ADIM) ---
-function calcularIrrigacao() {
-  const eto = parseFloat(document.getElementById('eto').value);
-  const p = parseFloat(document.getElementById('precipitacao').value);
-  const kc = parseFloat(document.getElementById('kc').value);
-  const pm = parseFloat(document.getElementById('pm').value);
-
-  const ep = parseFloat(document.getElementById('ep').value);
-  const el = parseFloat(document.getElementById('el').value);
-
-  const q = parseFloat(document.getElementById('q').value);
-  const n = parseFloat(document.getElementById('n').value);
-  const ef = parseFloat(document.getElementById('ef').value) / 100;
-  const nl = parseFloat(document.getElementById('nl').value);
-
-  // validação
-  if ([eto, p, kc, pm, ep, el, q, n, ef, nl].some(v => Number.isNaN(v))) {
-    alert("Por favor, preencha todos os campos corretamente.");
-    return;
-  }
-  if (ef <= 0 || nl <= 0 || q <= 0 || n <= 0 || ep <= 0 || el <= 0) {
-    alert("Verifique os valores: eficiência, NL, vazão, emissores e espaçamentos precisam ser > 0.");
-    return;
-  }
-
-  // 1) KL (Keller & Bliesner) — fórmula do seu código: KL = 0.1 * sqrt(Pm)
-  const kl = 0.1 * Math.sqrt(pm);
-
-  // 2) ETR
-  const etr = eto * kc * kl;
-
-  // 3) LLI
-  let lli = etr - p;
-  if (lli < 0) lli = 0;
-
-  // 4) LBI
-  const lbi = lli / (ef * nl);
-
-  // 5) AUP
-  const aup = ep * el;
-
-  // 6) Volume (litros)
-  const volume = lbi * aup;
-
-  // 7) Tempo (horas decimais)
-  const tfHorasDecimais = volume / (q * n);
-
-  const horas = Math.floor(tfHorasDecimais);
-  const minutos = Math.round((tfHorasDecimais - horas) * 60);
-
-  document.getElementById('res-kl').innerText = kl.toFixed(3);
-  document.getElementById('res-etr').innerText = etr.toFixed(2) + " mm/dia";
-  document.getElementById('res-lli').innerText = lli.toFixed(2) + " mm";
-  document.getElementById('res-lbi').innerText = lbi.toFixed(2) + " mm";
-  document.getElementById('res-vol').innerText = volume.toFixed(1) + " L";
-
-  let tempoTexto = "";
-  if (tfHorasDecimais <= 0) tempoTexto = "Sem irrigação (chuva suficiente)";
-  else tempoTexto = `${horas}h ${minutos}min`;
-
-  document.getElementById('res-tempo').innerText = tempoTexto;
-
-  const results = document.getElementById('results');
-  results.style.display = 'block';
-  results.scrollIntoView({ behavior: 'smooth' });
-}
-
-// Botão calcular
-const btnCalc = document.getElementById('btnCalcIrrigacao');
-if (btnCalc) btnCalc.addEventListener('click', calcularIrrigacao);
-
       
       // Funções Globais para os botões onclick do HTML
       window.nav = nav;
@@ -1245,10 +1073,3 @@ if (btnCalc) btnCalc.addEventListener('click', calcularIrrigacao);
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
