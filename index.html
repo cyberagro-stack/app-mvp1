@@ -788,7 +788,7 @@
             } else { html += "ESTIMATIVA: N/A (Requer vídeo)"; }
             resultadoDetalhado.textContent = html;
             const futuro = 2.50;
-            forecastMessage.textContent = `Hoje: R$ ${formatterCurrency.format(preco)}. Dia 15/12: R$ ${formatterCurrency.format(futuro)}. Venda recomendada!`;
+            forecastMessage.textContent = `Hoje: R$ ${formatterCurrency.format(preco)}. Dia 15/02: R$ ${formatterCurrency.format(futuro)}. Venda recomendada!`;
             btnAgenda.onclick = () => {
                const url = new URL("https://calendar.google.com/calendar/render?action=TEMPLATE");
                url.searchParams.append('text', "Venda Manga (CyberAgro)");
@@ -1073,3 +1073,4 @@
   </script>
 </body>
 </html>
+
