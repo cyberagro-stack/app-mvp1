@@ -1123,7 +1123,7 @@
             // Salvar no localStorage
             localStorage.setItem("lastAnalysisResult", html);
             localStorage.setItem("lastForecastMessage", `Hoje: R$ ${formatterCurrency.format(preco)}. Dia 15/02: R$ ${formatterCurrency.format(2.50)}. Venda recomendada!`);
-            localStorage.setItem("lastChartLabels", JSON.stringify(['3/10', '10/10', '17/10', '24/10', '31/10', '7/11']));
+            localStorage.setItem("lastChartLabels", JSON.stringify(['20/01', '30/01', '01/02', '02/02', '03/02', '05/02']));
             localStorage.setItem("lastChartData", JSON.stringify([2.51, 1.26, 1.95, 1.88, 2.06, 1.86]));
 
             resultadoDetalhado.textContent = html;
@@ -1138,7 +1138,7 @@
             };
             out.innerHTML = `<button id="btnVerResultado" class="btn-nova-contagem">Ver Resultado</button>`;
             document.getElementById("btnVerResultado").onclick = () => {
-              renderChart(['3/10', '10/10', '17/10', '24/10', '31/10', '7/11'], [2.51, 1.26, 1.95, 1.88, 2.06, 1.86]);
+              renderChart(['20/01', '30/01', '01/02', '02/02', '03/02', '05/02'], [2.51, 1.26, 1.95, 1.88, 2.06, 1.86]);
               nav('resultado-screen');
             };
           } else { statusEl.textContent = "Erro no processamento."; out.textContent = text; }
@@ -1441,3 +1441,4 @@
 </body>
 
 </html>
+
