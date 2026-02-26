@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="./vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CyberAgro</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FFFFFF">
+    <script type="module" crossorigin src="./assets/index-dfEuvFqY.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DpJQTNeN.css">
+  </head>
+  <body>
+    <div id="login-screen" class="wrap">
+    <div class="auth-header">
+      <img src="logo.png?v=7" alt="CyberAgro Logo" class="auth-logo">
+      <h2>Bem-vindo de volta!</h2>
+      <p class="muted">Acesse sua conta para continuar gerenciando sua produção.</p>
+    </div>
+    <div class="card auth-card">
+      <div class="input-group">
+        <label for="usernameInput">Usuário ou E-mail</label>
+        <input type="text" id="usernameInput" placeholder="ex: JoaoSilva99" class="area-input">
+      </div>
+      <div class="input-group" style="margin-top: 16px;">
+        <label for="passwordInput">Senha</label>
+        <input type="password" id="passwordInput" placeholder="••••••••" class="area-input">
+      </div>
+
+      <p id="loginError" class="login-error">Senha ou usuário incorretos. Tente novamente.</p>
+
+      <button id="loginButton" class="btn-primary" style="width:100%; margin-top: 24px;">Entrar</button>
+
+      <div class="auth-footer">
+        <p>Ainda não tem uma conta? <a href="#" onclick="nav('register-screen'); return false;" class="auth-link">Criar
+            conta</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="register-screen" class="wrap hide">
+    <div class="auth-header">
+      <img src="logo.png?v=7" alt="CyberAgro Logo" class="auth-logo" style="height: 100px;">
+      <h2>Crie sua conta</h2>
+      <p class="muted">Junte-se ao futuro do agronegócio inteligente.</p>
+    </div>
+    <div class="card auth-card">
+      <div class="input-group">
+        <label for="regNomeInput">Nome Completo</label>
+        <input type="text" id="regNomeInput" placeholder="Ex: João da Silva" class="area-input">
+      </div>
+      <div class="input-group" style="margin-top: 16px;">
+        <label for="regEmailInput">E-mail ou Usuário</label>
+        <input type="email" id="regEmailInput" placeholder="joao@exemplo.com" class="area-input">
+      </div>
+      <div class="input-group" style="margin-top: 16px;">
+        <label for="regPasswordInput">Senha</label>
+        <input type="password" id="regPasswordInput" placeholder="••••••••" class="area-input">
+      </div>
+      <div class="input-group" style="margin-top: 16px;">
+        <label for="regPasswordConfirmInput">Confirmar Senha</label>
+        <input type="password" id="regPasswordConfirmInput" placeholder="••••••••" class="area-input">
+      </div>
+
+      <p id="registerError" class="login-error">As senhas não coincidem ou campos vazios.</p>
+
+      <button id="registerButton" class="btn-primary" style="width:100%; margin-top: 24px;">Criar Conta</button>
+
+      <div class="auth-footer">
+        <p>Já possui uma conta? <a href="#" onclick="nav('login-screen'); return false;" class="auth-link">Fazer
+            login</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="selecao-cultura-screen" class="wrap hide">
+    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=7" alt="CyberAgro Logo" height="250"></h1>
+    <div class="card">
+      <h3 style="text-align: center;">Selecione a Cultura</h3>
+      <div class="cultura-grid">
+        <div id="btnIconeManga" class="cultura-btn">
+          <img src="manga.png" alt="Manga"><span>Manga</span>
+        </div>
+        <div id="btnIconeUva" class="cultura-btn">
+          <img src="uva.png" alt="Uva"><span>Uva</span>
+        </div>
+        <div id="btnIconePitaya" class="cultura-btn">
+          <img src="pitaya.png" alt="Pitaya"><span>Pitaya</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dashboard-screen" class="wrap hide">
+    <div class="dash-hero">
+      <div class="dash-hero-top">
+        <div>
+          <div class="dash-title">Exportação de Manga • Brasil</div>
+          <div class="dash-subtitle">
+            Fonte: HFBRASIL (HORTIFRUTI BRASIL)
+          </div>
+        </div>
+
+        <div class="dash-actions">
+          <button class="btn-secondary" id="btnReloadMango">Atualizar</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid" id="kpiGrid">
+        <div class="kpi-card">
+          <div class="kpi-label">Preço Médio Palmer</div>
+          <div class="kpi-value" id="kpiFobTotal">—</div>
+          <div class="kpi-foot" id="kpiFobFoot">—</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Preço Médio Tommy</div>
+          <div class="kpi-value" id="kpiKgTotal">—</div>
+          <div class="kpi-foot" id="kpiKgFoot">—</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Maior Preço (Teto)</div>
+          <div class="kpi-value" id="kpiUsdKg">—</div>
+          <div class="kpi-foot" id="kpiUsdKgFoot">—</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Melhor Mês (FOB)</div>
+          <div class="kpi-value" id="kpiBestMonth">—</div>
+          <div class="kpi-foot" id="kpiBestMonthFoot">—</div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-card-head">
+            <div>
+              <div class="dash-card-title">Evolução Mensal</div>
+              <div class="dash-card-sub">Últimos 12 meses disponíveis na base</div>
+            </div>
+            <div id="dashStatus" class="status">Pronto</div>
+          </div>
+          <div id="dashError" class="dash-error hide"></div>
+          <div class="chart-wrap">
+            <canvas id="mangaChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="chat-screen" class="chat-frame-container hide">
+    <div class="chat-header">
+      <button onclick="nav('dashboard-screen')" class="chat-header-btn">← Voltar</button>
+      <div style="flex: 1;">
+        <div class="chat-header-title">CyberAgro Assistente</div>
+        <div class="chat-header-status">Online</div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-empty-state">
+        <div class="chat-empty-state-icon">💬</div>
+        <div class="chat-empty-state-text">Olá! Sou seu assistente virtual. Como posso ajudá-lo hoje?</div>
+      </div>
+    </div>
+    <div class="chat-input-container">
+      <input type="text" id="chatInput" class="chat-input" placeholder="Digite sua mensagem..." autocomplete="off" />
+      <button id="chatSendBtn" class="chat-send-btn" title="Enviar mensagem">→</button>
+    </div>
+  </div>
+
+  <div id="perfil-screen" class="wrap hide">
+    <div class="profile-header card">
+      <img src="logo.png?v=7" alt="Foto de Perfil" class="profile-pic">
+      <div class="profile-info">
+        <div class="profile-name">CyberAgro</div>
+        <div class="profile-subtitle">cyberagro.contato@gmail.com</div>
+      </div>
+    </div>
+    <div class="menu-list card">
+      <a href="#" class="menu-item" id="navMeusDados"><span class="menu-icon">👤</span> <span>Meus Dados</span> <span
+          class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item" id="navConfig"><span class="menu-icon">⚙️</span> <span>Configurações</span> <span
+          class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item danger" id="navSair"><span class="menu-icon">🚪</span> <span>Sair</span> <span
+          class="menu-chevron">&gt;</span></a>
+    </div>
+  </div>
+
+  <div id="irrigacao-screen" class="wrap hide">
+    <div id="adim-widget" style="font-family: sans-serif; background-color: #fff; padding: 20px; border-radius: 10px;">
+
+      
+
+      <h3 style="color:#2E7D32; margin-top:0;">Calculadora de Rega </h3>
+
+      <div class="adim-group">
+        <label class="adim-label">ETo de Ontem (mm/dia)</label>
+        <input type="number" id="eto" class="adim-input" placeholder="Ex: 6.0" step="0.1">
+        <small class="adim-help" id="eto-source-msg">Insira o dado do INMET ou Rádio.</small>
+      </div>
+
+      <div class="adim-group">
+        <label class="adim-label">Chuva nas últimas 24h (mm)</label>
+        <input type="number" id="precipitacao" class="adim-input" value="0" step="0.1">
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+      <div class="adim-group">
+        <label class="adim-label">Como está o pomar hoje?</label>
+        <select id="fase_cultura" class="adim-select" onchange="verificarFase()">
+          <option value="vegetativo">🌱 Brotando (Pós-poda)</option>
+          <option value="inducao">🛑 Parado / Aplicando PBZ</option>
+          <option value="producao">🥭 Com Flor ou Fruta</option>
+          <option value="pos_colheita">💤 Repouso (Pós-colheita)</option>
+        </select>
+      </div>
+
+      <div class="adim-group" id="grupo-data-florada" style="display: none;">
+        <label class="adim-label">Data do Início da Florada</label>
+        <input type="date" id="data_florada" class="adim-input">
+        <small class="adim-help">Necessário para calcular a idade da fruta.</small>
+      </div>
+
+      <div id="fase-feedback" class="fase-info"></div>
+
+      <div class="adim-group">
+        <label class="adim-label">Espaçamento (Plantas x Linhas)</label>
+        <div style="display: flex; gap: 10px;">
+          <input type="number" id="ep" class="adim-input" placeholder="Plantas (m)" step="0.1">
+          <input type="number" id="el" class="adim-input" placeholder="Linhas (m)" step="0.1">
+        </div>
+      </div>
+
+      <div class="adim-group">
+        <label class="adim-label">Vazão do Bico (L/h)</label>
+        <div style="display: flex; gap: 10px;">
+          <input type="number" id="q" class="adim-input" placeholder="Ex: 50" step="0.1">
+          <input type="number" id="n" class="adim-input" value="1" placeholder="Qtd Bicos">
+        </div>
+        <small class="adim-help">Vazão por emissor e Nº de emissores por pé.</small>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <details>
+          <summary style="color: #666; cursor: pointer; font-size: 0.9rem;">Configurações Avançadas</summary>
+          <div class="adim-group" style="margin-top: 10px;">
+            <label class="adim-label">% Área Molhada (Pm)</label>
+            <input type="number" id="pm" class="adim-input" value="85" step="1">
+          </div>
+          <div class="adim-group">
+            <label class="adim-label">Eficiência (%) & Lixiviação</label>
+            <div style="display: flex; gap: 10px;">
+              <input type="number" id="ef" class="adim-input" value="90" placeholder="Ef %">
+              <input type="number" id="nl" class="adim-input" value="1.0" placeholder="NL">
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <button type="button" class="adim-btn" onclick="executarCalculoADIM()">CALCULAR TEMPO</button>
+
+      <div id="adim-results" class="adim-result-box">
+        <div class="adim-big-res">
+          Tempo de Rega:
+          <span id="out-tempo">--</span>
+        </div>
+
+        <div style="margin-top: 15px;">
+          <div class="adim-row"><span>Volume por Planta:</span> <strong id="out-vol">-</strong></div>
+          <div class="adim-row"><span>Fase Identificada:</span> <strong id="out-fase-desc"
+              style="font-size: 0.9em;">-</strong></div>
+          <div class="adim-row"><span>Kc Calculado:</span> <strong id="out-kc">-</strong></div>
+          <div class="adim-row"><span>ETo Usada:</span> <strong id="out-eto-usada">-</strong></div>
+        </div>
+      </div>
+
+      
+    </div>
+  </div>
+
+  <div class="app-footer">
+    <a onclick="nav('dashboard-screen')" class="footer-btn active">Início</a>
+    <a onclick="nav('irrigacao-screen')" class="footer-btn">Irrigação</a>
+    <a onclick="nav('perfil-screen')" class="footer-btn">Perfil</a>
+  </div>
+
+  <button id="btnChat" class="chat-fab" onclick="nav('chat-screen')">
+    <img src="imagem2.png" alt="Chat">
+  </button>
+
+  
+
+  <!-- Inicialização Isolada do Firebase (Parâmetros no .env) -->
+    
+    <!-- Vite Module Script -->
+  </body>
+</html>

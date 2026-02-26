@@ -1,0 +1,2268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CyberAgro</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FFFFFF">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/app-mvp1/sw.js')
+        .then(reg => {
+          reg.update();
+          console.log('Service Worker Registrado v10');
+        })
+        .catch(err => console.log('Service Worker falhou:', err));
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- SheetJS para processar planilhas Excel locais -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+  <!-- marked.js para processar Markdown das mensagens do bot -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    /* --- ESTILOS GERAIS --- */
+    :root {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+    }
+
+    body {
+      margin: 0 0 80px 0;
+      background: #FFFFFF;
+      color: #333333;
+      height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .wrap {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .card {
+      background: #F8F8F8;
+      border: 1px solid #E0E0E0;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button {
+      background: #2a7bf6;
+      color: white;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button[disabled] {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .muted {
+      color: #555555;
+      font-size: .9rem;
+      text-align: center;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #333333;
+    }
+
+    h3 {
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    .btn-upload {
+      position: relative;
+      display: inline-block;
+      background: #E6EEFA;
+      color: #2a7bf6;
+      border: 1px dashed #2a7bf6;
+    }
+
+    .file-proxy {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .area-input {
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 10px 14px;
+      border: 1px solid #E0E0E0;
+      border-radius: 12px;
+      background: #FFFFFF;
+      flex-grow: 1;
+      min-width: 150px;
+    }
+
+    .progress {
+      height: 6px;
+      background: #E0E0E0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0%;
+      background: #2a7bf6;
+      transition: width .2s;
+    }
+
+    #previewVideo,
+    #previewImage {
+      width: 100%;
+      border-radius: 12px;
+      background: #000;
+      margin-top: 10px;
+    }
+
+    .login-error {
+      color: #D32F2F;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .summary-card {
+      background: #EEEEEE;
+      border: 1px solid #E0E0E0;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .summary-card label {
+      display: block;
+      font-size: 0.8rem;
+      color: #555555;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .summary-card .value {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .data-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 8px;
+      border-bottom: 1px solid #EEE;
+      font-size: 0.9rem;
+    }
+
+    .data-row span:first-child {
+      color: #333;
+    }
+
+    .data-row span:last-child {
+      color: #555;
+      font-weight: 500;
+    }
+
+    .btn-nova-contagem {
+      background: #28a745;
+      /* Verde */
+      color: white;
+      border: 0;
+      border-radius: 12px;
+      padding: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1.1rem;
+      margin-top: 20px;
+    }
+
+    /* --- CHAT NATIVO PROFISSIONAL --- */
+    .chat-frame-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+      z-index: 900;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: white;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+
+    .chat-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .chat-header-btn {
+      background: rgba(255, 255, 255, 0.25);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 22px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .chat-header-btn:hover {
+      background: rgba(255, 255, 255, 0.35);
+      transform: translateX(-2px);
+    }
+
+    .chat-header-title {
+      flex: 1;
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+
+    .chat-header-status {
+      font-size: 0.75rem;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+      background: transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .chat-message {
+      display: flex;
+      gap: 10px;
+      animation: messageSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      max-width: 85%;
+      align-self: flex-start;
+    }
+
+    .chat-message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    @keyframes messageSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .chat-message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      flex-shrink: 0;
+      font-size: 0.85rem;
+      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+      border: 2px solid white;
+      overflow: hidden;
+    }
+
+    /* ÚNICA ALTERAÇÃO: fundo branco apenas para o avatar do bot */
+    .chat-message.bot .chat-message-avatar {
+      background: #ffffff;
+    }
+
+    .chat-message.user .chat-message-avatar {
+      background: linear-gradient(135deg, #2a7bf6 0%, #1e5fd4 100%);
+      box-shadow: 0 2px 8px rgba(42, 123, 246, 0.3);
+    }
+
+    .chat-message-content {
+      padding: 14px 18px;
+      border-radius: 20px;
+      word-wrap: break-word;
+      line-height: 1.5;
+      font-size: 0.95rem;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .chat-message.bot .chat-message-content {
+      background: white;
+      color: #2c3e50;
+      border-bottom-left-radius: 6px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat-message.user .chat-message-content {
+      background: linear-gradient(135deg, #2a7bf6 0%, #1e5fd4 100%);
+      color: white;
+      border-bottom-right-radius: 6px;
+      box-shadow: 0 4px 12px rgba(42, 123, 246, 0.25);
+    }
+
+    .chat-message-time {
+      font-size: 0.7rem;
+      opacity: 0.6;
+      margin-top: 4px;
+      padding-left: 2px;
+    }
+
+    .chat-input-container {
+      background: white;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      padding: 16px 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .chat-input {
+      flex: 1;
+      border: 2px solid #e9ecef;
+      border-radius: 26px;
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      background: #f8f9fa;
+    }
+
+    .chat-input:focus {
+      border-color: #28a745;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+    }
+
+    .chat-send-btn {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: white;
+      border: none;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+      font-weight: 600;
+    }
+
+    .chat-send-btn:hover:not(:disabled) {
+      transform: scale(1.08);
+      box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+    }
+
+    .chat-send-btn:active:not(:disabled) {
+      transform: scale(1.02);
+    }
+
+    .chat-send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: scale(1);
+    }
+
+    .chat-typing-indicator {
+      display: flex;
+      gap: 5px;
+      padding: 14px 18px;
+      background: white;
+      border-radius: 20px;
+      border-bottom-left-radius: 6px;
+      max-width: 70px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .chat-typing-dot {
+      width: 9px;
+      height: 9px;
+      background: #adb5bd;
+      border-radius: 50%;
+      animation: typingBounce 1.4s infinite;
+    }
+
+    .chat-typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .chat-typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typingBounce {
+
+      0%,
+      60%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.7;
+      }
+
+      30% {
+        transform: translateY(-12px);
+        opacity: 1;
+      }
+    }
+
+    .chat-empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #6c757d;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .chat-empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      opacity: 0.4;
+      filter: grayscale(0.3);
+    }
+
+    .chat-empty-state-text {
+      font-size: 1.05rem;
+      color: #6c757d;
+      font-weight: 500;
+      max-width: 280px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 480px) {
+      .chat-message {
+        max-width: 90%;
+      }
+
+      .chat-header {
+        padding: 16px 16px;
+      }
+
+      .chat-messages {
+        padding: 20px 16px;
+      }
+
+      .chat-input-container {
+        padding: 14px 16px;
+      }
+    }
+
+    /* ----------------------------- */
+
+    /* Rodapé começa oculto */
+    .app-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #FFFFFF;
+      border-top: 1px solid #E0E0E0;
+      display: none;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      z-index: 999;
+      padding: 0 10px;
+      height: 60px;
+    }
+
+    /* Chat começa oculto */
+    .chat-fab {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      background: #28a745;
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      display: none;
+      box-sizing: border-box;
+      padding: 10px;
+    }
+
+    .footer-btn {
+      flex: 1;
+      text-align: center;
+      padding: 10px 5px;
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #888888;
+      background: none;
+      border: none;
+    }
+
+    .footer-btn.active {
+      color: #28a745;
+      font-weight: 600;
+    }
+
+    .footer-btn-central {
+      background: #000000;
+      color: white;
+      width: 50px;
+      height: 50px;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 50%;
+      position: relative;
+      top: -20px;
+      box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.15);
+      border: 4px solid white;
+      padding: 6px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .footer-btn-central img {
+      width: 100%;
+      height: 100%;
+
+    }
+
+    .chat-fab img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    #agenda-section {
+      margin-top: 20px;
+      border-top: 1px solid #E0E0E0;
+      padding-top: 15px;
+    }
+
+    #grafico-placeholder {
+      width: 100%;
+      height: 250px;
+      background: #EEEEEE;
+      border-radius: 12px;
+    }
+
+    /* CSS da Seleção de Cultura */
+    .cultura-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .cultura-btn {
+      background: #F8F8F8;
+      border: 1px solid #E0E0E0;
+      border-radius: 12px;
+      padding: 15px 5px;
+      text-decoration: none;
+      color: #333;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cultura-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .cultura-btn img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      margin-bottom: 8px;
+    }
+
+    /* Estilos Perfil */
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .profile-pic {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #DDD;
+    }
+
+    .profile-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .profile-subtitle {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .menu-list {
+      margin-top: 20px;
+      padding: 0;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      text-decoration: none;
+      color: #333;
+      font-size: 1rem;
+      border-bottom: 1px solid #EEE;
+    }
+
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .menu-item.danger {
+      color: #D32F2F;
+    }
+
+    .menu-icon {
+      font-size: 1.2rem;
+      margin-right: 16px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .menu-chevron {
+      margin-left: auto;
+      color: #AAA;
+      font-weight: 600;
+    }
+
+    /* Helper */
+    .hide {
+      display: none !important;
+    }
+
+    /* --- AUTH STYLES --- */
+    .auth-header {
+      text-align: center;
+      margin-bottom: 30px;
+      margin-top: 2vh;
+    }
+
+    .auth-logo {
+      height: 140px;
+      margin-bottom: 16px;
+      animation: fadeInDown 0.8s ease;
+    }
+
+    .auth-header h2 {
+      font-size: 1.8rem;
+      color: #1a1a1a;
+      margin: 0 0 8px 0;
+      font-weight: 700;
+    }
+
+    .auth-card {
+      padding: 30px 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      border: none;
+      background: white;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+
+    .input-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .input-group .area-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px 16px;
+      background: #f9fbfd;
+      border: 1px solid #e1e5eb;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      border-radius: 12px;
+    }
+
+    .input-group .area-input:focus {
+      outline: none;
+      border-color: #28a745;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.1);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: white;
+      padding: 16px;
+      font-size: 1.05rem;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.25);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(40, 167, 69, 0.35);
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.95rem;
+      color: #666;
+    }
+
+    .auth-link {
+      color: #28a745;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .auth-link:hover {
+      color: #1e7e34;
+      text-decoration: underline;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* --- DASHBOARD EXPORTAÇÕES (SaaS) --- */
+    .dash-hero {
+      background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+      border: 1px solid #E0E0E0;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    .dash-hero-top {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .dash-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: #1f2d3d;
+    }
+
+    .dash-subtitle {
+      font-size: .92rem;
+      color: #52616b;
+      margin-top: 6px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #eef5ff;
+      border: 1px solid #d7e7ff;
+      color: #2a7bf6;
+      font-weight: 700;
+      font-size: .82rem;
+    }
+
+    .dash-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      border: 1px solid #dfe7f3;
+      color: #1f2d3d;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .05);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-1px);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .kpi-card {
+      background: #ffffff;
+      border: 1px solid #e7eef7;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .05);
+    }
+
+    .kpi-label {
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #6b7b87;
+      font-weight: 800;
+    }
+
+    .kpi-value {
+      font-size: 1.28rem;
+      font-weight: 900;
+      margin-top: 6px;
+      color: #1f2d3d;
+    }
+
+    .kpi-foot {
+      margin-top: 6px;
+      font-size: .86rem;
+      color: #60707c;
+    }
+
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .dash-card {
+      background: #ffffff;
+      border: 1px solid #e7eef7;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .05);
+    }
+
+    .dash-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .dash-card-title {
+      font-weight: 900;
+      color: #1f2d3d;
+    }
+
+    .dash-card-sub {
+      font-size: .9rem;
+      color: #60707c;
+      margin-top: 4px;
+    }
+
+    .status {
+      font-size: .82rem;
+      font-weight: 800;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #e7eef7;
+      color: #52616b;
+      background: #f7f9fc;
+    }
+
+    .status.loading {
+      color: #2a7bf6;
+      background: #eef5ff;
+      border-color: #d7e7ff;
+    }
+
+    .status.error {
+      color: #b42318;
+      background: #fff1f0;
+      border-color: #ffd6d3;
+    }
+
+    .chart-wrap {
+      width: 100%;
+      height: 280px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 12px;
+      border: 1px solid #eef2f7;
+    }
+
+    .dash-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+
+    .dash-table th,
+    .dash-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #eef2f7;
+      font-size: .92rem;
+      color: #1f2d3d;
+    }
+
+    .dash-table th {
+      text-align: left;
+      background: #f7f9fc;
+      color: #52616b;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .td-muted {
+      text-align: center;
+      color: #60707c;
+      padding: 16px 10px;
+    }
+
+    .dash-note {
+      margin-top: 10px;
+      color: #60707c;
+      font-size: .86rem;
+    }
+
+    .dash-error {
+      margin: 10px 0;
+      padding: 12px;
+      background: #fff1f0;
+      border: 1px solid #ffd6d3;
+      color: #7a271a;
+      border-radius: 12px;
+      font-size: .92rem;
+    }
+
+    @media (min-width: 720px) {
+      .wrap {
+        max-width: 980px;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .dash-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-wrap {
+        height: 340px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="login-screen" class="wrap">
+    <div class="auth-header">
+      <img src="logo.png?v=7" alt="CyberAgro Logo" class="auth-logo">
+      <h2>Bem-vindo de volta!</h2>
+      <p class="muted">Acesse sua conta para continuar gerenciando sua produção.</p>
+    </div>
+    <div class="card auth-card">
+      <div class="input-group">
+        <label for="usernameInput">Usuário ou E-mail</label>
+        <input type="text" id="usernameInput" placeholder="ex: JoaoSilva99" class="area-input">
+      </div>
+      <div class="input-group" style="margin-top: 16px;">
+        <label for="passwordInput">Senha</label>
+        <input type="password" id="passwordInput" placeholder="••••••••" class="area-input">
+      </div>
+
+      <p id="loginError" class="login-error">Senha ou usuário incorretos. Tente novamente.</p>
+
+      <button id="loginButton" class="btn-primary" style="width:100%; margin-top: 24px;">Entrar</button>
+
+      <div class="auth-footer">
+        <p>Ainda não tem uma conta? <a href="#" onclick="nav('register-screen'); return false;" class="auth-link">Criar
+            conta</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="register-screen" class="wrap hide">
+    <div class="auth-header">
+      <img src="logo.png?v=7" alt="CyberAgro Logo" class="auth-logo" style="height: 100px;">
+      <h2>Crie sua conta</h2>
+      <p class="muted">Junte-se ao futuro do agronegócio inteligente.</p>
+    </div>
+    <div class="card auth-card">
+      <div class="input-group">
+        <label for="regNomeInput">Nome Completo</label>
+        <input type="text" id="regNomeInput" placeholder="Ex: João da Silva" class="area-input">
+      </div>
+      <div class="input-group" style="margin-top: 16px;">
+        <label for="regEmailInput">E-mail ou Usuário</label>
+        <input type="email" id="regEmailInput" placeholder="joao@exemplo.com" class="area-input">
+      </div>
+      <div class="input-group" style="margin-top: 16px;">
+        <label for="regPasswordInput">Senha</label>
+        <input type="password" id="regPasswordInput" placeholder="••••••••" class="area-input">
+      </div>
+      <div class="input-group" style="margin-top: 16px;">
+        <label for="regPasswordConfirmInput">Confirmar Senha</label>
+        <input type="password" id="regPasswordConfirmInput" placeholder="••••••••" class="area-input">
+      </div>
+
+      <p id="registerError" class="login-error">As senhas não coincidem ou campos vazios.</p>
+
+      <button id="registerButton" class="btn-primary" style="width:100%; margin-top: 24px;">Criar Conta</button>
+
+      <div class="auth-footer">
+        <p>Já possui uma conta? <a href="#" onclick="nav('login-screen'); return false;" class="auth-link">Fazer
+            login</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="selecao-cultura-screen" class="wrap hide">
+    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=7" alt="CyberAgro Logo" height="250"></h1>
+    <div class="card">
+      <h3 style="text-align: center;">Selecione a Cultura</h3>
+      <div class="cultura-grid">
+        <div id="btnIconeManga" class="cultura-btn">
+          <img src="manga.png" alt="Manga"><span>Manga</span>
+        </div>
+        <div id="btnIconeUva" class="cultura-btn">
+          <img src="uva.png" alt="Uva"><span>Uva</span>
+        </div>
+        <div id="btnIconePitaya" class="cultura-btn">
+          <img src="pitaya.png" alt="Pitaya"><span>Pitaya</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dashboard-screen" class="wrap hide">
+    <div class="dash-hero">
+      <div class="dash-hero-top">
+        <div>
+          <div class="dash-title">Exportação de Manga • Brasil</div>
+          <div class="dash-subtitle">
+            Fonte: HFBRASIL (HORTIFRUTI BRASIL)
+          </div>
+        </div>
+
+        <div class="dash-actions">
+          <button class="btn-secondary" id="btnReloadMango">Atualizar</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid" id="kpiGrid">
+        <div class="kpi-card">
+          <div class="kpi-label">Preço Médio Palmer</div>
+          <div class="kpi-value" id="kpiFobTotal">—</div>
+          <div class="kpi-foot" id="kpiFobFoot">—</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Preço Médio Tommy</div>
+          <div class="kpi-value" id="kpiKgTotal">—</div>
+          <div class="kpi-foot" id="kpiKgFoot">—</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Maior Preço (Teto)</div>
+          <div class="kpi-value" id="kpiUsdKg">—</div>
+          <div class="kpi-foot" id="kpiUsdKgFoot">—</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Melhor Mês (FOB)</div>
+          <div class="kpi-value" id="kpiBestMonth">—</div>
+          <div class="kpi-foot" id="kpiBestMonthFoot">—</div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-card-head">
+            <div>
+              <div class="dash-card-title">Evolução Mensal</div>
+              <div class="dash-card-sub">Últimos 12 meses disponíveis na base</div>
+            </div>
+            <div id="dashStatus" class="status">Pronto</div>
+          </div>
+          <div id="dashError" class="dash-error hide"></div>
+          <div class="chart-wrap">
+            <canvas id="mangaChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="chat-screen" class="chat-frame-container hide">
+    <div class="chat-header">
+      <button onclick="nav('dashboard-screen')" class="chat-header-btn">← Voltar</button>
+      <div style="flex: 1;">
+        <div class="chat-header-title">CyberAgro Assistente</div>
+        <div class="chat-header-status">Online</div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-empty-state">
+        <div class="chat-empty-state-icon">💬</div>
+        <div class="chat-empty-state-text">Olá! Sou seu assistente virtual. Como posso ajudá-lo hoje?</div>
+      </div>
+    </div>
+    <div class="chat-input-container">
+      <input type="text" id="chatInput" class="chat-input" placeholder="Digite sua mensagem..." autocomplete="off" />
+      <button id="chatSendBtn" class="chat-send-btn" title="Enviar mensagem">→</button>
+    </div>
+  </div>
+
+  <div id="perfil-screen" class="wrap hide">
+    <div class="profile-header card">
+      <img src="logo.png?v=7" alt="Foto de Perfil" class="profile-pic">
+      <div class="profile-info">
+        <div class="profile-name">CyberAgro</div>
+        <div class="profile-subtitle">cyberagro.contato@gmail.com</div>
+      </div>
+    </div>
+    <div class="menu-list card">
+      <a href="#" class="menu-item" id="navMeusDados"><span class="menu-icon">👤</span> <span>Meus Dados</span> <span
+          class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item" id="navConfig"><span class="menu-icon">⚙️</span> <span>Configurações</span> <span
+          class="menu-chevron">&gt;</span></a>
+      <a href="#" class="menu-item danger" id="navSair"><span class="menu-icon">🚪</span> <span>Sair</span> <span
+          class="menu-chevron">&gt;</span></a>
+    </div>
+  </div>
+
+  <div id="irrigacao-screen" class="wrap hide">
+    <div id="adim-widget" style="font-family: sans-serif; background-color: #fff; padding: 20px; border-radius: 10px;">
+
+      <style>
+        .adim-group {
+          margin-bottom: 15px;
+        }
+
+        .adim-label {
+          display: block;
+          font-weight: bold;
+          margin-bottom: 5px;
+          color: #2E7D32;
+        }
+
+        .adim-input,
+        .adim-select {
+          width: 100%;
+          padding: 12px;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          box-sizing: border-box;
+          font-size: 1rem;
+          background: #fff;
+        }
+
+        .adim-help {
+          font-size: 0.8em;
+          color: #666;
+          margin-top: 4px;
+          display: block;
+        }
+
+        .adim-btn {
+          width: 100%;
+          padding: 15px;
+          background-color: #2E7D32;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-weight: bold;
+          cursor: pointer;
+          margin-top: 15px;
+          font-size: 1.1rem;
+        }
+
+        .adim-btn:active {
+          background-color: #1B5E20;
+        }
+
+        .adim-result-box {
+          display: none;
+          margin-top: 20px;
+          background-color: #E8F5E9;
+          padding: 15px;
+          border-radius: 8px;
+          border: 1px solid #81C784;
+        }
+
+        .adim-row {
+          display: flex;
+          justify-content: space-between;
+          border-bottom: 1px dashed #ccc;
+          padding: 8px 0;
+        }
+
+        .adim-big-res {
+          text-align: center;
+          margin-top: 15px;
+          background: #2E7D32;
+          color: white;
+          padding: 15px;
+          border-radius: 8px;
+        }
+
+        .adim-big-res span {
+          display: block;
+          font-size: 2em;
+          font-weight: bold;
+          margin-top: 5px;
+        }
+
+        .fase-info {
+          background: #fff3cd;
+          color: #856404;
+          padding: 10px;
+          border-radius: 5px;
+          margin-bottom: 15px;
+          font-size: 0.9rem;
+          display: none;
+          border: 1px solid #ffeeba;
+        }
+      </style>
+
+      <h3 style="color:#2E7D32; margin-top:0;">Calculadora de Rega </h3>
+
+      <div class="adim-group">
+        <label class="adim-label">ETo de Ontem (mm/dia)</label>
+        <input type="number" id="eto" class="adim-input" placeholder="Ex: 6.0" step="0.1">
+        <small class="adim-help" id="eto-source-msg">Insira o dado do INMET ou Rádio.</small>
+      </div>
+
+      <div class="adim-group">
+        <label class="adim-label">Chuva nas últimas 24h (mm)</label>
+        <input type="number" id="precipitacao" class="adim-input" value="0" step="0.1">
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+      <div class="adim-group">
+        <label class="adim-label">Como está o pomar hoje?</label>
+        <select id="fase_cultura" class="adim-select" onchange="verificarFase()">
+          <option value="vegetativo">🌱 Brotando (Pós-poda)</option>
+          <option value="inducao">🛑 Parado / Aplicando PBZ</option>
+          <option value="producao">🥭 Com Flor ou Fruta</option>
+          <option value="pos_colheita">💤 Repouso (Pós-colheita)</option>
+        </select>
+      </div>
+
+      <div class="adim-group" id="grupo-data-florada" style="display: none;">
+        <label class="adim-label">Data do Início da Florada</label>
+        <input type="date" id="data_florada" class="adim-input">
+        <small class="adim-help">Necessário para calcular a idade da fruta.</small>
+      </div>
+
+      <div id="fase-feedback" class="fase-info"></div>
+
+      <div class="adim-group">
+        <label class="adim-label">Espaçamento (Plantas x Linhas)</label>
+        <div style="display: flex; gap: 10px;">
+          <input type="number" id="ep" class="adim-input" placeholder="Plantas (m)" step="0.1">
+          <input type="number" id="el" class="adim-input" placeholder="Linhas (m)" step="0.1">
+        </div>
+      </div>
+
+      <div class="adim-group">
+        <label class="adim-label">Vazão do Bico (L/h)</label>
+        <div style="display: flex; gap: 10px;">
+          <input type="number" id="q" class="adim-input" placeholder="Ex: 50" step="0.1">
+          <input type="number" id="n" class="adim-input" value="1" placeholder="Qtd Bicos">
+        </div>
+        <small class="adim-help">Vazão por emissor e Nº de emissores por pé.</small>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <details>
+          <summary style="color: #666; cursor: pointer; font-size: 0.9rem;">Configurações Avançadas</summary>
+          <div class="adim-group" style="margin-top: 10px;">
+            <label class="adim-label">% Área Molhada (Pm)</label>
+            <input type="number" id="pm" class="adim-input" value="85" step="1">
+          </div>
+          <div class="adim-group">
+            <label class="adim-label">Eficiência (%) & Lixiviação</label>
+            <div style="display: flex; gap: 10px;">
+              <input type="number" id="ef" class="adim-input" value="90" placeholder="Ef %">
+              <input type="number" id="nl" class="adim-input" value="1.0" placeholder="NL">
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <button type="button" class="adim-btn" onclick="executarCalculoADIM()">CALCULAR TEMPO</button>
+
+      <div id="adim-results" class="adim-result-box">
+        <div class="adim-big-res">
+          Tempo de Rega:
+          <span id="out-tempo">--</span>
+        </div>
+
+        <div style="margin-top: 15px;">
+          <div class="adim-row"><span>Volume por Planta:</span> <strong id="out-vol">-</strong></div>
+          <div class="adim-row"><span>Fase Identificada:</span> <strong id="out-fase-desc"
+              style="font-size: 0.9em;">-</strong></div>
+          <div class="adim-row"><span>Kc Calculado:</span> <strong id="out-kc">-</strong></div>
+          <div class="adim-row"><span>ETo Usada:</span> <strong id="out-eto-usada">-</strong></div>
+        </div>
+      </div>
+
+      <script>
+        // --- VARIÁVEL GLOBAL PARA ETO FUTURA ---
+        // Quando você tiver o arquivo, vai alterar a função carregarEtoDoArquivo
+        let etoDoArquivo = null;
+
+        // Função placeholder para carregar ETo no futuro
+        async function carregarEtoDoArquivo() {
+          try {
+            // FUTURO: Descomentar quando tiver o arquivo 'eto_hoje.json'
+            // const response = await fetch('eto_hoje.json');
+            // const data = await response.json();
+            // etoDoArquivo = data.eto;
+            // document.getElementById('eto').value = etoDoArquivo;
+            // document.getElementById('eto').disabled = true; // Bloqueia edição se veio do arquivo
+            // document.getElementById('eto-source-msg').innerText = "Dado carregado automaticamente do arquivo.";
+          } catch (error) {
+            console.log("Modo manual de ETo ativo.");
+          }
+        }
+
+        // Chama ao carregar a página
+        document.addEventListener("DOMContentLoaded", carregarEtoDoArquivo);
+
+        // Lógica de Exibição da Data
+        function verificarFase() {
+          const fase = document.getElementById('fase_cultura').value;
+          const grupoData = document.getElementById('grupo-data-florada');
+
+          if (fase === 'producao') {
+            grupoData.style.display = 'block';
+          } else {
+            grupoData.style.display = 'none';
+          }
+        }
+
+        // --- MOTOR DE CÁLCULO (Embrapa + IF Sertão) ---
+        function executarCalculoADIM() {
+          // 1. Obter ETo (Prioridade: Arquivo > Manual)
+          let etoInput = parseFloat(document.getElementById('eto').value);
+          let etoFinal = (etoDoArquivo !== null) ? etoDoArquivo : etoInput;
+
+          // Validações Básicas
+          if (isNaN(etoFinal) || etoFinal <= 0) {
+            alert("Por favor, insira um valor válido para a ETo.");
+            return;
+          }
+
+          // 2. Definir KC Inteligente (Lógica Embrapa/Semiárido)
+          const fase = document.getElementById('fase_cultura').value;
+          let kc = 0.50; // Padrão
+          let faseDesc = "";
+          const dataFloradaVal = document.getElementById('data_florada').value;
+
+          if (fase === 'vegetativo') {
+            kc = 0.50;
+            faseDesc = "Vegetativo (Pós-poda)";
+          } else if (fase === 'inducao') {
+            kc = 0.20;
+            faseDesc = "Indução (PBZ)";
+          } else if (fase === 'pos_colheita') {
+            kc = 0.45;
+            faseDesc = "Repouso Pós-Colheita";
+          } else if (fase === 'producao') {
+            if (!dataFloradaVal) {
+              alert("Para fase de produção, informe a Data da Florada!");
+              return;
+            }
+            // Cálculo de Dias
+            const dataFlorada = new Date(dataFloradaVal);
+            const hoje = new Date();
+            const diffTime = Math.abs(hoje - dataFlorada);
+            const dias = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            faseDesc = `Produção (${dias} dias)`;
+
+            // Curva Kc Manga (Silva et al.)
+            if (dias <= 30) kc = 0.80;        // Floração
+            else if (dias <= 60) kc = 0.90;   // Chumbinho
+            else if (dias <= 100) kc = 0.95;  // Enchimento (Pico)
+            else kc = 0.70;                   // Maturação
+          }
+
+          // 3. Captura dos outros dados
+          const p = parseFloat(document.getElementById('precipitacao').value) || 0;
+          const pm = parseFloat(document.getElementById('pm').value) || 85;
+          const ep = parseFloat(document.getElementById('ep').value);
+          const el = parseFloat(document.getElementById('el').value);
+          const q = parseFloat(document.getElementById('q').value);
+          const n = parseFloat(document.getElementById('n').value);
+          const ef = (parseFloat(document.getElementById('ef').value) || 90) / 100;
+          const nl = parseFloat(document.getElementById('nl').value) || 1.0;
+
+          if (!ep || !el || !q || !n) {
+            alert("Preencha os dados de espaçamento e vazão.");
+            return;
+          }
+
+          // 4. Algoritmo Matemático (ADIM)
+          const kl = 0.1 * Math.sqrt(pm); // Keller & Bliesner
+          const etr = etoFinal * kc * kl;
+
+          let lli = etr - p;
+          if (lli < 0) lli = 0; // Chuva supriu tudo
+
+          const lbi = lli / (ef * nl);
+          const aup = ep * el;
+          const vol = lbi * aup; // Volume Litros
+
+          // Tempo em Horas Decimais
+          const tfHorasDecimais = vol / (q * n);
+
+          // Formatação Tempo
+          const horas = Math.floor(tfHorasDecimais);
+          const minutos = Math.round((tfHorasDecimais - horas) * 60);
+
+          // 5. Exibição
+          let textoTempo = "";
+          if (tfHorasDecimais <= 0) {
+            textoTempo = "0h 00min (Chuva suficiente)";
+            document.getElementById('adim-results').style.backgroundColor = "#E3F2FD"; // Azul se não precisar regar
+          } else {
+            textoTempo = `${horas}h ${minutos}min`;
+            document.getElementById('adim-results').style.backgroundColor = "#E8F5E9"; // Verde padrão
+          }
+
+          document.getElementById('out-tempo').innerText = textoTempo;
+          document.getElementById('out-vol').innerText = vol.toFixed(1) + " L";
+          document.getElementById('out-fase-desc').innerText = faseDesc;
+          document.getElementById('out-kc').innerText = kc.toFixed(2);
+          document.getElementById('out-eto-usada').innerText = etoFinal.toFixed(1) + " mm";
+
+          document.getElementById('adim-results').style.display = 'block';
+
+          // Feedback visual
+          const feedback = document.getElementById('fase-feedback');
+          feedback.style.display = 'block';
+          feedback.innerText = `Cálculo baseado em Kc de ${kc.toFixed(2)} para ${faseDesc}.`;
+        }
+      </script>
+    </div>
+  </div>
+
+  <div class="app-footer">
+    <a onclick="nav('dashboard-screen')" class="footer-btn active">Início</a>
+    <a onclick="nav('irrigacao-screen')" class="footer-btn">Irrigação</a>
+    <a onclick="nav('perfil-screen')" class="footer-btn">Perfil</a>
+  </div>
+
+  <button id="btnChat" class="chat-fab" onclick="nav('chat-screen')">
+    <img src="imagem2.png" alt="Chat">
+  </button>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const SENHA_SECRETA = "cyberagro2025";
+
+      // *** URL DO WEBHOOK DO N8N (PRODUÇÃO) ***
+      const N8N_CHAT_URL = "https://n8n-agent-476522137012.us-central1.run.app/webhook/chat";
+
+      // Telas
+      const loginScreen = document.getElementById("login-screen");
+      const registerScreen = document.getElementById("register-screen");
+      const selecaoCulturaScreen = document.getElementById("selecao-cultura-screen");
+      const dashboardScreen = document.getElementById("dashboard-screen");
+      const irrigacaoScreen = document.getElementById("irrigacao-screen");
+      const chatScreen = document.getElementById("chat-screen");
+      const perfilScreen = document.getElementById("perfil-screen");
+
+      // Elementos UI
+      const appFooter = document.querySelector(".app-footer");
+      const btnChat = document.getElementById("btnChat");
+      const loginButton = document.getElementById("loginButton");
+      const usernameInput = document.getElementById("usernameInput");
+      const passwordInput = document.getElementById("passwordInput");
+      const loginError = document.getElementById("loginError");
+
+      // Botões Seleção
+      const btnIconeManga = document.getElementById("btnIconeManga");
+      const btnIconeUva = document.getElementById("btnIconeUva");
+      const btnIconePitaya = document.getElementById("btnIconePitaya");
+
+      // Navegação Centralizada
+      function nav(telaId) {
+        // Esconde todas as telas
+        const telas = [loginScreen, registerScreen, selecaoCulturaScreen, dashboardScreen, irrigacaoScreen, chatScreen, perfilScreen];
+        telas.forEach(s => s.classList.add('hide'));
+
+        // Mostra a tela desejada
+        const telaAtual = document.getElementById(telaId);
+        telaAtual.classList.remove('hide');
+        telaAtual.style.display = (telaId === 'chat-screen') ? 'flex' : 'block';
+
+        // Lógica Rodapé/Chat
+        if (telaId === 'login-screen' || telaId === 'register-screen' || telaId === 'selecao-cultura-screen') {
+          appFooter.style.display = 'none';
+          btnChat.style.display = 'none';
+        } else if (telaId === 'chat-screen') {
+          appFooter.style.display = 'none';
+          btnChat.style.display = 'none';
+          // Foca no input quando abre o chat
+          setTimeout(() => {
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) chatInput.focus();
+          }, 300);
+        } else {
+          appFooter.style.display = 'flex';
+          appFooter.style.pointerEvents = 'auto';
+          btnChat.style.display = 'block';
+          btnChat.style.pointerEvents = 'auto';
+        }
+
+        // Atualizar abas ativas
+        const footerBtns = document.querySelectorAll('.footer-btn');
+        footerBtns.forEach(btn => {
+          btn.classList.remove('active');
+          const onClickAttr = btn.getAttribute('onclick');
+          if (onClickAttr && onClickAttr.includes(`'${telaId}'`)) {
+            btn.classList.add('active');
+          }
+        });
+      }
+
+      // Inicialização
+      nav('login-screen');
+
+      // --- Eventos ---
+      // Preencher campos se existirem no localStorage
+      if (localStorage.getItem("savedUsername")) {
+        usernameInput.value = localStorage.getItem("savedUsername");
+      }
+      if (localStorage.getItem("savedPassword")) {
+        passwordInput.value = localStorage.getItem("savedPassword");
+      }
+
+      loginButton.onclick = () => {
+        const isRegistered = usernameInput.value && localStorage.getItem("savedUsername") === usernameInput.value && localStorage.getItem("savedPassword") === passwordInput.value;
+        if (passwordInput.value === SENHA_SECRETA || isRegistered) {
+          // Salvar credenciais
+          localStorage.setItem("savedUsername", usernameInput.value);
+          localStorage.setItem("savedPassword", passwordInput.value);
+          nav('selecao-cultura-screen');
+        }
+        else loginError.style.display = "block";
+      };
+      passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") loginButton.click(); });
+
+      // Lógica de Registro
+      const registerButton = document.getElementById("registerButton");
+      const regNomeInput = document.getElementById("regNomeInput");
+      const regEmailInput = document.getElementById("regEmailInput");
+      const regPasswordInput = document.getElementById("regPasswordInput");
+      const regPasswordConfirmInput = document.getElementById("regPasswordConfirmInput");
+      const registerError = document.getElementById("registerError");
+
+      if (registerButton) {
+        registerButton.onclick = () => {
+          registerError.style.display = "none";
+          if (!regNomeInput.value || !regEmailInput.value || !regPasswordInput.value) {
+            registerError.textContent = "Preencha todos os campos.";
+            registerError.style.display = "block";
+            return;
+          }
+          if (regPasswordInput.value !== regPasswordConfirmInput.value) {
+            registerError.textContent = "As senhas não coincidem.";
+            registerError.style.display = "block";
+            return;
+          }
+          // Simula sucesso de cadastro e salva no localStorage
+          localStorage.setItem("savedUsername", regEmailInput.value);
+          localStorage.setItem("savedPassword", regPasswordInput.value);
+          if (usernameInput) usernameInput.value = regEmailInput.value;
+          if (passwordInput) passwordInput.value = regPasswordInput.value;
+
+          nav('selecao-cultura-screen');
+        };
+      }
+
+      btnIconeManga.onclick = () => nav('dashboard-screen');
+      btnIconeUva.onclick = () => alert("Em breve!");
+      btnIconePitaya.onclick = () => alert("Em breve!");
+
+      document.getElementById("navSair").onclick = (e) => {
+        e.preventDefault();
+        if (confirm("Sair?")) window.location.reload();
+      };
+
+
+
+      // --- LÓGICA DO CHAT NATIVO COM WEBHOOK ---
+      const chatMessages = document.getElementById('chatMessages');
+      const chatInput = document.getElementById('chatInput');
+      const chatSendBtn = document.getElementById('chatSendBtn');
+      let isTyping = false;
+
+      function formatTime() {
+        const now = new Date();
+        return now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      }
+
+      function addMessage(text, isUser = false) {
+        // Remove empty state se existir
+        const emptyState = chatMessages.querySelector('.chat-empty-state');
+        if (emptyState) emptyState.remove();
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'chat-message-avatar';
+        if (isUser) {
+          avatar.textContent = 'Você';
+        } else {
+          const img = document.createElement('img');
+          img.src = 'logo.png?v=9';
+          img.alt = 'Bot';
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.borderRadius = '50%';
+          img.style.objectFit = 'cover';
+          avatar.appendChild(img);
+        }
+
+        const contentWrapper = document.createElement('div');
+        contentWrapper.style.display = 'flex';
+        contentWrapper.style.flexDirection = 'column';
+        contentWrapper.style.maxWidth = '100%';
+
+        const content = document.createElement('div');
+        content.className = 'chat-message-content';
+        // Markdown para mensagens do bot, texto simples para usuário
+        let rendered;
+        if (isUser) {
+          rendered = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\n/g, '<br>');
+        } else if (window.marked) {
+          rendered = marked.parse(text);
+        } else {
+          rendered = text.replace(/\n/g, '<br>');
+        }
+        content.innerHTML = rendered;
+
+        const time = document.createElement('div');
+        time.className = 'chat-message-time';
+        time.textContent = formatTime();
+
+        contentWrapper.appendChild(content);
+        contentWrapper.appendChild(time);
+
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(contentWrapper);
+        chatMessages.appendChild(messageDiv);
+
+        // Scroll suave para o final
+        setTimeout(() => {
+          chatMessages.scrollTo({
+            top: chatMessages.scrollHeight,
+            behavior: 'smooth'
+          });
+        }, 100);
+      }
+
+      function showTypingIndicator() {
+        if (isTyping) return;
+        isTyping = true;
+
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-message bot';
+        typingDiv.id = 'typingIndicator';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'chat-message-avatar';
+        const img = document.createElement('img');
+        img.src = 'logo.png?v=9';
+        img.alt = 'Bot';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.borderRadius = '50%';
+        img.style.objectFit = 'cover';
+        avatar.appendChild(img);
+
+        const indicator = document.createElement('div');
+        indicator.className = 'chat-typing-indicator';
+        indicator.innerHTML = '<div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div>';
+
+        typingDiv.appendChild(avatar);
+        typingDiv.appendChild(indicator);
+        chatMessages.appendChild(typingDiv);
+
+        setTimeout(() => {
+          chatMessages.scrollTo({
+            top: chatMessages.scrollHeight,
+            behavior: 'smooth'
+          });
+        }, 100);
+      }
+
+      function hideTypingIndicator() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) {
+          indicator.remove();
+          isTyping = false;
+        }
+      }
+
+      async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message || isTyping) return;
+
+        // Adiciona mensagem do usuário
+        addMessage(message, true);
+        chatInput.value = '';
+        chatSendBtn.disabled = true;
+
+        // Mostra indicador de digitação
+        showTypingIndicator();
+
+        try {
+          // Obtém ou cria um chatId para manter a sessão
+          let chatId = localStorage.getItem('chatSessionId');
+          if (!chatId) {
+            chatId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            localStorage.setItem('chatSessionId', chatId);
+          }
+
+          // Prepara o payload para o webhook do n8n
+          const payload = {
+            message: message,
+            text: message,
+            chatId: chatId,
+            sessionId: chatId
+          };
+
+          console.log('Enviando para webhook:', N8N_CHAT_URL);
+          console.log('Payload:', payload);
+
+          // Envia para o Webhook do n8n via HTTP POST
+          // O n8n webhook espera os dados no body da requisição
+          const response = await fetch(N8N_CHAT_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            mode: 'cors', // Permite CORS
+            credentials: 'omit', // Não envia cookies
+            body: JSON.stringify(payload)
+          });
+
+          // Verifica se a requisição foi feita
+          if (!response) {
+            throw new Error('Nenhuma resposta recebida do servidor');
+          }
+
+          console.log('Response status:', response.status);
+          console.log('Response headers:', response.headers);
+
+          hideTypingIndicator();
+
+          if (response.ok) {
+            let data;
+            const contentType = response.headers.get('content-type');
+            const responseText = await response.text();
+
+            console.log('Response text:', responseText);
+            console.log('Content-Type:', contentType);
+
+            if (contentType && contentType.includes('application/json')) {
+              try {
+                data = JSON.parse(responseText);
+                console.log('Response data:', data);
+              } catch (e) {
+                console.error('Erro ao parsear JSON:', e);
+                data = { output: responseText, response: responseText };
+              }
+            } else {
+              try {
+                data = JSON.parse(responseText);
+              } catch {
+                data = { output: responseText, response: responseText };
+              }
+            }
+
+            // Webhook do n8n retorna em diferentes formatos
+            const botMessage = data.output ||
+              data.response ||
+              data.message ||
+              data.text ||
+              data.answer ||
+              (typeof data === 'string' ? data : 'Desculpe, não consegui processar sua mensagem.');
+
+            console.log('Mensagem extraída:', botMessage);
+            addMessage(botMessage, false);
+
+            // Atualiza chatId se fornecido na resposta
+            if (data.chatId) {
+              localStorage.setItem('chatSessionId', data.chatId);
+            }
+          } else {
+            const errorText = await response.text();
+            console.error('Erro HTTP:', response.status, errorText);
+
+            let errorMessage = 'Desculpe, ocorreu um erro ao processar sua mensagem.';
+
+            try {
+              const errorData = JSON.parse(errorText);
+              errorMessage = errorData.message || errorData.error || errorMessage;
+              console.error('Erro parseado:', errorData);
+            } catch {
+              if (errorText) {
+                console.error('Erro detalhado (texto):', errorText);
+              }
+            }
+
+            addMessage(`Erro ${response.status}: ${errorMessage}. Tente novamente.`, false);
+          }
+        } catch (error) {
+          hideTypingIndicator();
+          console.error('Erro completo no chat:', error);
+          console.error('Stack trace:', error.stack);
+
+          let errorMsg = 'Erro de conexão. ';
+          if (error.message) {
+            errorMsg += error.message;
+          } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            errorMsg += 'Não foi possível conectar ao servidor. Verifique se o webhook está ativo no n8n.';
+          } else {
+            errorMsg += 'Verifique sua internet e tente novamente.';
+          }
+
+          addMessage(errorMsg, false);
+        } finally {
+          chatSendBtn.disabled = false;
+          chatInput.focus();
+        }
+      }
+
+      // Event listeners do chat
+      if (chatSendBtn && chatInput) {
+        chatSendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
+        });
+      }
+
+      // ===============================
+      // DASHBOARD: EXPORTAÇÃO DE MANGA (EXCEL LOCAL)
+      // ===============================
+      let mangaChartInstance = null;
+      let mangoLoadedOnce = false;
+
+      // Botão atualizar
+      const btnReloadMango = document.getElementById("btnReloadMango");
+      if (btnReloadMango) btnReloadMango.addEventListener("click", () => loadMangoDashboard(true));
+
+      // Hook: sempre que entrar no dashboard, carrega (1ª vez)
+      const _navOriginal = nav;
+      nav = function (telaId) {
+        _navOriginal(telaId);
+        if (telaId === "dashboard-screen" && !mangoLoadedOnce) {
+          loadMangoDashboard(false);
+        }
+      };
+
+      // Funções Globais para os botões onclick do HTML
+      window.nav = nav;
+
+      function setDashStatus(kind, text) {
+        const el = document.getElementById("dashStatus");
+        if (!el) return;
+        el.classList.remove("loading", "error");
+        if (kind === "loading") el.classList.add("loading");
+        if (kind === "error") el.classList.add("error");
+        el.textContent = text || "Pronto";
+      }
+
+      function showDashError(msg) {
+        const box = document.getElementById("dashError");
+        if (!box) return;
+        if (!msg) { box.classList.add("hide"); box.textContent = ""; return; }
+        box.classList.remove("hide");
+        box.textContent = msg;
+      }
+
+      function fmtUSD(v) {
+        return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(v);
+      }
+      function fmtKG(v) {
+        return new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 }).format(v) + " kg";
+      }
+      function fmtUSDkg(v) {
+        return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(v) + "/kg";
+      }
+
+      function renderKpis(labels, palmer, tommy) {
+        const palmerVal = palmer.filter(p => p > 0);
+        const tommyVal = tommy.filter(t => t > 0);
+
+        const avgPalmer = palmerVal.length ? (palmerVal.reduce((a, b) => a + b, 0) / palmerVal.length) : 0;
+        const avgTommy = tommyVal.length ? (tommyVal.reduce((a, b) => a + b, 0) / tommyVal.length) : 0;
+
+        let maxPrice = 0;
+        let maxMonth = "—";
+        let bestVar = "";
+
+        labels.forEach((lab, i) => {
+          if (palmer[i] > maxPrice) { maxPrice = palmer[i]; maxMonth = lab; bestVar = "Palmer"; }
+          if (tommy[i] > maxPrice) { maxPrice = tommy[i]; maxMonth = lab; bestVar = "Tommy"; }
+        });
+
+        document.getElementById("kpiFobTotal").textContent = "R$ " + avgPalmer.toFixed(2).replace('.', ',');
+        document.getElementById("kpiFobFoot").textContent = `Média do período selecionado`;
+
+        document.getElementById("kpiKgTotal").textContent = "R$ " + avgTommy.toFixed(2).replace('.', ',');
+        document.getElementById("kpiKgFoot").textContent = `Média do período selecionado`;
+
+        document.getElementById("kpiUsdKg").textContent = "R$ " + maxPrice.toFixed(2).replace('.', ',');
+        document.getElementById("kpiUsdKgFoot").textContent = `Maior valor alcançado na série`;
+
+        document.getElementById("kpiBestMonth").textContent = maxMonth;
+        document.getElementById("kpiBestMonthFoot").textContent = `Variedade: ${bestVar} a R$ ${maxPrice.toFixed(2).replace('.', ',')}`;
+      }
+
+      function renderTable(labels, palmer, tommy) {
+        const tbody = document.getElementById("mangaTbody");
+        if (!tbody) return;
+
+        if (!labels.length) {
+          tbody.innerHTML = `<tr><td colspan="4" class="td-muted">Sem dados no período.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = labels.map((lab, i) => {
+          let soma = 0;
+          let qtd = 0;
+          if (palmer[i] > 0) { soma += palmer[i]; qtd++; }
+          if (tommy[i] > 0) { soma += tommy[i]; qtd++; }
+
+          let mediaMes = qtd > 0 ? (soma / qtd) : 0;
+
+          return `
+            <tr>
+              <td>${lab}</td>
+              <td style="text-align:right;">R$ ${palmer[i] > 0 ? palmer[i].toFixed(2).replace('.', ',') : '-'}</td>
+              <td style="text-align:right;">R$ ${tommy[i] > 0 ? tommy[i].toFixed(2).replace('.', ',') : '-'}</td>
+              <td style="text-align:right; font-weight:600;">R$ ${mediaMes > 0 ? mediaMes.toFixed(2).replace('.', ',') : '-'}</td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      function renderChart(labels, palmer, tommy) {
+        const canvas = document.getElementById("mangaChart");
+        if (!canvas) return;
+
+        if (mangaChartInstance) {
+          mangaChartInstance.destroy();
+          mangaChartInstance = null;
+        }
+
+        mangaChartInstance = new Chart(canvas, {
+          type: "line",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Palmer (R$/kg)",
+                data: palmer,
+                borderColor: "#e44d26",
+                backgroundColor: "#e44d26",
+                tension: 0.25,
+                pointRadius: 4,
+                borderWidth: 2
+              },
+              {
+                label: "Tommy (R$/kg)",
+                data: tommy,
+                borderColor: "#007bff",
+                backgroundColor: "#007bff",
+                tension: 0.25,
+                pointRadius: 4,
+                borderWidth: 2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+              legend: { display: true }
+            },
+            scales: {
+              y: {
+                beginAtZero: false,
+                ticks: {
+                  callback: (v) => "R$ " + v.toFixed(2).replace('.', ',')
+                },
+                title: { display: true, text: "Preço Ofertado (R$/kg)" }
+              }
+            }
+          }
+        });
+      }
+
+      async function loadMangoDashboard(forceRefresh = false) {
+        mangoLoadedOnce = true;
+        showDashError("");
+        setDashStatus("loading", "Lendo Planilha Local...");
+        const periodEl = document.getElementById("dashPeriod");
+
+        const tbody = document.getElementById("mangaTbody");
+        if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="td-muted">Carregando…</td></tr>`;
+
+        try {
+          const filePath = "exportacao_manga_2025.xlsx";
+          let fetchUrl = filePath;
+          if (forceRefresh) fetchUrl += "?v=" + new Date().getTime();
+
+          const r = await fetch(fetchUrl);
+          if (!r.ok) {
+            throw new Error(`Falha HTTP ao carregar tabela local: ${r.status}`);
+          }
+
+          const arrayBuffer = await r.arrayBuffer();
+
+          if (typeof XLSX === "undefined") {
+            throw new Error("A biblioteca local SheetJS (XLSX) não carregou.");
+          }
+
+          const workbook = XLSX.read(arrayBuffer, { type: "array" });
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+          if (!rawData || rawData.length < 2) {
+            throw new Error("Faltam dados lineares ou cabecalho ausente.");
+          }
+
+          const monthlyData = {};
+
+          rawData.slice(1).forEach(row => {
+            if (!row || row.length < 7) return;
+
+            const produtoRaw = String(row[0] || "").trim().toLowerCase();
+            const mes = String(row[2] || "").trim().padStart(2, '0');
+            const ano = String(row[3] || "").trim();
+            const preco = Number(row[6]) || 0;
+
+            if (!mes || !ano || preco === 0) return;
+
+            const labelStr = `${mes}/${ano}`;
+
+            if (!monthlyData[labelStr]) {
+              monthlyData[labelStr] = { palmer: 0, tommy: 0 };
+            }
+
+            if (produtoRaw.includes("palmer")) {
+              monthlyData[labelStr].palmer = preco;
+            } else if (produtoRaw.includes("tommy")) {
+              monthlyData[labelStr].tommy = preco;
+            }
+          });
+
+          // Sort labels chronologically (format MM/YYYY)
+          const labels = Object.keys(monthlyData).sort((a, b) => {
+            const [ma, ya] = a.split('/');
+            const [mb, yb] = b.split('/');
+            if (ya !== yb) return Number(ya) - Number(yb);
+            return Number(ma) - Number(mb);
+          });
+
+          const palmerData = labels.map(l => monthlyData[l].palmer);
+          const tommyData = labels.map(l => monthlyData[l].tommy);
+
+          if (labels.length === 0) {
+            throw new Error("Nenhum dado formatável foi encontrado na leitura das linhas.");
+          }
+
+          if (periodEl) {
+            periodEl.textContent = `${labels[0]} → ${labels[labels.length - 1]}`;
+          }
+
+          renderKpis(labels, palmerData, tommyData);
+          renderChart(labels, palmerData, tommyData);
+          renderTable(labels, palmerData, tommyData);
+
+          setDashStatus("ok", "Planilha lida");
+        } catch (err) {
+          console.error("[MANGO] Error Planilha:", err);
+          setDashStatus("error", "Falha leitura");
+          showDashError("Erro: " + err.message + " Certifique-se de hospedar pelo npx serve para evitar restrições de arquivo local.");
+          if (periodEl) periodEl.textContent = "Falha ao ler Excel";
+          if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="td-muted">Falha local.</td></tr>`;
+        }
+      }
+
+    });
+  </script>
+
+  <!-- Inicialização Isolada do Firebase (Parâmetros no .env) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+
+    // As chaves sensíveis foram isoladas no arquivo ".env" na raiz do seu projeto.
+    // Lembre-se: por padrão, HTML puro (vanilla) não consegue acessar variáveis do ".env" dinamicamente no navegador
+    // sem a presença de um pacote empacotador (Bundler) rodando no servidor local como Vite, Parcel, ou Webpack configurados.
+    const firebaseConfig = {
+      apiKey: process.env.FIREBASE_API_KEY,
+      authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+      appId: process.env.FIREBASE_APP_ID
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+  </script>
+</body>
+
+</html>
