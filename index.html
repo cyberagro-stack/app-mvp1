@@ -1,25 +1,33 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CyberAgro</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#FFFFFF">
-  </head>
-  <body>
-    <div id="login-screen" class="wrap">
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberAgro</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FFFFFF">
+</head>
+
+<body>
+
+  <!-- =========================
+       LOGIN
+  ========================== -->
+  <div id="login-screen" class="wrap">
     <div class="auth-header">
       <img src="logo.png?v=7" alt="CyberAgro Logo" class="auth-logo">
       <h2>Bem-vindo de volta!</h2>
       <p class="muted">Acesse sua conta para continuar gerenciando sua produção.</p>
     </div>
+
     <div class="card auth-card">
       <div class="input-group">
         <label for="usernameInput">Usuário ou E-mail</label>
         <input type="text" id="usernameInput" placeholder="ex: JoaoSilva99" class="area-input">
       </div>
+
       <div class="input-group" style="margin-top: 16px;">
         <label for="passwordInput">Senha</label>
         <input type="password" id="passwordInput" placeholder="••••••••" class="area-input">
@@ -30,31 +38,39 @@
       <button id="loginButton" class="btn-primary" style="width:100%; margin-top: 24px;">Entrar</button>
 
       <div class="auth-footer">
-        <p>Ainda não tem uma conta? <a href="#" onclick="nav('register-screen'); return false;" class="auth-link">Criar
-            conta</a></p>
+        <p>Ainda não tem uma conta?
+          <a href="#" onclick="nav('register-screen'); return false;" class="auth-link">Criar conta</a>
+        </p>
       </div>
     </div>
   </div>
 
+  <!-- =========================
+       REGISTER
+  ========================== -->
   <div id="register-screen" class="wrap hide">
     <div class="auth-header">
       <img src="logo.png?v=7" alt="CyberAgro Logo" class="auth-logo" style="height: 100px;">
       <h2>Crie sua conta</h2>
       <p class="muted">Junte-se ao futuro do agronegócio inteligente.</p>
     </div>
+
     <div class="card auth-card">
       <div class="input-group">
         <label for="regNomeInput">Nome Completo</label>
         <input type="text" id="regNomeInput" placeholder="Ex: João da Silva" class="area-input">
       </div>
+
       <div class="input-group" style="margin-top: 16px;">
         <label for="regEmailInput">E-mail ou Usuário</label>
         <input type="email" id="regEmailInput" placeholder="joao@exemplo.com" class="area-input">
       </div>
+
       <div class="input-group" style="margin-top: 16px;">
         <label for="regPasswordInput">Senha</label>
         <input type="password" id="regPasswordInput" placeholder="••••••••" class="area-input">
       </div>
+
       <div class="input-group" style="margin-top: 16px;">
         <label for="regPasswordConfirmInput">Confirmar Senha</label>
         <input type="password" id="regPasswordConfirmInput" placeholder="••••••••" class="area-input">
@@ -65,16 +81,24 @@
       <button id="registerButton" class="btn-primary" style="width:100%; margin-top: 24px;">Criar Conta</button>
 
       <div class="auth-footer">
-        <p>Já possui uma conta? <a href="#" onclick="nav('login-screen'); return false;" class="auth-link">Fazer
-            login</a></p>
+        <p>Já possui uma conta?
+          <a href="#" onclick="nav('login-screen'); return false;" class="auth-link">Fazer login</a>
+        </p>
       </div>
     </div>
   </div>
 
+  <!-- =========================
+       SELEÇÃO CULTURA
+  ========================== -->
   <div id="selecao-cultura-screen" class="wrap hide">
-    <h1 style="text-align:center;margin-bottom:16px;"><img src="logo.png?v=7" alt="CyberAgro Logo" height="250"></h1>
+    <h1 style="text-align:center;margin-bottom:16px;">
+      <img src="logo.png?v=7" alt="CyberAgro Logo" height="250">
+    </h1>
+
     <div class="card">
       <h3 style="text-align: center;">Selecione a Cultura</h3>
+
       <div class="cultura-grid">
         <div id="btnIconeManga" class="cultura-btn">
           <img src="manga.png" alt="Manga"><span>Manga</span>
@@ -89,66 +113,253 @@
     </div>
   </div>
 
-  <div id="dashboard-screen" class="wrap hide">
-    <div class="dash-hero">
-      <div class="dash-hero-top">
-        <div>
-          <div class="dash-title">Exportação de Manga • Brasil</div>
-          <div class="dash-subtitle">
-            Fonte: HFBRASIL (HORTIFRUTI BRASIL)
-          </div>
-        </div>
+  <!-- =========================
+       DASHBOARD (INÍCIO)
+       - Sub-abas: PRODUTIVIDADE / IRRIGAÇÃO
+       - Swipe horizontal (Page 1 / Page 2)
+  ========================== -->
+  <div id="dashboard-screen" class="hide"
+    style="height: 100%; display: flex; flex-direction: column; overflow: hidden;">
 
-        <div class="dash-actions">
-          <button class="btn-secondary" id="btnReloadMango">Atualizar</button>
-        </div>
+    <!-- Top Tabs -->
+    <div class="top-tabs">
+      <div class="hamburger-btn" onclick="openSidebar()" aria-label="Menu">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
       </div>
-
-      <div class="kpi-grid" id="kpiGrid">
-        <div class="kpi-card">
-          <div class="kpi-label">Preço Médio Palmer</div>
-          <div class="kpi-value" id="kpiFobTotal">—</div>
-          <div class="kpi-foot" id="kpiFobFoot">—</div>
-        </div>
-
-        <div class="kpi-card">
-          <div class="kpi-label">Preço Médio Tommy</div>
-          <div class="kpi-value" id="kpiKgTotal">—</div>
-          <div class="kpi-foot" id="kpiKgFoot">—</div>
-        </div>
-
-        <div class="kpi-card">
-          <div class="kpi-label">Maior Preço (Teto)</div>
-          <div class="kpi-value" id="kpiUsdKg">—</div>
-          <div class="kpi-foot" id="kpiUsdKgFoot">—</div>
-        </div>
-
-        <div class="kpi-card">
-          <div class="kpi-label">Melhor Mês (FOB)</div>
-          <div class="kpi-value" id="kpiBestMonth">—</div>
-          <div class="kpi-foot" id="kpiBestMonthFoot">—</div>
-        </div>
-      </div>
-
-      <div class="dash-grid">
-        <div class="dash-card">
-          <div class="dash-card-head">
-            <div>
-              <div class="dash-card-title">Evolução Mensal</div>
-              <div class="dash-card-sub">Últimos 12 meses disponíveis na base</div>
-            </div>
-            <div id="dashStatus" class="status">Pronto</div>
-          </div>
-          <div id="dashError" class="dash-error hide"></div>
-          <div class="chart-wrap">
-            <canvas id="mangaChart"></canvas>
-          </div>
-        </div>
-      </div>
+      <div class="top-tab active" id="tabProdutividade" onclick="switchHomeTab(0)">PRODUTIVIDADE</div>
+      <div class="top-tab" id="tabIrrigacao" onclick="switchHomeTab(1)">IRRIGAÇÃO</div>
     </div>
-  </div>
 
+    <!-- Swipeable Container -->
+    <div class="swipe-container" id="homeSwipeContainer" onscroll="handleHomeScroll()">
 
+      <!-- =========================
+           PAGE 1: PRODUTIVIDADE
+      ========================== -->
+      <div class="swipe-page" id="page-produtividade">
+        <div class="wrap" style="padding-top: 16px;">
+          <div class="dash-hero">
+            <div class="dash-hero-top">
+              <div>
+                <div class="dash-title">Exportação de Manga • Brasil</div>
+                <div class="dash-subtitle">Fonte: HFBRASIL (HORTIFRUTI BRASIL)</div>
+              </div>
+
+              <div class="dash-actions">
+                <button class="btn-secondary" id="btnReloadMango">Atualizar</button>
+              </div>
+            </div>
+
+            <div class="kpi-grid" id="kpiGrid">
+              <div class="kpi-card">
+                <div class="kpi-label">Preço Médio Palmer</div>
+                <div class="kpi-value" id="kpiFobTotal">—</div>
+                <div class="kpi-foot" id="kpiFobFoot">—</div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-label">Preço Médio Tommy</div>
+                <div class="kpi-value" id="kpiKgTotal">—</div>
+                <div class="kpi-foot" id="kpiKgFoot">—</div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-label">Maior Preço (Teto)</div>
+                <div class="kpi-value" id="kpiUsdKg">—</div>
+                <div class="kpi-foot" id="kpiUsdKgFoot">—</div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-label">Melhor Mês (FOB)</div>
+                <div class="kpi-value" id="kpiBestMonth">—</div>
+                <div class="kpi-foot" id="kpiBestMonthFoot">—</div>
+              </div>
+            </div>
+
+            <div class="dash-grid">
+              <div class="dash-card">
+                <div class="dash-card-head">
+                  <div>
+                    <div class="dash-card-title">Evolução Mensal</div>
+                    <div class="dash-card-sub">Últimos 12 meses disponíveis na base</div>
+                  </div>
+                  <div id="dashStatus" class="status">Pronto</div>
+                </div>
+
+                <div id="dashError" class="dash-error hide"></div>
+
+                <div class="chart-wrap">
+                  <canvas id="mangaChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FECHAMENTO DE SAFRA (continua em PRODUTIVIDADE) -->
+        <div class="dash-grid" style="margin-top: 20px;">
+          <div class="dash-card" style="border-top: 4px solid #F57F17;">
+            <div class="dash-card-head">
+              <div>
+                <div class="dash-card-title" style="color: #F57F17; font-size: 1.1rem; font-weight: 700;">
+                  Fechamento de Safra
+                </div>
+                <div class="dash-card-sub">Registre a colheita para gerar os Índices Proprietários de Gestão.</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 15px;">
+              <div class="adim-group">
+                <label class="adim-label" style="font-weight: 600;">Nome do Talhão a Fechar</label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" id="fecha_talhao" list="talhoes_salvos" class="adim-input"
+                    placeholder="Ex: Talhão 01 - Palmer" style="border-color: #ffd54f;">
+                </div>
+              </div>
+
+              <div class="adim-group" style="margin-top: 15px;">
+                <label class="adim-label" style="font-weight: 600;">Qtd. Mangas Estimadas na Árvore</label>
+                <input type="number" id="fecha_mangas_ia" class="adim-input" placeholder="Ex: 85000" step="1">
+                <small class="adim-help">A contagem pode ser fornecida pelo nosso serviço de IA. Contrate-nos.</small>
+              </div>
+
+              <div class="adim-group" style="margin-top: 15px;">
+                <label class="adim-label" style="font-weight: 600; color: #E65100;">Peso Total Colhido (Kg) </label>
+                <input type="number" id="fecha_peso_kg" class="adim-input" placeholder="Ex: 42500" step="0.1"
+                  style="border-color: #ffcc80; background: #fff3e0;">
+                <small class="adim-help">O peso exato que saiu da área para o packing house.</small>
+              </div>
+
+              <button type="button" class="adim-btn" id="btnFecharSafra" onclick="fecharSafra()"
+                style="background: #F57F17; font-weight: bold; margin-top: 20px;">
+                ENCERRAR CICLO E GERAR ÍNDICES
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================
+           HISTÓRICO DE COLHEITAS
+        ========================== -->
+        <div class="dash-grid" style="margin-top: 20px;">
+          <div class="dash-card">
+            <div class="dash-card-head">
+              <div>
+                <div class="dash-card-title">Histórico de Colheitas</div>
+                <div class="dash-card-sub">Últimos fechamentos registrados.</div>
+              </div>
+            </div>
+
+            <!-- FILTROS DO HISTÓRICO DE COLHEITAS -->
+            <div style="display:flex; gap:10px; margin-top:15px; margin-bottom:10px;">
+              <div style="flex:1;">
+                <label class="adim-label" style="font-size:0.8rem; margin-bottom:4px;">Filtrar por Talhão</label>
+                <select id="filtro-historico-talhao" class="adim-input" style="padding:6px; font-size:0.9rem;">
+                  <option value="TODOS">Todos os Talhões</option>
+                  <!-- Popula via JS talhões que existem nos fechamentos -->
+                </select>
+              </div>
+              <div style="flex:1;">
+                <label class="adim-label" style="font-size:0.8rem; margin-bottom:4px;">Período</label>
+                <select id="filtro-historico-periodo" class="adim-input" style="padding:6px; font-size:0.9rem;">
+                  <option value="ALL">Todo o Período</option>
+                  <option value="30">Últimos 30 dias</option>
+                  <option value="90">Últimos 90 dias</option>
+                  <option value="365">Últimos 365 dias</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="fechamentos-empty"
+              style="display:none; text-align:center; color:#777; font-size:.9rem; padding:14px; border:1px dashed #ddd; border-radius:10px;">
+              Nenhum fechamento registrado ainda.
+            </div>
+
+            <div id="fechamentos-list" style="display:flex; flex-direction:column; gap:10px; margin-top:10px;"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- =========================
+           PAGE 2: IRRIGAÇÃO (SUB-ABA DO INÍCIO)
+           - Aqui ficam os resultados do "Boletim Final da Safra"
+      ========================== -->
+      <div class="swipe-page" id="page-irrigacao">
+        <div class="wrap" style="padding-top: 16px;">
+
+          <!-- Container onde os cartões de resultado (IEH, IRE, IAF) aparecerão -->
+          <div id="container-indices-resultado"
+            style="display: none; margin-top: 5px; border-top: 2px dashed #4CAF50; padding-top: 20px;">
+            <h3 style="margin-top:0; color:#2E7D32; text-align:center;">Boletim Final da Safra</h3>
+
+            <div id="boletim-talhao-wrapper"
+              style="text-align:center; font-weight:700; margin-top:-6px; color:#2e7d32; display:flex; flex-direction:column; align-items:center;">
+              <label for="boletim-talhao-select" style="font-size:0.9rem;">Selecione o Talhão/Área:</label>
+              <select id="boletim-talhao-select" class="adim-input"
+                style="width: 80%; text-align:center; margin-top:5px; border-color: #4CAF50;">
+                <option value="">Carregando...</option>
+              </select>
+            </div>
+
+            <div id="boletim-safra" style="text-align:center; font-size:.85rem; color:#666; margin:10px 0 15px;">
+              Safra Oculta (Muda conforme Talhão)
+            </div>
+
+            <div class="kpi-grid" style="grid-template-columns: 1fr 1fr;">
+              <div class="kpi-card" style="background:#e8f4f8; border:1px solid #b3e5fc;">
+                <div class="kpi-label" style="color:#0277bd;">Índice de Efic. Hídrica (IEH)</div>
+                <div class="kpi-value" id="res_ieh" style="color:#01579b; font-size:1.1rem;">—</div>
+                <div class="kpi-foot" style="color:#0288d1;">Litros / Kg produzido</div>
+              </div>
+
+              <div class="kpi-card" style="background:#fbe9e7; border:1px solid #ffccbc;">
+                <div class="kpi-label" style="color:#d84315;">Risco de Estresse (IRE)</div>
+                <div class="kpi-value" id="res_ire" style="color:#bf360c; font-size:1.1rem;">—</div>
+                <div class="kpi-foot" style="color:#d84315;">No enchimento</div>
+              </div>
+
+              <div class="kpi-card" style="background:#f1f8e9; border:1px solid #c5e1a5;">
+                <div class="kpi-label" style="color:#558b2f;">Adequação Fenol. (IAF)</div>
+                <div class="kpi-value" id="res_iaf" style="color:#33691e; font-size:1.1rem;">—</div>
+                <div class="kpi-foot" style="color:#558b2f;">Fase de PBZ</div>
+              </div>
+
+              <div class="kpi-card" style="background:#fff8e1; border:1px solid #ffe082;">
+                <div class="kpi-label" style="color:#f57f17; font-weight:bold;">SCORE FINAL</div>
+                <div class="kpi-value" id="res_score" style="color:#e65100; font-size:1.3rem;">—</div>
+                <div class="kpi-foot" style="color:#f57f17;">De 0 a 100</div>
+              </div>
+            </div>
+
+            <!-- HISTÓRICO -->
+            <div id="historico-irrigacao-box" style="margin-top:18px;">
+              <h4 style="margin: 0 0 10px; color:#333;">Últimas irrigações</h4>
+
+              <div id="historico-irrigacao-empty"
+                style="display:none; text-align:center; color:#777; font-size:.9rem; padding:14px; border:1px dashed #ddd; border-radius:10px;">
+                Nenhuma irrigação registrada ainda para este talhão.
+              </div>
+
+              <div id="historico-irrigacao-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /swipe-container -->
+  </div><!-- /dashboard-screen -->
+
+  <!-- =========================
+       CHAT
+  ========================== -->
   <div id="chat-screen" class="chat-frame-container hide">
     <div class="chat-header">
       <button onclick="nav('dashboard-screen')" class="chat-header-btn">← Voltar</button>
@@ -157,47 +368,167 @@
         <div class="chat-header-status">Online</div>
       </div>
     </div>
+
     <div class="chat-messages" id="chatMessages">
       <div class="chat-empty-state">
         <div class="chat-empty-state-icon">💬</div>
         <div class="chat-empty-state-text">Olá! Sou seu assistente virtual. Como posso ajudá-lo hoje?</div>
       </div>
     </div>
+
     <div class="chat-input-container">
       <input type="text" id="chatInput" class="chat-input" placeholder="Digite sua mensagem..." autocomplete="off" />
       <button id="chatSendBtn" class="chat-send-btn" title="Enviar mensagem">→</button>
     </div>
   </div>
 
-  <div id="perfil-screen" class="wrap hide">
-    <div class="profile-header card">
+  <!-- =========================
+       SIDEBAR
+  ========================== -->
+  <div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <div id="perfil-sidebar" class="sidebar">
+    <div class="sidebar-header">
       <img src="logo.png?v=7" alt="Foto de Perfil" class="profile-pic">
       <div class="profile-info">
         <div class="profile-name">CyberAgro</div>
         <div class="profile-subtitle">cyberagro.contato@gmail.com</div>
       </div>
     </div>
-    <div class="menu-list card">
-      <a href="#" class="menu-item" id="navMeusDados"><span class="menu-icon">👤</span> <span>Meus Dados</span> <span
-          class="menu-chevron">&gt;</span></a>
-      <a href="#" class="menu-item" id="navConfig"><span class="menu-icon">⚙️</span> <span>Configurações</span> <span
-          class="menu-chevron">&gt;</span></a>
-      <a href="#" class="menu-item danger" id="navSair"><span class="menu-icon">🚪</span> <span>Sair</span> <span
-          class="menu-chevron">&gt;</span></a>
+
+    <div class="menu-list">
+      <a href="#" class="sidebar-menu-item" id="navMeusDados">
+        <span class="menu-icon">👤</span> <span>Meus Dados</span>
+      </a>
+      <a href="#" class="sidebar-menu-item" id="navConfig">
+        <span class="menu-icon">⚙️</span> <span>Configurações</span>
+      </a>
+      <a href="#" class="sidebar-menu-item danger" id="navSair">
+        <span class="menu-icon">🚪</span> <span>Sair</span>
+      </a>
     </div>
   </div>
 
+  <!-- =========================
+       CALCULADORA (TELA SEPARADA DO RODAPÉ)
+  ========================== -->
   <div id="irrigacao-screen" class="wrap hide">
     <div id="adim-widget" style="font-family: sans-serif; background-color: #fff; padding: 20px; border-radius: 10px;">
 
-      
+      <h3 style="color:#2E7D32; margin-top:0;">Calculadora de Rega</h3>
 
-      <h3 style="color:#2E7D32; margin-top:0;">Calculadora de Rega </h3>
+      <!-- Identificação do Talhão (Editável + Memória) -->
+      <div class="adim-group"
+        style="background: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #c8e6c9; margin-bottom: 20px;">
+        <label class="adim-label" style="color: #2E7D32; font-weight: bold; font-size: 1rem;">
+          Nome do Talhão / Área
+        </label>
+
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="nome_talhao" list="talhoes_salvos" class="adim-input"
+            placeholder="Ex: Talhão 01 - Palmer" style="border-color: #a5d6a7; font-weight: 600; flex: 1;">
+          <datalist id="talhoes_salvos">
+            <!-- As opções serão injetadas via Javascript (localStorage) -->
+          </datalist>
+        </div>
+
+        <small style="display: block; color: #4CAF50; margin-top: 5px; font-size: 0.8rem;">
+          Digite um novo nome ou escolha um da lista. Obrigatório para o histórico.
+        </small>
+      </div>
 
       <div class="adim-group">
-        <label class="adim-label">ETo de Ontem (mm/dia)</label>
-        <input type="number" id="eto" class="adim-input" placeholder="Ex: 6.0" step="0.1">
-        <small class="adim-help" id="eto-source-msg">Insira o dado do INMET ou Rádio.</small>
+        <label class="adim-label">Fonte de ETo (mm/dia)</label>
+
+        <!-- Seletor que abre o Modal -->
+        <div class="eto-selector" onclick="openEtoModal()">
+          <div style="flex: 1;">
+            <div style="font-size: 0.85rem; color: #666; font-weight: 500;">Método Selecionado</div>
+            <div id="eto-selected-text" style="font-weight: 700; font-size: 1.05rem; color: #2E7D32; margin-top: 2px;">
+              ✍️ Calcular Manualmente
+            </div>
+          </div>
+          <div style="color: #28a745;">▼</div>
+        </div>
+
+        <!-- Input manual (padrão) -->
+        <div id="eto-manual-input-container" style="margin-top: 12px;">
+          <input type="number" id="eto" class="adim-input" placeholder="Ex: 6.0" step="0.1">
+          <small class="adim-help" id="eto-source-msg">Insira o ETo atual do seu pomar.</small>
+        </div>
+
+        <!-- Inputs da Estação Própria (escondido por padrão) -->
+        <div id="eto-propria-input-container"
+          style="margin-top: 12px; display: none; background: #f9fbfd; padding: 15px; border-radius: 8px; border: 1px solid #e1e5eb;">
+          <h4 style="margin-top: 0; color: #2E7D32; font-size: 0.95rem;">Dados Climáticos Locais</h4>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label class="adim-label" style="font-size: 0.8rem;">Temp. Máxima (°C)</label>
+              <input type="number" id="ep_tmax" class="adim-input" placeholder="Ex: 35.2" step="0.1">
+            </div>
+            <div>
+              <label class="adim-label" style="font-size: 0.8rem;">Temp. Mínima (°C)</label>
+              <input type="number" id="ep_tmin" class="adim-input" placeholder="Ex: 22.1" step="0.1">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label class="adim-label" style="font-size: 0.8rem;">Umidade Média (%)</label>
+              <input type="number" id="ep_ur" class="adim-input" placeholder="Ex: 60" step="1">
+            </div>
+            <div>
+              <label class="adim-label" style="font-size: 0.8rem;">Vento (km/h)</label>
+              <input type="number" id="ep_vento" class="adim-input" placeholder="Ex: 8.5" step="0.1">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label class="adim-label" style="font-size: 0.8rem;">Chuva (mm)</label>
+              <input type="number" id="ep_chuva" class="adim-input" placeholder="Ex: 12.5" step="0.1">
+            </div>
+            <div>
+              <label class="adim-label" style="font-size: 0.8rem;">Altitude (m)</label>
+              <input type="number" id="ep_alt" class="adim-input" value="376" step="1">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label class="adim-label" style="font-size: 0.8rem;">Data da Medição</label>
+            <input type="date" id="ep_data" class="adim-input">
+          </div>
+
+          <button type="button" class="adim-btn" onclick="calcularEtoEstacaoPropria()"
+            style="background: #007bff; margin-bottom: 5px;">
+            CALCULAR ETO DA ESTAÇÃO
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Bottom Sheet para as opções de ETo -->
+      <div class="sidebar-overlay" id="eto-modal-overlay" onclick="closeEtoModal()"></div>
+      <div class="bottom-sheet" id="eto-bottom-sheet">
+        <div class="bottom-sheet-drag"></div>
+        <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.1rem; color: #333; text-align: center;">
+          Escolha a Fonte do ETo
+        </h3>
+
+        <div class="eto-options-grid">
+          <div class="eto-option-btn active" id="btnEtoManual" onclick="selectEtoOption('manual')">
+            <div class="eto-icon">✍️</div>
+            <div class="eto-title">Calcular<br>Manualmente</div>
+          </div>
+          <div class="eto-option-btn" id="btnEtoPropria" onclick="selectEtoOption('propria')">
+            <div class="eto-icon">📡</div>
+            <div class="eto-title">Estação<br>Própria</div>
+          </div>
+          <div class="eto-option-btn" id="btnEtoIFSertao" onclick="selectEtoOption('ifsertao')">
+            <div class="eto-icon">🏫</div>
+            <div class="eto-title">IFSertão - Campus<br>Zona Rural</div>
+          </div>
+        </div>
       </div>
 
       <div class="adim-group">
@@ -245,10 +576,12 @@
       <div style="margin-top: 10px;">
         <details>
           <summary style="color: #666; cursor: pointer; font-size: 0.9rem;">Configurações Avançadas</summary>
+
           <div class="adim-group" style="margin-top: 10px;">
             <label class="adim-label">% Área Molhada (Pm)</label>
             <input type="number" id="pm" class="adim-input" value="85" step="1">
           </div>
+
           <div class="adim-group">
             <label class="adim-label">Eficiência (%) & Lixiviação</label>
             <div style="display: flex; gap: 10px;">
@@ -263,38 +596,57 @@
 
       <div id="adim-results" class="adim-result-box">
         <div class="adim-big-res">
-          Tempo de Rega:
-          <span id="out-tempo">--</span>
+          Tempo de Rega Recomendado:
+          <span id="out-tempo" style="display: block; font-size: 1.5rem; margin-top: 5px;">--</span>
         </div>
 
-        <div style="margin-top: 15px;">
+        <div style="margin-top: 15px; font-size: 0.9rem;">
           <div class="adim-row"><span>Volume por Planta:</span> <strong id="out-vol">-</strong></div>
-          <div class="adim-row"><span>Fase Identificada:</span> <strong id="out-fase-desc"
-              style="font-size: 0.9em;">-</strong></div>
+          <div class="adim-row"><span>Fase Identificada:</span> <strong id="out-fase-desc">-</strong></div>
           <div class="adim-row"><span>Kc Calculado:</span> <strong id="out-kc">-</strong></div>
           <div class="adim-row"><span>ETo Usada:</span> <strong id="out-eto-usada">-</strong></div>
         </div>
+
+        <!-- Confirmação e Salvamento -->
+        <hr style="border: 0; border-top: 1px dashed #ccc; margin: 20px 0;">
+
+        <div class="adim-group" style="margin-bottom: 20px;">
+          <label class="adim-label" style="color: #d32f2f; font-weight: bold;">Tempo Realmente Irrigado
+            (Minutos)</label>
+          <input type="number" id="tempo_real" class="adim-input" placeholder="Ex: 120" step="1"
+            style="border-color: #ef9a9a; background: #fff8f8;">
+          <small class="adim-help" style="color: #666;">O quanto a bomba efetivamente ficou ligada hoje.</small>
+        </div>
+
+        <button type="button" class="adim-btn" id="btnSalvarIrrigacao" onclick="salvarHistoricoIrrigacao()"
+          style="background: #2E7D32; font-weight: bold; font-size: 1.05rem; box-shadow: 0 4px 6px rgba(46, 125, 50, 0.3);">
+          CONFIRMAR E SALVAR IRRIGAÇÃO
+        </button>
       </div>
 
-      
     </div>
   </div>
 
+  <!-- =========================
+       FOOTER NAV
+  ========================== -->
   <div class="app-footer">
     <a onclick="nav('dashboard-screen')" class="footer-btn active">Início</a>
-    <a onclick="nav('irrigacao-screen')" class="footer-btn">Irrigação</a>
-    <a onclick="nav('perfil-screen')" class="footer-btn">Perfil</a>
+    <a onclick="nav('irrigacao-screen')" class="footer-btn">Calculadora</a>
   </div>
 
+  <!-- =========================
+       CHAT FAB
+  ========================== -->
   <button id="btnChat" class="chat-fab" onclick="nav('chat-screen')">
     <img src="imagem2.png" alt="Chat">
   </button>
 
-  
+  <!-- =========================
+       VITE MODULE SCRIPT
+  ========================== -->
+  <script type="module" src="/src/main.js"></script>
 
-  <!-- Inicialização Isolada do Firebase (Parâmetros no .env) -->
-    
-    <!-- Vite Module Script -->
-    <script type="module" src="/src/main.js"></script>
-  </body>
+</body>
+
 </html>
