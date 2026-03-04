@@ -108,7 +108,7 @@ async function calcularEtoIFSertao() {
     // Calcular chuva somando TODA a coluna "chuv_total" do arquivo
     let totalChuvaArquivo = 0;
     rows.forEach(r => {
-      totalChuvaArquivo += parseFloat(r.chuv_total) || 0;
+      totalChuvaArquivo += corrigirDecimalExcel(r.chuv_total) || 0;
     });
     let maxT = -999, minT = 999;
     let sumTempExt = 0, sumUmid = 0, sumVento = 0, sumPress = 0, sumRad = 0;
@@ -137,7 +137,7 @@ async function calcularEtoIFSertao() {
       const press_ar = corrigirDecimalExcel(r.press_ar);
       const umid_ext = parseFloat(r.umid_ext);
       const rad_solar = parseFloat(r.rad_solar);
-      const chuv_total = parseFloat(r.chuv_total) || 0;
+      const chuv_total = corrigirDecimalExcel(r.chuv_total) || 0;
 
       if (temp_ext !== null) {
         sumTempExt += temp_ext;
