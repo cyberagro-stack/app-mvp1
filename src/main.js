@@ -104,6 +104,12 @@ async function calcularEtoIFSertao() {
     // 3. Organiza/Filtra
     let somaChuva = 0;
     let count = 0;
+
+    // Calcular chuva somando TODA a coluna "chuv_total" do arquivo
+    let totalChuvaArquivo = 0;
+    rows.forEach(r => {
+      totalChuvaArquivo += parseFloat(r.chuv_total) || 0;
+    });
     let maxT = -999, minT = 999;
     let sumTempExt = 0, sumUmid = 0, sumVento = 0, sumPress = 0, sumRad = 0;
 
@@ -180,7 +186,7 @@ async function calcularEtoIFSertao() {
 
     // 6. Prepara envio
     const finalEto = isNaN(eto) ? 0 : parseFloat(eto.toFixed(2));
-    const finalChuva = parseFloat(somaChuva.toFixed(2));
+    const finalChuva = parseFloat(totalChuvaArquivo.toFixed(2));
 
     etoDoArquivo = finalEto;
     document.getElementById('eto').value = finalEto;
