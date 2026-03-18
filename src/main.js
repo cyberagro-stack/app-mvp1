@@ -871,6 +871,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const dashboardScreen = document.getElementById("dashboard-screen");
   const irrigacaoScreen = document.getElementById("irrigacao-screen");
   const chatScreen = document.getElementById("chat-screen");
+  const mercadoScreen = document.getElementById("mercado-screen");
 
   // Elementos UI
   const appFooter = document.querySelector(".app-footer");
@@ -888,13 +889,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Navegação Centralizada
   function nav(telaId) {
     // Esconde todas as telas
-    const telas = [loginScreen, registerScreen, selecaoCulturaScreen, dashboardScreen, irrigacaoScreen, chatScreen];
+    const telas = [loginScreen, registerScreen, selecaoCulturaScreen, dashboardScreen, irrigacaoScreen, chatScreen, mercadoScreen];
     telas.forEach(s => { if (s) s.classList.add('hide'); });
 
     // Mostra a tela desejada
     const telaAtual = document.getElementById(telaId);
     telaAtual.classList.remove('hide');
-    telaAtual.style.display = (telaId === 'chat-screen' || telaId === 'dashboard-screen') ? 'flex' : 'block';
+    telaAtual.style.display = (telaId === 'chat-screen' || telaId === 'dashboard-screen' || telaId === 'mercado-screen') ? 'flex' : 'block';
 
     // Lógica Rodapé/Chat
     if (telaId === 'login-screen' || telaId === 'register-screen' || telaId === 'selecao-cultura-screen') {

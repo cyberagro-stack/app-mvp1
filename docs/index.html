@@ -8,7 +8,7 @@
   <title>CyberAgro</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FFFFFF">
-  <script type="module" crossorigin src="./assets/index-Csvw9fuQ.js"></script>
+  <script type="module" crossorigin src="./assets/index-Cq1wsaV8.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-vZheArP7.css">
 </head>
 
@@ -145,62 +145,6 @@
       ========================== -->
       <div class="swipe-page" id="page-produtividade">
         <div class="wrap" style="padding-top: 16px;">
-          <div class="dash-hero">
-            <div class="dash-hero-top">
-              <div>
-                <div class="dash-title">Mercado de Manga • Brasil</div>
-                <div class="dash-subtitle">Fonte: HFBRASIL (HORTIFRUTI BRASIL)</div>
-              </div>
-
-              <div class="dash-actions">
-                <button class="btn-secondary" id="btnReloadMango">Atualizar</button>
-              </div>
-            </div>
-
-            <div class="kpi-grid" id="kpiGrid">
-              <div class="kpi-card">
-                <div class="kpi-label">Preço Médio Palmer</div>
-                <div class="kpi-value" id="kpiFobTotal">—</div>
-                <div class="kpi-foot" id="kpiFobFoot">—</div>
-              </div>
-
-              <div class="kpi-card">
-                <div class="kpi-label">Preço Médio Tommy</div>
-                <div class="kpi-value" id="kpiKgTotal">—</div>
-                <div class="kpi-foot" id="kpiKgFoot">—</div>
-              </div>
-
-              <div class="kpi-card">
-                <div class="kpi-label">Maior Preço (Teto)</div>
-                <div class="kpi-value" id="kpiUsdKg">—</div>
-                <div class="kpi-foot" id="kpiUsdKgFoot">—</div>
-              </div>
-
-              <div class="kpi-card">
-                <div class="kpi-label">Melhor Mês (FOB)</div>
-                <div class="kpi-value" id="kpiBestMonth">—</div>
-                <div class="kpi-foot" id="kpiBestMonthFoot">—</div>
-              </div>
-            </div>
-
-            <div class="dash-grid">
-              <div class="dash-card">
-                <div class="dash-card-head">
-                  <div>
-                    <div class="dash-card-title">Evolução Mensal</div>
-                    <div class="dash-card-sub">Últimos 12 meses disponíveis na base</div>
-                  </div>
-                  <div id="dashStatus" class="status">Pronto</div>
-                </div>
-
-                <div id="dashError" class="dash-error hide"></div>
-
-                <div class="chart-wrap">
-                  <canvas id="mangaChart"></canvas>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- FECHAMENTO DE SAFRA (continua em PRODUTIVIDADE) -->
@@ -360,6 +304,85 @@
   </div><!-- /dashboard-screen -->
 
   <!-- =========================
+       MERCADO
+  ========================== -->
+  <div id="mercado-screen" class="hide"
+    style="height: 100%; display: flex; flex-direction: column; overflow: hidden; background-color: #f7f9fc;">
+    <div class="top-tabs">
+      <div class="hamburger-btn" onclick="openSidebar()" aria-label="Menu">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </div>
+      <div class="top-tab active" style="flex:1; text-align: left; padding-left: 10px; cursor: default;">MERCADO</div>
+    </div>
+
+    <div style="flex: 1; overflow-y: auto; padding-bottom: 80px;">
+      <div class="wrap" style="padding-top: 16px;">
+        <div class="dash-hero">
+          <div class="dash-hero-top">
+            <div>
+              <div class="dash-title">Mercado de Manga • Brasil</div>
+              <div class="dash-subtitle">Fonte: HFBRASIL (HORTIFRUTI BRASIL)</div>
+            </div>
+
+            <div class="dash-actions">
+              <button class="btn-secondary" id="btnReloadMango">Atualizar</button>
+            </div>
+          </div>
+
+          <div class="kpi-grid" id="kpiGrid">
+            <div class="kpi-card">
+              <div class="kpi-label">Preço Médio Palmer</div>
+              <div class="kpi-value" id="kpiFobTotal">—</div>
+              <div class="kpi-foot" id="kpiFobFoot">—</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-label">Preço Médio Tommy</div>
+              <div class="kpi-value" id="kpiKgTotal">—</div>
+              <div class="kpi-foot" id="kpiKgFoot">—</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-label">Maior Preço (Teto)</div>
+              <div class="kpi-value" id="kpiUsdKg">—</div>
+              <div class="kpi-foot" id="kpiUsdKgFoot">—</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-label">Melhor Mês (FOB)</div>
+              <div class="kpi-value" id="kpiBestMonth">—</div>
+              <div class="kpi-foot" id="kpiBestMonthFoot">—</div>
+            </div>
+          </div>
+
+          <div class="dash-grid">
+            <div class="dash-card">
+              <div class="dash-card-head">
+                <div>
+                  <div class="dash-card-title">Evolução Mensal</div>
+                  <div class="dash-card-sub">Últimos 12 meses disponíveis na base</div>
+                </div>
+                <div id="dashStatus" class="status">Pronto</div>
+              </div>
+
+              <div id="dashError" class="dash-error hide"></div>
+
+              <div class="chart-wrap">
+                <canvas id="mangaChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================
        CHAT
   ========================== -->
   <div id="chat-screen" class="chat-frame-container hide">
@@ -404,6 +427,10 @@
       </a>
       <a href="#" class="sidebar-menu-item" id="navConfig">
         <span class="menu-icon">⚙️</span> <span>Configurações</span>
+      </a>
+      <a href="#" class="sidebar-menu-item" id="navMercado"
+        onclick="closeSidebar(); nav('mercado-screen'); return false;">
+        <span class="menu-icon">📈</span> <span>Mercado</span>
       </a>
       <a href="#" class="sidebar-menu-item danger" id="navSair">
         <span class="menu-icon">🚪</span> <span>Sair</span>
